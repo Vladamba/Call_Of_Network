@@ -1,0 +1,7 @@
+﻿  main.cpp
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(7,15): warning C4930: 'sf::RenderWindow window(void)': prototyped function not called (was a variable definition intended?)
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 1 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Client.vcxproj -> C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\x64\Release\Client.exe
