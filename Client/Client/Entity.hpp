@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "Animation.hpp"
 #include "Level.hpp"
+#include <vector>
 
 using namespace sf;
 
@@ -29,7 +30,7 @@ public:
 		dx = dy = timer = timerEnd = 0;
 	}
 
-	//virtual void update(float time) = 0;
+	virtual void update(float time) = 0;
 
 	void draw(RenderWindow& window)
 	{

@@ -22,7 +22,7 @@ public:
 		option("Player", 0, 100, "stand");
 		state = State::stand; 
 		hit = false;
-		objects = Level::getAllObjects();
+		objects = lev.getAllObjects();
 	}
 
 	void updateKeyboard()

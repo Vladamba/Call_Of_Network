@@ -26,9 +26,6 @@
     <ClInclude Include="Animation.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="tinyxml2.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -36,6 +33,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Player.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

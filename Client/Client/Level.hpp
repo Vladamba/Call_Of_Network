@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "tinyxml2.h"
+#include <vector>
 
 using namespace sf;
 using namespace tinyxml2;
@@ -15,7 +16,6 @@ public:
     Rect<float> rect;
     std::map<const char*, const char*> properties;
     Sprite sprite;
-
 
     int getPropertyInt(const char* name)
     {
@@ -39,27 +39,28 @@ struct Layer
     std::vector<Sprite> tiles;
 };
 
-static class Level
+class Level
 {
 public://private
     int width, height, tileWidth, tileHeight;
     int firstTileID;
     Rect<float> drawingBounds;
     Texture tilesetImage;
-    static std::vector<Object> objects;
+    std::vector<Object> objects;
     std::vector<Layer> layers;
 
-    bool loadFromFile(const char* fileName)
-    {
-        XMLDocument levelFile = new XMLDocument();
+    bool loadFromXML(const char* fileName)
+    {       
+        XMLDocument levelFile;
 
-        if (!levelFile.LoadFile(fileName))
+        //levelFile.LoadFile(fileName);
+        if (levelFile.LoadFile(fileName) != XML_SUCCESS)
         {
-            //std::cout << "Loading level \"" << filename << "\" failed." << std::endl;
+            printf("Loading level failed.");
             return false;
         }
 
-        XMLElement* map;
+        XMLElement* map;       
         map = levelFile.FirstChildElement("map");
 
         width = atoi(map->Attribute("width"));
@@ -78,7 +79,7 @@ public://private
         Image image;
         if (!image.loadFromFile(imagePath))
         {
-            //std::cout << "Failed to load tile sheet." << std::endl;
+            printf("Failed to load tile sheet.");
             return false;
         }
 
@@ -125,7 +126,7 @@ public://private
 
             if (layerDataElement == NULL)
             {
-                // std::cout << "Bad map. No layer information found." << std::endl;
+                printf("Bad map. No layer information found.");
                 return false;
             }
             
@@ -134,7 +135,7 @@ public://private
 
             if (tileElement == NULL)
             {
-                //std::cout << "Bad map. No tile information found." << std::endl;
+                printf("Bad map. No tile information found.");
                 return false;
             }
 
@@ -185,16 +186,16 @@ public://private
 
                 while (objectElement)
                 {
-                    const char* objectType;
+                    const char* objectType = "";
                     if (objectElement->Attribute("type") != NULL)
                     {
                         objectType = objectElement->Attribute("type");
                     }
-                    const char* objectName;
+                    const char* objectName = "";                    
                     if (objectElement->Attribute("name") != NULL)
                     {
                         objectName = objectElement->Attribute("name");
-                    }
+                    }                    
                     int x = atoi(objectElement->Attribute("x"));
                     int y = atoi(objectElement->Attribute("y"));
 
@@ -218,7 +219,7 @@ public://private
                     }
 
                     Object object;
-                    object.name = objectName;
+                    object.name = objectName;                    
                     object.type = objectType;
                     object.sprite = sprite;
 
@@ -248,8 +249,8 @@ public://private
                             }
                         }
                     }
-
                     objects.push_back(object);
+                    printf("%s", objects[objects.size() - 1].name);
 
                     objectElement = objectElement->NextSiblingElement("object");
                 }
@@ -258,7 +259,7 @@ public://private
         }
         else
         {
-            //std::cout << "No object layers found..." << std::endl;
+            printf("No object layers found...");
         }
 
         return true;
@@ -267,19 +268,23 @@ public://private
 
     Object getObject(const char* name)
     {
-        // Только первый объект с заданным именем
-        for (int i = 0; i < objects.size(); i++)
-        {
+        // Только первый объект с заданным именем        
+        int i;
+        for (i = 0; i < objects.size()-5; i++)
+        {            
+            printf("%s",objects[i].name);
             if (objects[i].name == name)
             {
-                return objects[i];
+                printf("huy3");
+                break;              
             }                
-        }            
+        }         
+        return objects[20];
     }
 
     std::vector<Object> getObjects(const char* name)
     {
-        // Все объекты с заданным именем
+        // Все объекты с заданным именем        
         std::vector<Object> vec;
         for (int i = 0; i < objects.size(); i++)
         {
@@ -291,8 +296,8 @@ public://private
         return vec;
     }
 
-    static std::vector<Object> getAllObjects()
-    {
+    std::vector<Object> getAllObjects()
+    {        
         return objects;
     }
 

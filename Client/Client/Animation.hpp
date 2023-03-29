@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "tinyxml2.h"
+#include <vector>
 
 using namespace sf;
 using namespace tinyxml2;
@@ -18,6 +19,7 @@ public:
 	Animation()
 	{		
 		currentFrame = 0;
+		loop = false;
 		flip = false;
 		isPlaying = true;	
 	}
@@ -58,19 +60,19 @@ public:
 	const char* currentAnimation;
 	std::map<const char*, Animation> animationList;
 
-	AnimationManager()
-	{
-	}
-
 	~AnimationManager()
 	{
 		animationList.clear();
 	}
 
-	void loadFromXML(const char* fileName, Texture& t)
+	bool loadFromXML(const char* fileName, Texture& t)
 	{
-		XMLDocument animationFile = new XMLDocument();
-		animationFile.LoadFile(fileName);		
+		XMLDocument animationFile;
+		if (animationFile.LoadFile(fileName) != XML_SUCCESS)
+		{
+			printf("Loading animation failed!");
+			return false;
+		}
 
 		XMLElement* head;
 		head = animationFile.FirstChildElement("sprites");
@@ -103,6 +105,7 @@ public:
 			animationList[currentAnimation] = a;
 			animationElement = animationElement->NextSiblingElement("animation");
 		}
+		return true;
 	}
 
 	void draw(RenderWindow& window, int x, int y)
