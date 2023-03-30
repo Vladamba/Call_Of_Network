@@ -14,16 +14,12 @@ using namespace sf;
 
 int main()
 {
-	///////////// инициализация ///////////////////////////
 	RenderWindow window(VideoMode(450, 280), "The Game!");
 
 	View view(FloatRect(0, 0, 450, 280));
 
-	Level lvl;	
-	if (!lvl.loadFromXML("files\\Level1.tmx"))
-	{
-		return 1;
-	}
+	Level lvl;
+	lvl.loadFromXML("files\\Level1.tmx");
 	
 	Texture enemy_t, moveplatform_t, megaman_t, bullet_t, bg;
 	bg.loadFromFile("files/images/bg.png");

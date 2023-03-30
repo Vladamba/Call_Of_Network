@@ -3,34 +3,15 @@
 
 #include <SFML/Graphics.hpp>
 #include "tinyxml2.h"
-#include <vector>
 
 using namespace sf;
 using namespace tinyxml2;
 
-class Object
+struct Object
 {
-public:
-    const char* name;
-    const char* type;
+    std::string name;
     Rect<float> rect;
-    std::map<const char*, const char*> properties;
     Sprite sprite;
-
-    int getPropertyInt(const char* name)
-    {
-        return atoi(properties[name]);
-    }
-
-    float getPropertyFloat(const char* name)
-    {
-        return strtof(properties[name], NULL);
-    }
-
-    const char* getPropertyString(const char* name)
-    {
-        return properties[name];
-    }
 };
 
 struct Layer
@@ -185,17 +166,7 @@ public://private
                 objectElement = objectGroupElement->FirstChildElement("object");
 
                 while (objectElement)
-                {
-                    const char* objectType = "";
-                    if (objectElement->Attribute("type") != NULL)
-                    {
-                        objectType = objectElement->Attribute("type");
-                    }
-                    const char* objectName = "";                    
-                    if (objectElement->Attribute("name") != NULL)
-                    {
-                        objectName = objectElement->Attribute("name");
-                    }                    
+                {                                    
                     int x = atoi(objectElement->Attribute("x"));
                     int y = atoi(objectElement->Attribute("y"));
 
@@ -219,8 +190,7 @@ public://private
                     }
 
                     Object object;
-                    object.name = objectName;                    
-                    object.type = objectType;
+                    object.name = objectElement->Attribute("name");
                     object.sprite = sprite;
 
                     Rect<float> objectRect;
@@ -230,27 +200,8 @@ public://private
                     objectRect.width = width;
                     object.rect = objectRect;
 
-                    XMLElement* properties;
-                    properties = objectElement->FirstChildElement("properties");
-                    if (properties != NULL)
-                    {
-                        XMLElement* property;
-                        property = properties->FirstChildElement("property");
-                        if (property != NULL)
-                        {
-                            while (property)
-                            {
-                                const char* propertyName = property->Attribute("name");
-                                const char* propertyValue = property->Attribute("value");
-
-                                object.properties[propertyName] = propertyValue;
-
-                                property = property->NextSiblingElement("property");
-                            }
-                        }
-                    }
                     objects.push_back(object);
-                    printf("%s", objects[objects.size() - 1].name);
+                    //printf("%s", objects[objects.size() - 1].name);
 
                     objectElement = objectElement->NextSiblingElement("object");
                 }
@@ -266,23 +217,22 @@ public://private
     }
 
 
-    Object getObject(const char* name)
+    Object getObject(std::string name)
     {
         // Только первый объект с заданным именем        
         int i;
-        for (i = 0; i < objects.size()-5; i++)
-        {            
-            printf("%s",objects[i].name);
+        for (i = 0; i < objects.size(); i++)
+        {                      
             if (objects[i].name == name)
             {
                 printf("huy3");
                 break;              
             }                
         }         
-        return objects[20];
+        return objects[i];
     }
 
-    std::vector<Object> getObjects(const char* name)
+    std::vector<Object> getObjects(std::string name)
     {
         // Все объекты с заданным именем        
         std::vector<Object> vec;

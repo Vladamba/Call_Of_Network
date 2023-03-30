@@ -26,7 +26,7 @@
   <cut w="31" x="381" y="464" h="44" row="1" col="1"/>
   <cut w="30" x="414" y="463" h="45" row="1" col="1"/>
  </animation>
- <animation title="duck" delay="150">
+ <animation title="crawl" delay="150">
   <cut w="32" x="242" y="335" h="31" row="1" col="1"/>
  </animation>
  <animation title="shoot" delay="150">
@@ -61,7 +61,7 @@
 
   <cut w="-30" x="241" y="388" h="53" row="1" col="1"/>
  </animation>
- <animation title="stay" delay="150">
+ <animation title="stand" delay="150">
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
@@ -75,7 +75,7 @@
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
  </animation>
- <animation title="walk" delay="150">
+ <animation title="run" delay="150">
   <cut w="27" x="84" y="575" h="40" row="1" col="1"/>
   <cut w="23" x="119" y="574" h="41" row="1" col="1"/>
   <cut w="31" x="150" y="574" h="41" row="1" col="1"/>

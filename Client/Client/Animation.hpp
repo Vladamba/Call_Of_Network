@@ -57,18 +57,18 @@ public:
 class AnimationManager
 {
 public:
-	const char* currentAnimation;
-	std::map<const char*, Animation> animationList;
+	std::string currentAnimation;
+	std::map<std::string, Animation> animationList;
 
 	~AnimationManager()
 	{
 		animationList.clear();
 	}
 
-	bool loadFromXML(const char* fileName, Texture& t)
+	bool loadFromXML(std::string fileName, Texture& t)
 	{
 		XMLDocument animationFile;
-		if (animationFile.LoadFile(fileName) != XML_SUCCESS)
+		if (animationFile.LoadFile(fileName.c_str()) != XML_SUCCESS)
 		{
 			printf("Loading animation failed!");
 			return false;
