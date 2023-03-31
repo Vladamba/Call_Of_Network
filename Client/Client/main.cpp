@@ -93,11 +93,11 @@ int main()
 		}
 
 
-		if (Keyboard::isKeyPressed(Keyboard::Left)) Mario.key["L"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Right)) Mario.key["R"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Up)) Mario.key["Up"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Down)) Mario.key["Down"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Space)) Mario.key["Space"] = true;
+		if (Keyboard::isKeyPressed(Keyboard::Left)) Mario.keys["L"] = true;
+		if (Keyboard::isKeyPressed(Keyboard::Right)) Mario.keys["R"] = true;
+		if (Keyboard::isKeyPressed(Keyboard::Up)) Mario.keys["Up"] = true;
+		if (Keyboard::isKeyPressed(Keyboard::Down)) Mario.keys["Down"] = true;
+		if (Keyboard::isKeyPressed(Keyboard::Space)) Mario.keys["Space"] = true;
 
 
 		for (it = entities.begin(); it != entities.end();)

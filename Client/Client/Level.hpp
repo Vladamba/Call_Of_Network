@@ -9,89 +9,55 @@ using namespace tinyxml2;
 
 struct Object
 {
-    std::string type;
+    std::string name;
     IntRect rect;
 };
 
 struct Layer
 {
-    int opacity;
     std::vector<Sprite> tiles;
+    int opacity;
 };
 
 class Level
 {
 public:
+    Texture texture;
     int width, height, tileWidth, tileHeight;
-    int firstTileID;
-    Rect<float> drawingBounds;
-    Texture tilesetImage;
+    FloatRect drawingBounds;
     std::vector<Object> objects;
     std::vector<Layer> layers;
 
-    Level(const char* fileName, Texture& t)
-    {       
+    Level(const char* image, const char* file)
+    {
+        if (!texture.loadFromFile(image))
+        {
+            printf("Loading level image failed!");
+        }
+        texture.setSmooth(false);
+
         XMLDocument levelFile;
-        if (levelFile.LoadFile(fileName) != XML_SUCCESS)
+        if (!levelFile.LoadFile(file))
         {
-            printf("Loading level failed.");
+            printf("Loading level file failed.");
         }
 
-        XMLElement* map;       
-        map = levelFile.FirstChildElement("map");
+        XMLElement* mapElement;       
+        mapElement = levelFile.FirstChildElement("map");
 
-        width = atoi(map->Attribute("width"));
-        height = atoi(map->Attribute("height"));
-        tileWidth = atoi(map->Attribute("tilewidth"));
-        tileHeight = atoi(map->Attribute("tileheight"));
-
-        XMLElement* tilesetElement;
-        tilesetElement = map->FirstChildElement("tileset");
-        firstTileID = atoi(tilesetElement->Attribute("firstgid"));
-        
-        XMLElement* imageElement;
-        imageElement = tilesetElement->FirstChildElement("image");
-        const char* imagePath = imageElement->Attribute("source");
-        
-        Image image;
-        if (!image.loadFromFile(imagePath))
-        {
-            printf("Failed to load tile sheet.");
-            return false;
-        }
-
-        image.createMaskFromColor(Color(255, 255, 255));
-        tilesetImage.loadFromImage(image);
-        tilesetImage.setSmooth(false);
-
-        int columns = tilesetImage.getSize().x / tileWidth;
-        int rows = tilesetImage.getSize().y / tileHeight;
-
-        std::vector<Rect<int> > subRects;
-
-        for (int y = 0; y < rows; y++)
-            for (int x = 0; x < columns; x++)
-            {
-                Rect<int> rect;
-
-                rect.top = y * tileHeight;
-                rect.height = tileHeight;
-                rect.left = x * tileWidth;
-                rect.width = tileWidth;
-
-                subRects.push_back(rect);
-            }
+        width = atoi(mapElement->Attribute("width"));
+        height = atoi(mapElement->Attribute("height"));
+        tileWidth = atoi(mapElement->Attribute("tilewidth"));
+        tileHeight = atoi(mapElement->Attribute("tileheight"));       
 
         XMLElement* layerElement;
-        layerElement = map->FirstChildElement("layer");
+        layerElement = mapElement->FirstChildElement("layer");
         while (layerElement)
         {
             Layer layer;
-            
             if (layerElement->Attribute("opacity") != NULL)
             {
-                float opacity = strtod(layerElement->Attribute("opacity"), NULL);
-                layer.opacity = 255 * opacity;
+                layer.opacity = 255 * strtof(layerElement->Attribute("opacity"), NULL);
             }
             else
             {
@@ -100,42 +66,39 @@ public:
 
             XMLElement* layerDataElement;
             layerDataElement = layerElement->FirstChildElement("data");
-
             if (layerDataElement == NULL)
             {
                 printf("Bad map. No layer information found.");
-                return false;
             }
             
             XMLElement* tileElement;
             tileElement = layerDataElement->FirstChildElement("tile");
-
             if (tileElement == NULL)
             {
                 printf("Bad map. No tile information found.");
-                return false;
             }
 
+            int columns = texture.getSize().x / tileWidth;
             int x = 0;
             int y = 0;
-
+            IntRect rect;
+            rect.width = tileWidth;
+            rect.height = tileHeight;
             while (tileElement)
             {
-                int tileGID = atoi(tileElement->Attribute("gid"));
-                int subRectToUse = tileGID - firstTileID;
-
-                if (subRectToUse >= 0)
+                int tileGid = atoi(tileElement->Attribute("gid"));
+                if (tileGid > 0)
                 {
+                    rect.left = (tileGid % columns - 1) * tileWidth;
+                    rect.top = (tileGid / columns) * tileHeight;
+
                     Sprite sprite;
-                    sprite.setTexture(tilesetImage);
-                    sprite.setTextureRect(subRects[subRectToUse]);
+                    sprite.setTexture(texture);
+                    sprite.setTextureRect(rect);
                     sprite.setPosition(x * tileWidth, y * tileHeight);
                     sprite.setColor(Color(255, 255, 255, layer.opacity));
-
                     layer.tiles.push_back(sprite);
                 }
-
-                tileElement = tileElement->NextSiblingElement("tile");
 
                 x++;
                 if (x >= width)
@@ -145,86 +108,62 @@ public:
                     if (y >= height)
                         y = 0;
                 }
+
+                tileElement = tileElement->NextSiblingElement("tile");
             }
             layers.push_back(layer);
 
             layerElement = layerElement->NextSiblingElement("layer");
         }
+
         
         XMLElement* objectGroupElement;
-
-        if (map->FirstChildElement("objectgroup") != NULL)
+        objectGroupElement = mapElement->FirstChildElement("objectgroup");
+        if (objectGroupElement == NULL)
         {
-            objectGroupElement = map->FirstChildElement("objectgroup");
-            while (objectGroupElement)
-            {
-                XMLElement* objectElement;
-                objectElement = objectGroupElement->FirstChildElement("object");
+            printf("No object layers found");
+        }
+        while (objectGroupElement)
+        {
+            XMLElement* objectElement;
+            objectElement = objectGroupElement->FirstChildElement("object");
+            while (objectElement)
+            {                
+                Object object;
+                object.name = objectElement->Attribute("name");
+                object.rect.left = atoi(objectElement->Attribute("x"));
+                object.rect.top = atoi(objectElement->Attribute("y"));
 
-                while (objectElement)
-                {                                    
-                    int x = atoi(objectElement->Attribute("x"));
-                    int y = atoi(objectElement->Attribute("y"));
-
-                    int width, height;
-
-                    Sprite sprite;
-                    sprite.setTexture(tilesetImage);
-                    sprite.setTextureRect(Rect<int>(0, 0, 0, 0));
-                    sprite.setPosition(x, y);
-
-                    if (objectElement->Attribute("width") != NULL)
-                    {
-                        width = atoi(objectElement->Attribute("width"));
-                        height = atoi(objectElement->Attribute("height"));
-                    }
-                    else
-                    {
-                        width = subRects[atoi(objectElement->Attribute("gid")) - firstTileID].width;
-                        height = subRects[atoi(objectElement->Attribute("gid")) - firstTileID].height;
-                        sprite.setTextureRect(subRects[atoi(objectElement->Attribute("gid")) - firstTileID]);
-                    }
-
-                    Object object;
-                    object.type = objectElement->Attribute("name");
-                    object.sprite = sprite;
-
-                    Rect<float> objectRect;
-                    objectRect.top = y;
-                    objectRect.left = x;
-                    objectRect.height = height;
-                    objectRect.width = width;
-                    object.rect = objectRect;
-
-                    objects.push_back(object);
-                    //printf("%s", objects[objects.size() - 1].name);
-
-                    objectElement = objectElement->NextSiblingElement("object");
+                if (objectElement->Attribute("width") != NULL)
+                {
+                    object.rect.width = atoi(objectElement->Attribute("width"));
+                    object.rect.height = atoi(objectElement->Attribute("height"));
                 }
-                objectGroupElement = objectGroupElement->NextSiblingElement("objectgroup");
-            }
-        }
-        else
-        {
-            printf("No object layers found...");
-        }
+                else
+                {
+                    object.rect.width = 0;
+                    object.rect.height = 0;
+                }
 
-        return true;
+                objects.push_back(object);
+
+                objectElement = objectElement->NextSiblingElement("object");
+            }
+            objectGroupElement = objectGroupElement->NextSiblingElement("objectgroup");
+        }
     }
 
 
-    Object getObject(std::string name)
-    {
-        // Только первый объект с заданным именем        
-        int i;
-        for (i = 0; i < objects.size(); i++)
+    Vector2f getObjectVector(std::string name)
+    {      
+        for (int i = 0; i < objects.size(); i++)
         {                      
-            if (objects[i].type == name)
+            if (objects[i].name == name)
             {
-                break;              
+                return Vector2f(objects[i].rect.left, objects[i].rect.top);
             }                
-        }         
-        return objects[i];
+        }       
+        return Vector2f(0, 0);
     }
 
     std::vector<Object> getObjects(std::string name)
@@ -233,7 +172,7 @@ public:
         std::vector<Object> vec;
         for (int i = 0; i < objects.size(); i++)
         {
-            if (objects[i].type == name)
+            if (objects[i].name == name)
             {
                 vec.push_back(objects[i]);
             }              

@@ -1,36 +1,15 @@
 ﻿  main.cpp
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(97,31): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(98,37): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(136,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(136,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(178,43): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(178,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(197,38): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(60,37): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(98,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(98,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(166,9): error C2561: 'Level::getObjectRect': function must return a value
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(157,13): message : see declaration of 'Level::getObjectRect'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Entity.hpp(27,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(198,39): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(199,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(200,40): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Entity.hpp(26,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Entity.hpp(27,43): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Entity.hpp(28,43): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
           with
           [
               T=float
@@ -41,39 +20,132 @@ C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Bullet.h
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Bullet.hpp(17,1): warning C4305: '=': truncation from 'double' to 'float'
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Bullet.hpp(24,3): error C2065: 'x': undeclared identifier
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Bullet.hpp(28,8): error C3861: 'getRect': identifier not found
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(20,64): error C2661: 'Entity::Entity': no overloaded function takes 3 arguments
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(20,64): message : while trying to match the argument list '(AnimationManager, int, int)'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(22,3): error C3861: 'option': identifier not found
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(35,1): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(48,1): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(64,1): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(76,1): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(89,1): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(198,17): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(202,3): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(205,3): error C2065: 'y': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(213,8): error C3861: 'getRect': identifier not found
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(221,8): error C2065: 'y': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(221,34): error C2065: 'h': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(227,8): error C2065: 'y': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(235,8): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(235,35): error C2065: 'w': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(239,8): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(249,7): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(256,16): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(256,20): error C2065: 'w': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(256,67): error C2065: 'h': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(257,10): error C2065: 'y': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(259,11): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(259,15): error C2065: 'w': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(261,8): error C2065: 'y': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(270,17): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(270,21): error C2065: 'w': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(270,79): error C2065: 'h': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(271,10): error C2065: 'y': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(273,11): error C2065: 'x': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(273,15): error C2065: 'w': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(275,8): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(26,32): error C2039: 'getObject': is not a member of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(22,7): message : see declaration of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(26,69): error C2039: 'getObject': is not a member of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(22,7): message : see declaration of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(26,9): error C2661: 'Entity::Entity': no overloaded function takes 5 arguments
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(26,9): message : while trying to match the argument list '(const char *, const char *, sf::Texture, int, int)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(37,7): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(37,7): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(42,1): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(50,7): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(50,7): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(55,1): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(63,7): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [3]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(63,7): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [3])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(71,1): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(77,9): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(77,9): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(77,22): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(77,22): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(83,1): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(88,7): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [5]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(88,7): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [5])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(96,1): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(100,7): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [6]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(100,7): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [6])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(106,9): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(106,9): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(106,22): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(106,22): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(115,9): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [3]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(115,9): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [3])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(115,23): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [5]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(115,23): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [5])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(123,8): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [5]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(123,8): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [5])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(131,8): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [6]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(131,8): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [6])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,3): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,3): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,15): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,15): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,27): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [3]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,27): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [3])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,40): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [5]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,40): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [5])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,55): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [6]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(136,55): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [6])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(205,17): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(209,3): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(212,3): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(220,8): error C3861: 'getRect': identifier not found
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(228,8): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(228,34): error C2065: 'h': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(234,8): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(242,8): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(242,35): error C2065: 'w': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(246,8): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(256,7): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(262,18): error C2440: 'initializing': cannot convert from 'sf::IntRect' to 'sf::Rect<float>'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(262,18): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(263,16): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(263,20): error C2065: 'w': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(263,67): error C2065: 'h': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(264,10): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(266,11): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(266,15): error C2065: 'w': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(268,8): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(276,18): error C2440: 'initializing': cannot convert from 'sf::IntRect' to 'sf::Rect<float>'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(276,18): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(277,17): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(277,21): error C2065: 'w': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(277,79): error C2065: 'h': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(278,10): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(280,11): error C2065: 'x': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(280,15): error C2065: 'w': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(282,8): error C2065: 'y': undeclared identifier
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(19,8): error C2512: 'Level': no appropriate default constructor available
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(22,7): message : see declaration of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(20,6): error C2039: 'loadFromXML': is not a member of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(22,7): message : see declaration of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(29,23): error C2665: 'AnimationManager::AnimationManager': no overloaded function could convert all the argument types
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Animation.hpp(64,2): message : could be 'AnimationManager::AnimationManager(const char *,const char *)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(29,23): message : 'AnimationManager::AnimationManager(const char *,const char *)': cannot convert argument 2 from 'sf::Texture' to 'const char *'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(29,51): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(29,23): message : while trying to match the argument list '(const char [23], sf::Texture)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(36,24): error C2665: 'AnimationManager::AnimationManager': no overloaded function could convert all the argument types
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Animation.hpp(64,2): message : could be 'AnimationManager::AnimationManager(const char *,const char *)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(36,24): message : 'AnimationManager::AnimationManager(const char *,const char *)': cannot convert argument 2 from 'sf::Texture' to 'const char *'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(36,46): message : No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(36,24): message : while trying to match the argument list '(const char [17], sf::Texture)'
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(50,58): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
           with
           [
@@ -84,15 +156,13 @@ C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp
           [
               T=unsigned int
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(64,47): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(63,18): error C2039: 'getObject': is not a member of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(22,7): message : see declaration of 'Level'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(64,14): error C2661: 'Player::Player': no overloaded function takes 4 arguments
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(64,14): message : while trying to match the argument list '(AnimationManager, Level, T, T)'
           with
           [
-              T=float
-          ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(64,33): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
+              T=int
           ]
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(73,14): warning C4244: 'initializing': conversion from 'sf::Int64' to 'float', possible loss of data
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(90,54): error C2039: 'x': is not a member of 'Player'
@@ -101,6 +171,26 @@ C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(6,7): message : see declaration of 'Player'
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(90,35): error C2661: 'Bullet::Bullet': no overloaded function takes 3 arguments
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(90,35): message : while trying to match the argument list '(AnimationManager, Level, bool)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(96,52): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(96,52): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(97,53): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [2]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(97,53): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [2])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(98,50): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [3]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(98,50): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [3])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(99,52): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [5]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(99,52): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [5])'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(100,53): error C2679: binary '[': no operator found which takes a right-hand operand of type 'const char [6]' (or there is no acceptable conversion)
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(344,18): message : could be 'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](const Player::Key &)'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\map(173,18): message : or       'bool &std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>::operator [](Player::Key &&)'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(100,53): message : while trying to match the argument list '(std::map<Player::Key,bool,std::less<Player::Key>,std::allocator<std::pair<const Player::Key,bool>>>, const char [6])'
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(168,24): error C2039: 'x': is not a member of 'Player'
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Player.hpp(6,7): message : see declaration of 'Player'
 C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(168,33): error C2039: 'y': is not a member of 'Player'

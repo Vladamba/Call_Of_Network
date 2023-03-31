@@ -47,65 +47,106 @@ public:
 	}
 };
 
-
-std::string AnimationType[] = {"stand", "run", "jump", "crawl", "climb", 
-	"standShoot","runShoot", "jumpShoot", "crawlShoot"};
+enum class AnimationType {Stand, Run, Jump, Crawl, Climb, Move, Explode};
 
 
 class AnimationManager
 {
 public:
-	std::string currentAnimation;
-	std::map<std::string, Animation> animationList;
+	Texture texture;
+	AnimationType currentAnimation;
+	std::map<AnimationType, Animation> animationList;
 
 	AnimationManager(){}
 
-	AnimationManager(const char* fileName, Texture& t)
+	AnimationManager(const char* image, const char* file)
 	{
-		XMLDocument animationFile;
-		if (animationFile.LoadFile(fileName) != XML_SUCCESS)
+		if (!texture.loadFromFile(image))
 		{
-			printf("Loading animation failed!");			
+			printf("Loading animation image failed!");
+		}
+		texture.setSmooth(false);
+
+		XMLDocument animationFile;
+		if (animationFile.LoadFile(file) != XML_SUCCESS)
+		{
+			printf("Loading animation file failed!");			
 		}
 
 		XMLElement* animationElement;
 		animationElement = animationFile.FirstChildElement("sprites")->FirstChildElement("animation");
 		while (animationElement)
-		{			
-			currentAnimation = animationElement->Attribute("title");	
-			bool correctAnimation = false;
-			for (int i = 0; i < AnimationType->size(); i++) 
+		{						
+			const char* title = animationElement->Attribute("title");	
+			if (title == "Stand")
 			{
-				if (currentAnimation == AnimationType[i])
-				{
-					correctAnimation = true;
-					break;
-				}
-			}
-			if (correctAnimation)
-			{
-				Animation animation(atoi(animationElement->Attribute("delay")), t);
-				XMLElement* cut;
-				cut = animationElement->FirstChildElement("cut");
-				while (cut)
-				{
-					int x = atoi(cut->Attribute("x"));
-					int y = atoi(cut->Attribute("y"));
-					int w = atoi(cut->Attribute("w"));
-					int h = atoi(cut->Attribute("h"));
-
-					animation.frames_right.push_back(IntRect(x, y, w, h));
-					animation.frames_left.push_back(IntRect(x + w, y, -w, h));
-
-					cut = cut->NextSiblingElement("cut");
-				}
-				//animation.sprite.setOrigin(0, animation.frames_right[0].height);
-				animationList[currentAnimation] = animation;
+				currentAnimation = AnimationType::Stand;
 			}
 			else
 			{
-				printf("Found incorrect animation!");
-			}	
+				if (title == "Run")
+				{
+					currentAnimation = AnimationType::Run;
+				}
+				else
+				{
+					if (title == "Jump")
+					{
+						currentAnimation = AnimationType::Jump;
+					}
+					else
+					{
+						if (title == "Crawl")
+						{
+							currentAnimation = AnimationType::Crawl;
+						}
+						else
+						{
+							if (title == "Climb")
+							{
+								currentAnimation = AnimationType::Climb;
+							}
+							else
+							{
+								if (title == "Move")
+								{
+									currentAnimation = AnimationType::Move;
+								}
+								else
+								{
+									if (title == "Explode")
+									{
+										currentAnimation = AnimationType::Explode;
+									}
+									else
+									{
+										printf("Found incorrect animation!");
+									}
+								}
+							}
+						}
+					}
+				}
+			}		
+
+			Animation animation(atoi(animationElement->Attribute("delay")), texture);
+			XMLElement* cut;
+			cut = animationElement->FirstChildElement("cut");
+			while (cut)
+			{
+				int x = atoi(cut->Attribute("x"));
+				int y = atoi(cut->Attribute("y"));
+				int w = atoi(cut->Attribute("w"));
+				int h = atoi(cut->Attribute("h"));
+
+				animation.frames_right.push_back(IntRect(x, y, w, h));
+				animation.frames_left.push_back(IntRect(x + w, y, -w, h));
+
+				cut = cut->NextSiblingElement("cut");
+			}
+
+			animationList[currentAnimation] = animation;
+
 			animationElement = animationElement->NextSiblingElement("animation");
 		}
 	}
@@ -120,7 +161,7 @@ public:
 		return animationList[currentAnimation].isPlaying;
 	}
 
-	void set(std::string name)
+	void set(AnimationType name)
 	{
 		currentAnimation = name;
 		//animationList[currentAnimation].left = false;
@@ -141,7 +182,7 @@ public:
 		animationList[currentAnimation].isPlaying = false;
 	}
 
-	void play(std::string name)
+	void play(AnimationType name)
 	{
 		animationList[name].isPlaying = true;
 	}

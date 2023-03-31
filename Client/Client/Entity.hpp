@@ -17,13 +17,12 @@ public:
 	bool isAlive, left;
 	int health;
 
-	Entity(const char* fileName, Texture &t, float x, float y, float speed, int _health)
+	Entity(const char* image, const char* file, Texture &t, Vector2f vec, float speed, int _health)
 	{
-		animationManager = AnimationManager(fileName, t);
-		animationManager.set("stand");
+		animationManager = AnimationManager(image, file);		
 
-		rect.left = x;
-		rect.top = y;
+		rect.left = vec.x;
+		rect.top = vec.y;
 		rect.width = animationManager.getWidth();
 		rect.height = animationManager.getHeight();
 
