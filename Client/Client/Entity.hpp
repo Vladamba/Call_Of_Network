@@ -4,56 +4,43 @@
 #include <SFML/Graphics.hpp>
 #include "Animation.hpp"
 #include "Level.hpp"
-#include <vector>
 
 using namespace sf;
 
 class Entity
 {
 public:
-	float x, y, dx, dy, w, h, timer, timerEnd;
+	FloatRect rect;
+	float dx, dy, timer, timerEnd;
 	AnimationManager animationManager;
 	std::vector<Object> objects;
-	bool isAlive, dir;
-	const char* name;
+	bool isAlive, left;
 	int health;
 
-	Entity(AnimationManager &a, int _x, int _y)
+	Entity(const char* fileName, Texture &t, float x, float y, float speed, int _health)
 	{
-		animationManager = a;
-		x = _x;
-		y = _y;		
+		animationManager = AnimationManager(fileName, t);
+		animationManager.set("stand");
 
-		isAlive = true;
-		dir = false;
+		rect.left = x;
+		rect.top = y;
+		rect.width = animationManager.getWidth();
+		rect.height = animationManager.getHeight();
 
-		dx = dy = timer = timerEnd = 0;
-	}
-
-	virtual void update(float time) = 0;
-
-	void draw(RenderWindow& window)
-	{
-		animationManager.draw(window, x, y + h);
-	}
-
-	FloatRect getRect()
-	{
-		return FloatRect(x, y, w, h);
-	}
-
-	void option(const char* _name, float speed, int _health, const char* animation = "")
-	{
-		name = _name;
 		dx = speed;
 		health = _health;
 
-		if (animation != "")
-		{
-			animationManager.set(animation);
-		}
-		w = animationManager.getW();
-		h = animationManager.getH();
+		dy = timer = timerEnd = 0;
+
+		isAlive = true;
+		left = false;
+	}
+
+	virtual void update(float time){};
+
+	void draw(RenderWindow &window)
+	{
+		animationManager.draw(window, rect.left, rect.top);
 	}
 };
 

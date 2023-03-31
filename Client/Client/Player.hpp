@@ -29,7 +29,7 @@ public:
 	{
 		if (key["L"])
 		{
-			dir = 1;
+			left = 1;
 			if (state != State::crawl)
 			{
 				dx = -0.1;
@@ -42,7 +42,7 @@ public:
 
 		if (key["R"])
 		{
-			dir = 0;
+			left = 0;
 			if (state != State::crawl)
 			{
 				dx = 0.1;
@@ -175,7 +175,7 @@ public:
 			animationManager.set("hit");
 		}
 
-		if (dir)
+		if (left)
 		{
 			animationManager.flip(true);
 		}
@@ -212,7 +212,7 @@ public:
 		{
 			if (getRect().intersects(objects[i].rect))
 			{
-				if (objects[i].name == "solid")
+				if (objects[i].type == "solid")
 				{
 					if (num == 1)
 					{
@@ -241,7 +241,7 @@ public:
 					}
 				}
 
-				if (objects[i].name == "ladder")
+				if (objects[i].type == "ladder")
 				{
 					onLadder = true;
 					if (state == State::climb)
@@ -250,7 +250,7 @@ public:
 					}
 				}
 
-				if (objects[i].name == "SlopeLeft")
+				if (objects[i].type == "SlopeLeft")
 				{
 					FloatRect r = objects[i].rect;
 					int y0 = (x + w / 2 - r.left) * r.height / r.width + r.top - h;
@@ -264,7 +264,7 @@ public:
 					}
 				}
 
-				if (objects[i].name == "SlopeRight")
+				if (objects[i].type == "SlopeRight")
 				{
 					FloatRect r = objects[i].rect;
 					int y0 = -(x + w / 2 - r.left) * r.height / r.width + r.top + r.height - h;

@@ -9,9 +9,8 @@ using namespace tinyxml2;
 
 struct Object
 {
-    std::string name;
-    Rect<float> rect;
-    Sprite sprite;
+    std::string type;
+    IntRect rect;
 };
 
 struct Layer
@@ -22,7 +21,7 @@ struct Layer
 
 class Level
 {
-public://private
+public:
     int width, height, tileWidth, tileHeight;
     int firstTileID;
     Rect<float> drawingBounds;
@@ -30,15 +29,12 @@ public://private
     std::vector<Object> objects;
     std::vector<Layer> layers;
 
-    bool loadFromXML(const char* fileName)
+    Level(const char* fileName, Texture& t)
     {       
         XMLDocument levelFile;
-
-        //levelFile.LoadFile(fileName);
         if (levelFile.LoadFile(fileName) != XML_SUCCESS)
         {
             printf("Loading level failed.");
-            return false;
         }
 
         XMLElement* map;       
@@ -190,7 +186,7 @@ public://private
                     }
 
                     Object object;
-                    object.name = objectElement->Attribute("name");
+                    object.type = objectElement->Attribute("name");
                     object.sprite = sprite;
 
                     Rect<float> objectRect;
@@ -223,9 +219,8 @@ public://private
         int i;
         for (i = 0; i < objects.size(); i++)
         {                      
-            if (objects[i].name == name)
+            if (objects[i].type == name)
             {
-                printf("huy3");
                 break;              
             }                
         }         
@@ -238,7 +233,7 @@ public://private
         std::vector<Object> vec;
         for (int i = 0; i < objects.size(); i++)
         {
-            if (objects[i].name == name)
+            if (objects[i].type == name)
             {
                 vec.push_back(objects[i]);
             }              

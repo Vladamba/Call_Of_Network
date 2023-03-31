@@ -3,7 +3,6 @@
 
 #include <SFML/Graphics.hpp>
 #include "tinyxml2.h"
-#include <vector>
 
 using namespace sf;
 using namespace tinyxml2;
@@ -11,17 +10,19 @@ using namespace tinyxml2;
 class Animation
 {
 public:
-	std::vector<IntRect> frames, framesFliped;
+	std::vector<IntRect> frames_right, frames_left;
 	float currentFrame, speed;
-	bool loop, flip, isPlaying;
+	bool loop, left, isPlaying;
 	Sprite sprite;
 
-	Animation()
+	Animation(int delay, Texture& t)
 	{		
 		currentFrame = 0;
-		loop = false;
-		flip = false;
+		speed = 1.0f / delay;
+		loop = true;
+		left = false;
 		isPlaying = true;	
+		sprite.setTexture(t);
 	}
 
 	void update(float time)
@@ -29,29 +30,26 @@ public:
 		if (isPlaying)
 		{
 			currentFrame += speed * time;
-			if (currentFrame > frames.size())
+			if (currentFrame > frames_right.size())
 			{
-				currentFrame -= frames.size();
+				currentFrame -= frames_right.size();
 			}
-
-			sprite.setTextureRect(frames[currentFrame]);
-			if (flip)
+			
+			if (left)
 			{
-				sprite.setTextureRect(framesFliped[currentFrame]);
+				sprite.setTextureRect(frames_left[(int)currentFrame]);
+			}
+			else
+			{
+				sprite.setTextureRect(frames_right[(int)currentFrame]);
 			}
 		}		
 	}
 };
 
 
-/*enum class AnimationType
-{
-	stand, standShoot,
-	run, runShoot,
-	crawl, crawlShoot,
-	jump, jumpShoot,
-	climb
-};*/
+std::string AnimationType[] = {"stand", "run", "jump", "crawl", "climb", 
+	"standShoot","runShoot", "jumpShoot", "crawlShoot"};
 
 
 class AnimationManager
@@ -60,69 +58,77 @@ public:
 	std::string currentAnimation;
 	std::map<std::string, Animation> animationList;
 
-	~AnimationManager()
-	{
-		animationList.clear();
-	}
+	AnimationManager(){}
 
-	bool loadFromXML(std::string fileName, Texture& t)
+	AnimationManager(const char* fileName, Texture& t)
 	{
 		XMLDocument animationFile;
-		if (animationFile.LoadFile(fileName.c_str()) != XML_SUCCESS)
+		if (animationFile.LoadFile(fileName) != XML_SUCCESS)
 		{
-			printf("Loading animation failed!");
-			return false;
+			printf("Loading animation failed!");			
 		}
 
-		XMLElement* head;
-		head = animationFile.FirstChildElement("sprites");
-
-		XMLElement * animationElement;
-		animationElement = head->FirstChildElement("animation");
+		XMLElement* animationElement;
+		animationElement = animationFile.FirstChildElement("sprites")->FirstChildElement("animation");
 		while (animationElement)
-		{
-			Animation a;
-			currentAnimation = animationElement->Attribute("title");			
-			a.speed = 1.0f / atoi(animationElement->Attribute("delay"));
-			a.sprite.setTexture(t);
-
-			XMLElement* cut;
-			cut = animationElement->FirstChildElement("cut");
-			while (cut)
+		{			
+			currentAnimation = animationElement->Attribute("title");	
+			bool correctAnimation = false;
+			for (int i = 0; i < AnimationType->size(); i++) 
 			{
-				int x = atoi(cut->Attribute("x"));
-				int y = atoi(cut->Attribute("y"));
-				int w = atoi(cut->Attribute("w"));
-				int h = atoi(cut->Attribute("h"));
-				
-				a.frames.push_back(IntRect(x, y, w, h));
-				a.framesFliped.push_back(IntRect(x + w, y, -w, h));
-				cut = cut->NextSiblingElement("cut");
+				if (currentAnimation == AnimationType[i])
+				{
+					correctAnimation = true;
+					break;
+				}
 			}
+			if (correctAnimation)
+			{
+				Animation animation(atoi(animationElement->Attribute("delay")), t);
+				XMLElement* cut;
+				cut = animationElement->FirstChildElement("cut");
+				while (cut)
+				{
+					int x = atoi(cut->Attribute("x"));
+					int y = atoi(cut->Attribute("y"));
+					int w = atoi(cut->Attribute("w"));
+					int h = atoi(cut->Attribute("h"));
 
-			a.sprite.setOrigin(0, a.frames[0].height);
+					animation.frames_right.push_back(IntRect(x, y, w, h));
+					animation.frames_left.push_back(IntRect(x + w, y, -w, h));
 
-			animationList[currentAnimation] = a;
+					cut = cut->NextSiblingElement("cut");
+				}
+				//animation.sprite.setOrigin(0, animation.frames_right[0].height);
+				animationList[currentAnimation] = animation;
+			}
+			else
+			{
+				printf("Found incorrect animation!");
+			}	
 			animationElement = animationElement->NextSiblingElement("animation");
 		}
-		return true;
 	}
 
-	void draw(RenderWindow& window, int x, int y)
+	void draw(RenderWindow& window, float x, float y)
 	{
 		animationList[currentAnimation].sprite.setPosition(x, y);
 		window.draw(animationList[currentAnimation].sprite);
 	}
 
-	void set(const char* name)
-	{
-		currentAnimation = name;
-		animationList[currentAnimation].flip = false;
+	bool isPlaying() {
+		return animationList[currentAnimation].isPlaying;
 	}
 
-	void flip(bool f)
+	void set(std::string name)
 	{
-		animationList[currentAnimation].flip = f;
+		currentAnimation = name;
+		//animationList[currentAnimation].left = false;
+	}
+
+	void flip(bool left)
+	{
+		animationList[currentAnimation].left = left;
 	}
 
 	void update(float time)
@@ -135,19 +141,19 @@ public:
 		animationList[currentAnimation].isPlaying = false;
 	}
 
-	void play(const char* name)
+	void play(std::string name)
 	{
 		animationList[name].isPlaying = true;
 	}
 
-	float getH()
+	int getWidth()
 	{
-		return animationList[currentAnimation].frames[animationList[currentAnimation].currentFrame].height;
+		return animationList[currentAnimation].frames_right[(int)animationList[currentAnimation].currentFrame].width;
 	}
 
-	float getW()
+	int getHeight()
 	{
-		return animationList[currentAnimation].frames[animationList[currentAnimation].currentFrame].width;
+		return animationList[currentAnimation].frames_right[(int)animationList[currentAnimation].currentFrame].height;
 	}
 };
 

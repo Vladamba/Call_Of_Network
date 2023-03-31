@@ -1,12 +1,10 @@
 #include <SFML/Graphics.hpp>
 #include <list>
-#include <vector>
 #include "Level.hpp"
 #include "Animation.hpp"
 #include "Entity.hpp"
-//#include "Bullet.hpp"
+#include "Bullet.hpp"
 #include "Player.hpp"
-//#include "Enemy.hpp"
 //#include "MovingPlatform.hpp"
 //#include "HealthBar.hpp"
 
@@ -14,12 +12,12 @@ using namespace sf;
 
 int main()
 {
-	RenderWindow window(VideoMode(450, 280), "The Game!");
+	RenderWindow window(VideoMode(450, 280), "Call Of Network");
 
 	View view(FloatRect(0, 0, 450, 280));
 
 	Level lvl;
-	lvl.loadFromXML("files\\Level1.tmx");
+	lvl.loadFromXML("files\\Level2.tmx");
 	
 	Texture enemy_t, moveplatform_t, megaman_t, bullet_t, bg;
 	bg.loadFromFile("files/images/bg.png");
@@ -28,18 +26,20 @@ int main()
 	megaman_t.loadFromFile("files/images/megaman.png");
 	bullet_t.loadFromFile("files/images/bullet.png");
 
-	AnimationManager anim;
-	if (!anim.loadFromXML("files\\anim_megaman.xml", megaman_t))
+	AnimationManager anim("files\\anim_megaman.xml", megaman_t);
+	//if (!anim.loadFromXML("files\\anim_megaman.xml", megaman_t))
 	{
 		return 2;
 	}
 	anim.animationList["jump"].loop = 0;
 
-	/*AnimationManager anim2;
-	anim2.create("move", bullet_t, 7, 10, 8, 8, 1, 0);
-	anim2.create("explode", bullet_t, 27, 7, 18, 18, 4, 0.01, 29, false);
+	AnimationManager anim2("files\\bullet.xml", bullet_t);
+	//if (!anim2.loadFromXML("files\\bullet.xml", bullet_t))
+	{
+		return 2;
+	}
 
-	AnimationManager anim3;
+	/*AnimationManager anim3;
 	anim3.create("move", enemy_t, 0, 0, 16, 16, 2, 0.002, 18);
 	anim3.create("dead", enemy_t, 58, 0, 16, 16, 1, 0);
 
@@ -49,8 +49,8 @@ int main()
 	Sprite background(bg);
 	background.setOrigin(bg.getSize().x / 2, bg.getSize().y / 2);
 
-	//std::list<Entity*>  entities;
-	//std::list<Entity*>::iterator it;
+	std::list<Entity*>  entities;
+	std::list<Entity*>::iterator it;
 
 	//std::vector<Object> e = lvl.GetObjects("enemy");
 	//for (int i = 0; i < e.size(); i++)
@@ -83,9 +83,13 @@ int main()
 			if (event.type == Event::Closed)
 				window.close();
 
-			//if (event.type == Event::KeyPressed)
-				//if (event.key.code == Keyboard::Space)
-					//entities.push_back(new Bullet(anim2, lvl, Mario.x + 18, Mario.y + 18, Mario.dir));
+			if (event.type == Event::KeyPressed)
+			{
+				if (event.key.code == Keyboard::Space)
+				{
+					entities.push_back(new Bullet(anim2, lvl, Mario.x + 18, Mario.y + 18, Mario.left));
+				}
+			}
 		}
 
 
@@ -96,7 +100,7 @@ int main()
 		if (Keyboard::isKeyPressed(Keyboard::Space)) Mario.key["Space"] = true;
 
 
-		/*for (it = entities.begin(); it != entities.end();)
+		for (it = entities.begin(); it != entities.end();)
 		{
 			Entity* b = *it;
 			b->update(time);
@@ -106,7 +110,7 @@ int main()
 				delete b; 
 			}
 			else it++;
-		}*/
+		}
 
 		Mario.update(time);
 		//healthBar.update(Mario.Health);
@@ -126,17 +130,21 @@ int main()
 						Mario.Health -= 5; Mario.hit = true;
 						if (Mario.dir) Mario.x += 10; else Mario.x -= 10;
 					}
-
+					
 
 				for (std::list<Entity*>::iterator it2 = entities.begin(); it2 != entities.end(); it2++)
 				{
 					Entity* bullet = *it2;
-					if (bullet->Name == "Bullet")
-						if (bullet->Health > 0)
+					if (bullet->name == "Bullet")
+					{					
+						if (bullet->health > 0)
+						{
 							if (bullet->getRect().intersects(enemy->getRect()))
 							{
-								bullet->Health = 0; enemy->Health -= 5;
+								bullet->health = 0; enemy->health -= 5;
 							}
+						}
+					}
 				}
 			}
 
@@ -165,8 +173,10 @@ int main()
 
 		lvl.draw(window);
 
-		//for (it = entities.begin(); it != entities.end(); it++)
-			//(*it)->draw(window);
+		for (it = entities.begin(); it != entities.end(); it++)
+		{
+			(*it)->draw(window);
+		}
 
 		Mario.draw(window);
 		//healthBar.draw(window);
