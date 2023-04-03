@@ -17,9 +17,9 @@ public:
 	bool isAlive, left;
 	int health;
 
-	Entity(const char* image, const char* file, Vector2f vec, float speed, int _health)
+	Entity(AnimationManager a, Vector2f vec, float speed, int _health)
 	{
-		animationManager = AnimationManager(image, file);		
+		animationManager = a;		
 
 		rect.left = vec.x;
 		rect.top = vec.y;
@@ -37,7 +37,7 @@ public:
 
 	virtual void update(float time){};
 
-	void draw(RenderWindow &window)
+	void draw(RenderWindow& window)
 	{
 		animationManager.draw(window, rect.left, rect.top);
 	}

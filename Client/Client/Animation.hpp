@@ -35,6 +35,10 @@ public:
 			if (currentFrame > frames_right.size())
 			{
 				currentFrame -= frames_right.size();
+				if (!loop)
+				{
+					isPlaying = false;
+				}
 			}
 			
 			if (left)
@@ -49,14 +53,14 @@ public:
 	}
 };
 
-enum class AnimationType {Stand, Run, Jump, Fall, Crawl, Climb, Move, Explode};
+enum class AnimationType { Stand, Run, Jump, Fall, Crawl, Climb, Move, Explode };
 
 
 class AnimationManager
 {
 public:
 	Texture texture;
-	AnimationType currentAnimation;
+	AnimationType currentAnimation, previousAnimation;
 	std::map<AnimationType, Animation> animationList;
 
 	AnimationManager(){}
@@ -158,6 +162,7 @@ public:
 
 			animationElement = animationElement->NextSiblingElement("animation");
 		}
+		previousAnimation = currentAnimation;
 	}
 
 	void draw(RenderWindow& window, float x, float y)
@@ -173,6 +178,16 @@ public:
 	void left(bool left)
 	{
 		animationList[currentAnimation].left = left;
+	}
+
+	void set(AnimationType t)
+	{
+		if (t != previousAnimation)
+		{
+			currentAnimation = t;
+			previousAnimation = currentAnimation;
+			animationList[currentAnimation].currentFrame = 0;
+		}
 	}
 
 	void update(float time)

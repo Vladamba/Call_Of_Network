@@ -16,7 +16,7 @@ int main()
 
 	View view(FloatRect(0, 0, 450, 280));
 
-	Level lvl("files\\images\\tileset1.png", "files\\Level1.tmx");
+	Level lvl("files/images/tileset1.png", "files/Level1.tmx");
 	
 	Texture enemy_t, moveplatform_t, bg;
 	bg.loadFromFile("files/images/bg.png");
@@ -42,7 +42,8 @@ int main()
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
 
-	Player Mario("files\\images\\megaman.png", "files\\anim_megaman.xml", lvl, 100);
+	AnimationManager playerA("files/images/megaman.png", "files/myanim.xml");
+	Player Mario(playerA, lvl, 100);
 
 	//HealthBar healthBar;
 

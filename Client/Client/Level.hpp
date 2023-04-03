@@ -37,7 +37,7 @@ public:
         texture.setSmooth(false);
 
         XMLDocument levelFile;
-        if (!levelFile.LoadFile(file))
+        if (levelFile.LoadFile(file) != XML_SUCCESS)
         {
             printf("Loading level file failed.");
         }
@@ -57,7 +57,7 @@ public:
             Layer layer;
             if (layerElement->Attribute("opacity") != NULL)
             {
-                layer.opacity = 255 * strtof(layerElement->Attribute("opacity"), NULL);
+                layer.opacity = (int)255.0f * strtof(layerElement->Attribute("opacity"), NULL);
             }
             else
             {

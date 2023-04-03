@@ -8,8 +8,8 @@ class Bullet : public Entity
 {
 public:
 
-	Bullet(const char* image, const char* file, Level level, int _health) :
-		Entity(image, file, level.getObjectVector("bullet"), 0, _health)
+	Bullet(AnimationManager& a, Level level, int _health) :
+		Entity(a, level.getObjectVector("bullet"), 0, _health)
 	{
 		animationManager.currentAnimation = AnimationType::Move;
 		objects = level.getAllObjects();

@@ -6,18 +6,19 @@
 class Player : public Entity
 {
 public:
-	enum class Key
-	{
-		Left, Right, Up, Down, Space
-	};
-	
-	bool onLadder, shoot, hit;
+	enum class Key { Left, Right, Up, Down, Space };
+	enum class State { Stand, Run, Jump, Fall, Crawl, Climb } state;
+	bool onGround, onLadder, shoot, hit;
 	std::map<Key, bool> keys;
 
-	Player(const char* image, const char* file, Level level, int _health) : 
-		Entity(image, file, level.getObjectVector("player"), 0, _health)
+	Player(AnimationManager a, Level level, int _health) : 
+		Entity(a, level.getObjectVector("player"), 0, _health)
 	{
-		animationManager.currentAnimation = AnimationType::Stand;
+		state = State::Stand;
+		animationManager.set(AnimationType::Stand);
+		animationManager.animationList[AnimationType::Jump].loop = false;
+		animationManager.animationList[AnimationType::Fall].loop = false;
+		onGround = false;
 		onLadder = false;
 		shoot = false;
 		hit = false;
@@ -28,13 +29,13 @@ public:
 	{
 		if (keys[Key::Left])
 		{
-			left = true;		
+			left = true;	
 			dx = -0.1f;
-			if (animationManager.currentAnimation == AnimationType::Stand)
+			if (onGround)
 			{
-				animationManager.currentAnimation = AnimationType::Run;
+				state = State::Run;
 			}
-			if (animationManager.currentAnimation == AnimationType::Climb)
+			if (state == State::Climb)
 			{
 				dx = -0.05f;
 			}
@@ -45,11 +46,11 @@ public:
 			{
 				left = false;
 				dx = 0.1f;
-				if (animationManager.currentAnimation == AnimationType::Stand)
+				if (state == State::Stand)
 				{
-					animationManager.currentAnimation = AnimationType::Run;
+					state = State::Run;
 				}
-				if (animationManager.currentAnimation == AnimationType::Climb)
+				if (state == State::Climb)
 				{
 					dx = 0.05f;
 				}
@@ -57,29 +58,30 @@ public:
 			else
 			{
 				dx = 0;
-				if (animationManager.currentAnimation == AnimationType::Run)
+				if (state == State::Run)
 				{
-					animationManager.currentAnimation = AnimationType::Stand;
+					state = State::Stand;
 				}
-			}	
+			}
 		}
+
+		
 
 		if (keys[Key::Up])
 		{
 			if (onLadder)
 			{
 				dy = -0.05f;
-				animationManager.currentAnimation = AnimationType::Climb;			
+				state = State::Climb;
 			}
-			if (animationManager.currentAnimation == AnimationType::Stand || 
-				animationManager.currentAnimation == AnimationType::Run)
+			if (state == State::Stand || state == State::Run)
 			{ 
 				dy = -0.27f; 
-				animationManager.currentAnimation = AnimationType::Jump;
+				state = State::Jump;
 			}
-			if (animationManager.currentAnimation == AnimationType::Crawl)
+			if (state == State::Crawl)
 			{
-				animationManager.currentAnimation = AnimationType::Stand;
+				state = State::Stand;
 			}
 					
 		}
@@ -90,28 +92,29 @@ public:
 				if (onLadder)
 				{
 					dy = 0.05f;
-					animationManager.currentAnimation = AnimationType::Climb;
+					state = State::Climb;
 				}
-				if (animationManager.currentAnimation == AnimationType::Stand ||
-					animationManager.currentAnimation == AnimationType::Run)
+				if (state == State::Stand || state == State::Run)
 				{
-					animationManager.currentAnimation = AnimationType::Crawl;
+					state = State::Crawl;
 				}
 			}
 			else
 			{
-				if (animationManager.currentAnimation == AnimationType::Climb)
+				if (state == State::Climb)
 				{
 					dy = 0;
 				}
 			}
 		}	
 
+		
+
 		if (keys[Key::Space])
 		{
-			if (animationManager.currentAnimation == AnimationType::Climb)
+			if (state == State::Climb)
 			{
-				animationManager.currentAnimation = AnimationType::Jump;
+				state = State::Jump;
 				dy = -0.27f;
 				onLadder = false;
 			}
@@ -130,6 +133,27 @@ public:
 
 	void updateAnimation(float time)
 	{		
+		switch (state)
+		{
+		case State::Stand:
+			animationManager.set(AnimationType::Stand);
+			break;
+		case State::Run:
+			animationManager.set(AnimationType::Run);
+			break;
+		case State::Jump:
+			animationManager.set(AnimationType::Jump);
+			break;
+		case State::Fall:
+			animationManager.set(AnimationType::Fall);
+			break;
+		case State::Crawl:
+			animationManager.set(AnimationType::Crawl);
+			break;
+		case State::Climb:
+			animationManager.set(AnimationType::Climb);
+			break;
+		}
 		/*if (state == State::Climb)
 		{ 
 			animationManager.set("climb"); 
@@ -161,7 +185,6 @@ public:
 
 		animationManager.left(left);
 
-
 		animationManager.update(time);
 	}
 
@@ -169,13 +192,11 @@ public:
 	{
 		updateKeys();
 
-		updateAnimation(time);
-
-		if (animationManager.currentAnimation == AnimationType::Jump)
+		if (state == State::Jump)
 		{
 			if (dy >= 0)
 			{
-				//animationManager.currentAnimation = AnimationType::Fall;
+				state = State::Fall;
 			}
 		}
 
@@ -183,11 +204,12 @@ public:
 		//{
 		//	state = State::Stand;
 		//}
-		if (animationManager.currentAnimation != AnimationType::Climb)
+		//if (state != State::Climb)
 		{
 			dy += 0.0005 * time;
 		}
 
+		onGround = false;
 		onLadder = false;
 
 		rect.left += dx * time;
@@ -196,14 +218,22 @@ public:
 		rect.top += dy * time;
 		Collision(1);
 
-		if (animationManager.currentAnimation == AnimationType::Climb)
+		if (state == State::Climb)
 		{
 			if (!onLadder)
 			{
-				animationManager.currentAnimation = AnimationType::Jump;
+				state = State::Jump;
 				dy = -0.27f;
 			}		
 		}
+
+		if (onGround && dx == 0)
+		{
+			state = State::Stand;
+		}
+
+
+		updateAnimation(time);
 	}
 
 	void Collision(int num)
@@ -219,14 +249,14 @@ public:
 						if (dy > 0)
 						{
 							rect.top = objects[i].rect.top - rect.height;
-							dy = 0;
-							animationManager.currentAnimation = AnimationType::Stand;
+							dy = 0;				
+							onGround = true;
 						}
 						if (dy < 0)
 						{
 							rect.top = objects[i].rect.top + objects[i].rect.height;
 							dy = 0;
-							//animationManager.currentAnimation = AnimationType::Fall;
+							state = State::Fall;
 						}
 					}
 					else
@@ -234,12 +264,12 @@ public:
 						if (dx > 0)
 						{
 							rect.left = objects[i].rect.left - rect.width;
-							animationManager.currentAnimation = AnimationType::Stand;
+							state = State::Stand;
 						}
 						if (dx < 0)
 						{
 							rect.left = objects[i].rect.left + objects[i].rect.width;
-							animationManager.currentAnimation = AnimationType::Stand;
+							state = State::Stand;
 						}
 					}
 				}
@@ -255,6 +285,7 @@ public:
 
 				if (objects[i].name == "SlopeLeft")
 				{
+					onGround = true;
 					FloatRect r = objects[i].rect;
 					int y0 = (rect.left + rect.width / 2 - r.left) * r.height / r.width + r.top - rect.height;
 					if (rect.top > y0)
@@ -263,13 +294,13 @@ public:
 						{
 							rect.top = y0; 
 							dy = 0; 
-							//animationManager.currentAnimation = AnimationType::Stand;
 						}
 					}
 				}
 
 				if (objects[i].name == "SlopeRight")
 				{
+					onGround = true;
 					FloatRect r = objects[i].rect;
 					int y0 = -(rect.left + rect.width / 2 - r.left) * r.height / r.width + r.top + r.height - rect.height;
 					if (rect.top > y0)
@@ -278,7 +309,6 @@ public:
 						{
 							rect.top = y0; 
 							dy = 0; 
-							//animationManager.currentAnimation = AnimationType::Stand;
 						}
 					}
 				}
