@@ -17,7 +17,7 @@ public:
 	bool isAlive, left;
 	int health;
 
-	Entity(const char* image, const char* file, Texture &t, Vector2f vec, float speed, int _health)
+	Entity(const char* image, const char* file, Vector2f vec, float speed, int _health)
 	{
 		animationManager = AnimationManager(image, file);		
 

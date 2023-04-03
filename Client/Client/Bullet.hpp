@@ -8,41 +8,42 @@ class Bullet : public Entity
 {
 public:
 
-	Bullet(AnimationManager& a, Level& lev, int x, int y, bool dir) :Entity(a, x, y)
+	Bullet(const char* image, const char* file, Level level, int _health) :
+		Entity(image, file, level.getObjectVector("bullet"), 0, _health)
 	{
-		option("Bullet", 0.3, 10, "move");
-
-		if (dir)
-		{
-			dx = -0.3;
-		}
-		objects = lev.getObjects("solid");
+		animationManager.currentAnimation = AnimationType::Move;
+		objects = level.getAllObjects();
 	}
 
 	void update(float time)
 	{
-		x += dx * time;
+		rect.left += dx * time;
 
 		for (int i = 0; i < objects.size(); i++)
 		{
-			if (getRect().intersects(objects[i].rect))
+			if (rect.intersects(objects[i].rect))
 			{
 				health = 0;
 			}
 		}
 
-		if (health <= 0) {
-			animationManager.set("explode"); 
-			dx = 0;
+		if (dx == 0)
+		{
 			if (animationManager.isPlaying() == false)
 			{
 				isAlive = false;
 			}
 		}
 
+		if (health == 0) {
+			animationManager.currentAnimation = AnimationType::Explode;
+			animationManager.loop(false);
+			dx = 0;
+
+		}
+
 		animationManager.update(time);
 	}
-
 };
 
 #endif BULLET_H

@@ -1,6 +1,6 @@
 <!DOCTYPE SpriteDecomposer>
 <sprites image="megamanmastersheet.gif" transparentColor="0">
- <animation title="jump" delay="150">
+ <animation title="Jump" delay="150">
   <cut w="27" x="39" y="704" h="40" row="1" col="1"/>
   <cut w="24" x="75" y="702" h="42" row="1" col="1"/>
   <cut w="27" x="107" y="695" h="49" row="1" col="1"/>
@@ -26,7 +26,7 @@
   <cut w="31" x="381" y="464" h="44" row="1" col="1"/>
   <cut w="30" x="414" y="463" h="45" row="1" col="1"/>
  </animation>
- <animation title="crawl" delay="150">
+ <animation title="Crawl" delay="150">
   <cut w="32" x="242" y="335" h="31" row="1" col="1"/>
  </animation>
  <animation title="shoot" delay="150">
@@ -50,7 +50,7 @@
   <cut w="43" x="643" y="634" h="38" row="1" col="1"/>
   <cut w="43" x="690" y="633" h="39" row="1" col="1"/>
  </animation>
- <animation title="climb" delay="150">
+ <animation title="Climb" delay="150">
   <cut w="21" x="122" y="387" h="58" row="1" col="1"/>
   <cut w="25" x="146" y="389" h="51" row="1" col="1"/>
 
@@ -61,7 +61,7 @@
 
   <cut w="-30" x="241" y="388" h="53" row="1" col="1"/>
  </animation>
- <animation title="stand" delay="150">
+ <animation title="Stand" delay="150">
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
@@ -75,7 +75,7 @@
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
   <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
  </animation>
- <animation title="run" delay="150">
+ <animation title="Run" delay="150">
   <cut w="27" x="84" y="575" h="40" row="1" col="1"/>
   <cut w="23" x="119" y="574" h="41" row="1" col="1"/>
   <cut w="31" x="150" y="574" h="41" row="1" col="1"/>

@@ -10,7 +10,7 @@ using namespace tinyxml2;
 struct Object
 {
     std::string name;
-    IntRect rect;
+    FloatRect rect;
 };
 
 struct Layer
@@ -182,7 +182,15 @@ public:
 
     std::vector<Object> getAllObjects()
     {        
-        return objects;
+        std::vector<Object> vec;
+        for (int i = 0; i < objects.size(); i++)
+        {
+            if (objects[i].name != "player")
+            {
+                vec.push_back(objects[i]);
+            }
+        }
+        return vec;
     }
 
     Vector2i getTileSize()

@@ -16,35 +16,17 @@ int main()
 
 	View view(FloatRect(0, 0, 450, 280));
 
-	Level lvl;
-	lvl.loadFromXML("files\\Level2.tmx");
+	Level lvl("files\\images\\tileset1.png", "files\\Level1.tmx");
 	
-	Texture enemy_t, moveplatform_t, megaman_t, bullet_t, bg;
+	Texture enemy_t, moveplatform_t, bg;
 	bg.loadFromFile("files/images/bg.png");
 	enemy_t.loadFromFile("files/images/enemy.png");
 	moveplatform_t.loadFromFile("files/images/movingPlatform.png");
-	megaman_t.loadFromFile("files/images/megaman.png");
-	bullet_t.loadFromFile("files/images/bullet.png");
 
-	AnimationManager anim("files\\anim_megaman.xml", megaman_t);
-	//if (!anim.loadFromXML("files\\anim_megaman.xml", megaman_t))
-	{
-		return 2;
-	}
-	anim.animationList["jump"].loop = 0;
+	//AnimationManager anim2("file\\images\\bullet.png", "files\\bullet.xml");
 
-	AnimationManager anim2("files\\bullet.xml", bullet_t);
-	//if (!anim2.loadFromXML("files\\bullet.xml", bullet_t))
-	{
-		return 2;
-	}
-
-	/*AnimationManager anim3;
-	anim3.create("move", enemy_t, 0, 0, 16, 16, 2, 0.002, 18);
-	anim3.create("dead", enemy_t, 58, 0, 16, 16, 1, 0);
-
-	AnimationManager anim4;
-	anim4.create("move", moveplatform_t, 0, 0, 95, 22, 1, 0);*/
+	//AnimationManager anim4;
+	//anim4.create("move", moveplatform_t, 0, 0, 95, 22, 1, 0);*/
 
 	Sprite background(bg);
 	background.setOrigin(bg.getSize().x / 2, bg.getSize().y / 2);
@@ -60,8 +42,7 @@ int main()
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
 
-	Object pl = lvl.getObject("player");
-	Player Mario(anim, lvl, pl.rect.left, pl.rect.top);
+	Player Mario("files\\images\\megaman.png", "files\\anim_megaman.xml", lvl, 100);
 
 	//HealthBar healthBar;
 
@@ -87,17 +68,32 @@ int main()
 			{
 				if (event.key.code == Keyboard::Space)
 				{
-					entities.push_back(new Bullet(anim2, lvl, Mario.x + 18, Mario.y + 18, Mario.left));
+					//entities.push_back(new Bullet(anim2, lvl, Mario.x + 18, Mario.y + 18, Mario.left));
 				}
 			}
 		}
 
 
-		if (Keyboard::isKeyPressed(Keyboard::Left)) Mario.keys["L"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Right)) Mario.keys["R"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Up)) Mario.keys["Up"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Down)) Mario.keys["Down"] = true;
-		if (Keyboard::isKeyPressed(Keyboard::Space)) Mario.keys["Space"] = true;
+		if (Keyboard::isKeyPressed(Keyboard::Left))
+		{
+			Mario.keys[Player::Key::Left] = true;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Right))
+		{
+			Mario.keys[Player::Key::Right] = true;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Up))
+		{
+			Mario.keys[Player::Key::Up] = true;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Down))
+		{
+			Mario.keys[Player::Key::Down] = true;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Space))
+		{
+			Mario.keys[Player::Key::Space] = true;
+		}
 
 
 		for (it = entities.begin(); it != entities.end();)
@@ -165,7 +161,7 @@ int main()
 
 
 		/////////////////////отображаем на экран/////////////////////
-		view.setCenter(Mario.x, Mario.y);
+		view.setCenter(Mario.rect.left, Mario.rect.top);
 		window.setView(view);
 
 		background.setPosition(view.getCenter());

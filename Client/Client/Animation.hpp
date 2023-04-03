@@ -15,6 +15,8 @@ public:
 	bool loop, left, isPlaying;
 	Sprite sprite;
 
+	Animation(){}
+
 	Animation(int delay, Texture& t)
 	{		
 		currentFrame = 0;
@@ -47,7 +49,7 @@ public:
 	}
 };
 
-enum class AnimationType {Stand, Run, Jump, Crawl, Climb, Move, Explode};
+enum class AnimationType {Stand, Run, Jump, Fall, Crawl, Climb, Move, Explode};
 
 
 class AnimationManager
@@ -77,7 +79,7 @@ public:
 		animationElement = animationFile.FirstChildElement("sprites")->FirstChildElement("animation");
 		while (animationElement)
 		{						
-			const char* title = animationElement->Attribute("title");	
+			std::string title = animationElement->Attribute("title");	
 			if (title == "Stand")
 			{
 				currentAnimation = AnimationType::Stand;
@@ -96,35 +98,42 @@ public:
 					}
 					else
 					{
-						if (title == "Crawl")
+						if (title == "Fall")
 						{
-							currentAnimation = AnimationType::Crawl;
+							currentAnimation = AnimationType::Fall;
 						}
 						else
 						{
-							if (title == "Climb")
+							if (title == "Crawl")
 							{
-								currentAnimation = AnimationType::Climb;
+								currentAnimation = AnimationType::Crawl;
 							}
 							else
 							{
-								if (title == "Move")
+								if (title == "Climb")
 								{
-									currentAnimation = AnimationType::Move;
+									currentAnimation = AnimationType::Climb;
 								}
 								else
 								{
-									if (title == "Explode")
+									if (title == "Move")
 									{
-										currentAnimation = AnimationType::Explode;
+										currentAnimation = AnimationType::Move;
 									}
 									else
 									{
-										printf("Found incorrect animation!");
+										if (title == "Explode")
+										{
+											currentAnimation = AnimationType::Explode;
+										}
+										else
+										{
+											printf("Found incorrect animation!");
+										}
 									}
 								}
 							}
-						}
+						}						
 					}
 				}
 			}		
@@ -161,13 +170,7 @@ public:
 		return animationList[currentAnimation].isPlaying;
 	}
 
-	void set(AnimationType name)
-	{
-		currentAnimation = name;
-		//animationList[currentAnimation].left = false;
-	}
-
-	void flip(bool left)
+	void left(bool left)
 	{
 		animationList[currentAnimation].left = left;
 	}
@@ -185,6 +188,11 @@ public:
 	void play(AnimationType name)
 	{
 		animationList[name].isPlaying = true;
+	}
+
+	void loop(bool loop)
+	{
+		animationList[currentAnimation].loop = loop;
 	}
 
 	int getWidth()
