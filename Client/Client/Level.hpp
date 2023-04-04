@@ -7,25 +7,20 @@
 using namespace sf;
 using namespace tinyxml2;
 
-struct Object
-{
-    std::string name;
-    FloatRect rect;
-};
-
 struct Layer
 {
     std::vector<Sprite> tiles;
     int opacity;
 };
 
+enum class ObjectType { None, Solid, Ladder, Player };
+
 class Level
 {
 public:
     Texture texture;
-    int width, height, tileWidth, tileHeight;
-    FloatRect drawingBounds;
-    std::vector<Object> objects;
+    int mapWidth, mapHeight, tileWidth, tileHeight;    
+    ObjectType** objects;
     std::vector<Layer> layers;
 
     Level(const char* image, const char* file)
@@ -45,10 +40,20 @@ public:
         XMLElement* mapElement;       
         mapElement = levelFile.FirstChildElement("map");
 
-        width = atoi(mapElement->Attribute("width"));
-        height = atoi(mapElement->Attribute("height"));
+        mapWidth = atoi(mapElement->Attribute("width"));
+        mapHeight = atoi(mapElement->Attribute("height"));
         tileWidth = atoi(mapElement->Attribute("tilewidth"));
-        tileHeight = atoi(mapElement->Attribute("tileheight"));       
+        tileHeight = atoi(mapElement->Attribute("tileheight"));      
+
+        objects = new ObjectType*[mapHeight];
+        for (int i = 0; i < mapHeight; i++)
+        {
+            objects[i] = new ObjectType[mapWidth];
+            for (int j = 0; j < mapWidth; j++)
+            {
+                objects[i][j] = ObjectType::None;
+            }
+        }        
 
         XMLElement* layerElement;
         layerElement = mapElement->FirstChildElement("layer");
@@ -101,15 +106,15 @@ public:
                     sprite.setTextureRect(rect);
                     sprite.setPosition(x * tileWidth, y * tileHeight);
                     sprite.setColor(Color(255, 255, 255, layer.opacity));
-                    layer.tiles.push_back(sprite);
+                    layer.tiles.push_back(sprite);                    
                 }
 
                 x++;
-                if (x >= width)
+                if (x >= mapWidth)
                 {
                     x = 0;
                     y++;
-                    if (y >= height)
+                    if (y >= mapHeight)
                         y = 0;
                 }
 
@@ -133,23 +138,41 @@ public:
             objectElement = objectGroupElement->FirstChildElement("object");
             while (objectElement)
             {                
-                Object object;
-                object.name = objectElement->Attribute("name");
-                object.rect.left = atoi(objectElement->Attribute("x"));
-                object.rect.top = atoi(objectElement->Attribute("y"));
-
-                if (objectElement->Attribute("width") != NULL)
+                std::string name = objectElement->Attribute("name");
+                for (int i = atoi(objectElement->Attribute("y")); i < atoi(objectElement->Attribute("height")); i++)
                 {
-                    object.rect.width = atoi(objectElement->Attribute("width"));
-                    object.rect.height = atoi(objectElement->Attribute("height"));
-                }
-                else
-                {
-                    object.rect.width = 0;
-                    object.rect.height = 0;
+                    for (int j = atoi(objectElement->Attribute("x")); j < atoi(objectElement->Attribute("width")); j++)
+                    {
+                        if (name == "Solid")
+                        {
+                            objects[i][j] = ObjectType::Solid;
+                        }    
+                        else
+                        {
+                            if (name == "Ladder")
+                            {
+                                objects[i][j] = ObjectType::Ladder;
+                            }
+                            else
+                            {
+                                if (name == "Player")
+                                {
+                                    objects[i][j] = ObjectType::Player;
+                                }
+                                else
+                                {
+                                    objects[i][j] = ObjectType::None;
+                                }
+                            }
+                        }
+                    }
                 }
 
-                objects.push_back(object);
+                if (objectElement->Attribute("width") == NULL)
+                {
+                    printf("Bad object found.");
+
+                }
 
                 objectElement = objectElement->NextSiblingElement("object");
             }
@@ -167,7 +190,7 @@ public:
                 return Vector2f(objects[i].rect.left, objects[i].rect.top);
             }                
         }       
-        return Vector2f(0, 0);
+        return Vector2f(1, 1);
     }
 
     std::vector<Object> getObjects(std::string name)
