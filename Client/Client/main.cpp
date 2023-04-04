@@ -30,8 +30,8 @@ int main()
 	Sprite background(bg);
 	background.setOrigin(bg.getSize().x / 2, bg.getSize().y / 2);
 
-	std::list<Entity*>  entities;
-	std::list<Entity*>::iterator it;
+	std::list<Bullet>  entities;
+	std::list<Bullet>::iterator it;
 
 
 	//e = lvl.GetObjects("MovingPlatform");
@@ -42,13 +42,16 @@ int main()
 	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
 	Player Mario(playerAnimationManager, level, 100);
 
+	std::vector<FloatRect> players;
+	players.push_back(Mario.rect);
+
 	//HealthBar healthBar;
 
 	Clock clock;
 	
 	while (window.isOpen())
 	{
-		if (clock.getElapsedTime().asMilliseconds() > 10)
+		//if (clock.getElapsedTime().asMilliseconds() > 10)
 		{
 			float time = clock.getElapsedTime().asMicroseconds();
 			clock.restart();
@@ -91,19 +94,18 @@ int main()
 				Mario.keys[Player::Key::Space] = true;
 
 			}
-
-			Mario.update(time);
+			//float time, ObjectType** map, int mapWidth, int mapHeight, int tileWidth, int tileHeight
+			Mario.update(time, level);
 			if (Mario.shoot)
 			{
-				entities.push_back(new Bullet(bulletAnimationManager, level, 
-					Vector2f(Mario.rect.left + Mario.rect.width / 2, Mario.rect.top), 1, Mario.left));
+				entities.push_back(Bullet(bulletAnimationManager, Vector2f(Mario.rect.left + Mario.rect.width / 2, Mario.rect.top), 1, Mario.left));
 			}
 
 			it = entities.begin();
 			while (it != entities.end())
 			{
-				(*it)->update(time);
-				if ((*it)->isAlive == false)
+				(*it).update(time, level, players);
+				if ((*it).isAlive == false)
 				{
 					it = entities.erase(it);
 				}
@@ -138,7 +140,7 @@ int main()
 
 			for (it = entities.begin(); it != entities.end(); it++)
 			{
-				(*it)->draw(window);
+				(*it).draw(window);
 			}
 
 			Mario.draw(window);

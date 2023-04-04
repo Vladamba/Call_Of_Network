@@ -7,13 +7,15 @@ class Bullet : public Entity
 {
 public:
 
-	Bullet(AnimationManager a, Level level, Vector2f vec, int _health, bool _left) :
+	Bullet(AnimationManager a, Vector2f vec, int _health, bool _left) :
 		Entity(a, vec, _health)
 	{
 		animationManager.set(AnimationType::Move);
+		rect.width = animationManager.getWidth();
+		rect.height = animationManager.getHeight();
 		animationManager.loop(AnimationType::Move, false);
 		animationManager.loop(AnimationType::Explode, false);
-				
+						
 		left = _left;		
 		if (left)
 		{
@@ -22,24 +24,48 @@ public:
 		else
 		{
 			dx = 0.2f;
-		}
-		objects = level.getAllObjects();
+		}		
 	}
 
-	void update(float time)
+	Vector2i update(float time, Level level, std::vector<FloatRect> playerRects)
 	{
 		rect.left += dx * time;
 
-		for (int i = 0; i < objects.size(); i++)
+		Vector2i vec(0, 0);
+		if (health > 0)
 		{
-			if (objects[i].name == "solid")
+			for (int i = rect.top / level.tileHeight; i < (rect.top + rect.height) / level.tileHeight; i++)
 			{
-				if (rect.intersects(objects[i].rect))
+				for (int j = rect.left / level.tileWidth; j < (rect.left + rect.width) / level.tileWidth; j++)
 				{
+					if (i < level.mapHeight && i >= 0 && j < level.mapWidth && j >= 0)
+					{
+						if (level.objects[i][j] == ObjectType::Solid)
+						{
+							health = 0;
+							goto collisionHappened;
+						}
+					}
+					else
+					{
+						// choto sdelat nado
+					}
+				}
+			}
+
+			for (int i = 0; i < playerRects.size(); i++)
+			{
+				if (rect.intersects(playerRects[i]))
+				{
+					vec.x = health;
+					vec.y = i;
 					health = 0;
+					break;
 				}
 			}
 		}
+
+		collisionHappened:
 
 		if (dx == 0)
 		{
@@ -56,6 +82,7 @@ public:
 		}
 
 		animationManager.update(time, left);
+		return vec;
 	}
 };
 

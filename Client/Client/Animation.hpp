@@ -154,7 +154,7 @@ public:
 
 				animation.frames_right.push_back(IntRect(x, y, w, h));
 				animation.frames_left.push_back(IntRect(x + w, y, -w, h));
-				animation.sprite.setOrigin(0, h);
+				//animation.sprite.setOrigin(0, h);
 
 				cut = cut->NextSiblingElement("cut");
 			}
@@ -197,9 +197,9 @@ public:
 		animationList[currentAnimation].isPlaying = false;
 	}
 
-	void play(AnimationType name)
+	void play()
 	{
-		animationList[name].isPlaying = true;
+		animationList[currentAnimation].isPlaying = true;
 	}
 
 	void loop(AnimationType a, bool loop)

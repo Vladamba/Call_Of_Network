@@ -1,6 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include <math.h>
 #include <SFML/Graphics.hpp>
 #include "Animation.hpp"
 #include "Level.hpp"
@@ -11,33 +12,27 @@ class Entity
 {
 public:
 	FloatRect rect;
-	float dx, dy, timer, timerEnd;
-	AnimationManager animationManager;
-	std::vector<Object> objects;
+	float dx, dy;
+	AnimationManager animationManager;	
 	bool isAlive, left;
 	int health;
 
 	Entity(AnimationManager a, Vector2f vec, int _health)
 	{		
-		animationManager = a;
+		animationManager = a;		
 
 		rect.left = vec.x;
 		rect.top = vec.y;
-		rect.width = animationManager.getWidth();
-		rect.height = animationManager.getHeight();
-
 		health = _health;
-
-		dx = dy = timer = timerEnd = 0;
-
+		dx = 0;
+		dy = 0;
 		isAlive = true;
-	}
-
-	virtual void update(float time){};
+	}	
 
 	void draw(RenderWindow& window)
 	{
-		animationManager.draw(window, rect.left, rect.top + rect.height);
+		//animationManager.draw(window, rect.left, rect.top + rect.height);
+		animationManager.draw(window, rect.left, rect.top);
 	}
 };
 

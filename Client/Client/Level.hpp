@@ -135,13 +135,15 @@ public:
         while (objectGroupElement)
         {
             XMLElement* objectElement;
-            objectElement = objectGroupElement->FirstChildElement("object");
+            objectElement = objectGroupElement->FirstChildElement("object");            
             while (objectElement)
-            {                
+            {            
                 std::string name = objectElement->Attribute("name");
-                for (int i = atoi(objectElement->Attribute("y")); i < atoi(objectElement->Attribute("height")); i++)
+                int x = atoi(objectElement->Attribute("x"));
+                int y = atoi(objectElement->Attribute("y"));
+                for (int i = y / tileHeight; i < (y + atoi(objectElement->Attribute("height"))) / tileHeight; i++)
                 {
-                    for (int j = atoi(objectElement->Attribute("x")); j < atoi(objectElement->Attribute("width")); j++)
+                    for (int j = x / tileWidth; j < (x + atoi(objectElement->Attribute("width"))) / tileWidth; j++)
                     {
                         if (name == "Solid")
                         {
@@ -159,40 +161,67 @@ public:
                                 {
                                     objects[i][j] = ObjectType::Player;
                                 }
-                                else
-                                {
-                                    objects[i][j] = ObjectType::None;
-                                }
                             }
                         }
                     }
                 }
 
-                if (objectElement->Attribute("width") == NULL)
-                {
-                    printf("Bad object found.");
-
-                }
-
                 objectElement = objectElement->NextSiblingElement("object");
             }
+            
             objectGroupElement = objectGroupElement->NextSiblingElement("objectgroup");
         }
     }
 
 
-    Vector2f getObjectVector(std::string name)
+    Vector2f getObjectCoord(ObjectType type)
     {      
-        for (int i = 0; i < objects.size(); i++)
-        {                      
-            if (objects[i].name == name)
+        for (int i = 0; i < mapHeight; i++)
+        {            
+            for (int j = 0; j < mapWidth; j++)
             {
-                return Vector2f(objects[i].rect.left, objects[i].rect.top);
-            }                
-        }       
+                if (objects[i][j] == type)
+                {
+                    return Vector2f(j * tileWidth, i * tileHeight);
+                }
+            }
+        }  
         return Vector2f(1, 1);
     }
 
+    /*
+    
+    for (int i = 0; i < mapHeight; i++)
+    {
+        for (int j = 0; j < mapWidth; j++)
+        {
+            if (objects[i][j] == ObjectType::None)
+            {
+                printf("n");
+            }
+            if (objects[i][j] == ObjectType::Solid)
+            {
+                printf("s");
+            }
+            if (objects[i][j] == ObjectType::Ladder)
+            {
+                printf("l");
+            }
+            if (objects[i][j] == ObjectType::Player)
+            {
+                printf("p");
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+    
+    
+    
+    
+    
+    
     std::vector<Object> getObjects(std::string name)
     {
         // Все объекты с заданным именем        
@@ -218,16 +247,10 @@ public:
             }
         }
         return vec;
-    }
-
-    Vector2i getTileSize()
-    {
-        return Vector2i(tileWidth, tileHeight);
-    }
+    }*/
 
     void draw(RenderWindow& window)
     {
-        // Рисуем все тайлы (объекты НЕ рисуем!)
         for (int layer = 0; layer < layers.size(); layer++)
         {
             for (int tile = 0; tile < layers[layer].tiles.size(); tile++)

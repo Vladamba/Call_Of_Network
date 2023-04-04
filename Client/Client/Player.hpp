@@ -3,6 +3,11 @@
 
 #include "Entity.hpp"
 
+const float speed = 0.1f;
+const float jump = 0.27f;
+const float climb = 0.05f;
+const float fall = 0.0005f;
+
 class Player : public Entity
 {
 public:
@@ -12,11 +17,13 @@ public:
 	bool onGround, onLadder, shoot, hit;
 	std::map<Key, bool> keys;
 
-	Player(AnimationManager a, Level level, int _health) : 
-		Entity(a, level.getObjectVector("player"), _health)
+	Player(AnimationManager a, Level level, int _health) :
+		Entity(a, level.getObjectCoord(ObjectType::Player), _health)
 	{
 		state = State::Stand;
 		animationManager.set(AnimationType::Stand);
+		rect.width = animationManager.getWidth();
+		rect.height = animationManager.getHeight();
 		animationManager.loop(AnimationType::Jump, false);
 		animationManager.loop(AnimationType::Fall, false);
 
@@ -26,22 +33,21 @@ public:
 		shoot = false;
 		hit = false;
 		left = false;
-		objects = level.getAllObjects();
 	}
 
 	void updateKeys()
 	{
 		if (keys[Key::Left])
 		{
-			left = true;	
-			dx = -0.1f;
+			left = true;
+			dx = -speed;
 			if (state == State::Stand)
 			{
 				state = State::Run;
 			}
 			if (state == State::Climb)
 			{
-				dx = -0.05f;
+				dx = -climb;
 			}
 		}
 		else
@@ -49,14 +55,14 @@ public:
 			if (keys[Key::Right])
 			{
 				left = false;
-				dx = 0.1f;
+				dx = speed;
 				if (state == State::Stand)
 				{
 					state = State::Run;
 				}
 				if (state == State::Climb)
 				{
-					dx = 0.05f;
+					dx = climb;
 				}
 			}
 			else
@@ -69,26 +75,26 @@ public:
 			}
 		}
 
-		
+
 		if (keys[Key::Up])
 		{
 			if (onLadder)
 			{
-				dy = -0.05f;
+				dy = -climb;
 				state = State::Climb;
-			} 
+			}
 			else
 			{
 				if (state == State::Stand || state == State::Run)
 				{
-					dy = -0.27f;
+					dy = -jump;
 					state = State::Jump;
 				}
 				if (state == State::Crawl)
 				{
 					state = State::Stand;
 				}
-			}							
+			}
 		}
 		else
 		{
@@ -96,7 +102,7 @@ public:
 			{
 				if (onLadder)
 				{
-					dy = 0.05f;
+					dy = climb;
 					state = State::Climb;
 				}
 				else
@@ -114,20 +120,20 @@ public:
 					dy = 0;
 				}
 			}
-		}	
+		}
 
 		if (keys[Key::Space])
 		{
 			if (state == State::Climb)
 			{
-				state = State::Jump;
-				dy = -0.27f;
+				dy = -jump;
+				state = State::Jump;				
 				onLadder = false;
 			}
 			else
 			{
 				shoot = true;
-			}		
+			}
 		}
 		else
 		{
@@ -138,7 +144,7 @@ public:
 	}
 
 	void updateAnimation(float time)
-	{		
+	{
 		switch (state)
 		{
 		case State::Stand:
@@ -158,9 +164,9 @@ public:
 			break;
 		}
 		/*if (state == State::Climb)
-		{ 
-			animationManager.set("climb"); 
-			animationManager.pause(); 
+		{
+			animationManager.set("climb");
+			animationManager.pause();
 			if (dy != 0)
 			{
 				animationManager.play("climb");
@@ -177,43 +183,52 @@ public:
 
 		if (hit) {
 			timer += time;
-			if (timer > 1000) 
-			{ 
-				hit = false; 
-				timer = 0; 
+			if (timer > 1000)
+			{
+				hit = false;
+				timer = 0;
 			}
 			animationManager.set("hit");
 		}
 		*/
-		
+
 		animationManager.update(time, left);
 	}
 
-	void update(float time)
+	void update(float time, Level level)
 	{
-		updateKeys();
+		//rect.width = animationManager.getWidth();
+		//rect.height = animationManager.getHeight();
 
-		if (state != State::Climb)
-		{
-			dy += 0.0005 * time;
-		}
+		updateKeys();
 
 		onGround = false;
 		onLadder = false;
 
-		rect.left += dx * time;
-		Collision(0);
+		if (dx != 0)
+		{
+			rect.left += dx * time;
+			collision(true, time, level);
+		}
 
-		rect.top += dy * time;
-		Collision(1);
+		if (state != State::Climb)
+		{
+			dy += fall * time;
+		}
+
+		if (dy != 0)
+		{
+			rect.top += dy * time;
+			collision(false, time, level);
+		}
 
 		if (state == State::Climb)
 		{
 			if (!onLadder)
 			{
+				dy = jump;
 				state = State::Jump;
-				dy = -0.27f;
-			}		
+			}
 		}
 
 		if (onGround && dx == 0 && state != State::Crawl)
@@ -223,11 +238,11 @@ public:
 
 		shootTimer += time;
 		if (shoot)
-		{			
+		{
 			if (shootTimer > 400)
 			{
 				shootTimer = 0;
-				shoot = true;			
+				shoot = true;
 			}
 			else
 			{
@@ -236,7 +251,7 @@ public:
 		}
 		else
 		{
-			if (shootTimer > 4000)
+			if (shootTimer > 10000)
 			{
 				shootTimer = 400;
 			}
@@ -245,82 +260,92 @@ public:
 		updateAnimation(time);
 	}
 
-	void Collision(int num)
+	void collision(bool checkX, float time, Level level)
 	{
-		for (int i = 0; i < objects.size(); i++)
+		for (int i = rect.top / level.tileHeight; i < (rect.top + rect.height) / level.tileHeight; i++)
 		{
-			if (rect.intersects(objects[i].rect))
+			for (int j = rect.left / level.tileWidth; j < (rect.left + rect.width) / level.tileWidth; j++)
 			{
-				if (objects[i].name == "solid")
+				if (i < level.mapHeight && i >= 0 && j < level.mapWidth && j >= 0)
 				{
-					if (num == 1)
+					if (level.objects[i][j] == ObjectType::Ladder)
 					{
-						if (dy > 0)
+						onLadder = true;
+					}
+
+					if (level.objects[i][j] == ObjectType::Solid)
+					{
+						if (checkX)
 						{
-							rect.top = objects[i].rect.top - rect.height;
-							dy = 0;				
-							onGround = true;
+							if (dx > 0)
+							{
+								rect.left = j * level.tileWidth - rect.width;
+							}
+							else
+							{
+								rect.left = j * level.tileWidth + level.tileWidth;
+							}
+							dx = 0;
 						}
-						if (dy < 0)
+						else
 						{
-							rect.top = objects[i].rect.top + objects[i].rect.height;
+							if (dy > 0)
+							{
+								rect.top = i * level.tileHeight - rect.height;
+								onGround = true;
+							}
+							else
+							{
+								rect.top = i * level.tileHeight + level.tileHeight;
+
+							}
 							dy = 0;
 						}
-					}
-					else
-					{
-						if (dx > 0)
-						{
-							rect.left = objects[i].rect.left - rect.width;
-						}
-						if (dx < 0)
-						{
-							rect.left = objects[i].rect.left + objects[i].rect.width;							
-						}
-						dx = 0;
+						return;
+						//goto collisionHappened;
 					}
 				}
-
-				if (objects[i].name == "ladder")
+				else
 				{
-					onLadder = true;
-					//if (animationManager.currentAnimation == AnimationType::Climb)
-					//{
-					//	rect.left = objects[i].rect.left - 10;
-					//}
-				}
-
-				if (objects[i].name == "SlopeLeft")
-				{
-					onGround = true;
-					FloatRect r = objects[i].rect;
-					int y0 = (rect.left + rect.width / 2 - r.left) * r.height / r.width + r.top - rect.height;
-					if (rect.top > y0)
-					{
-						if (rect.left + rect.width / 2 > r.left)
-						{
-							rect.top = y0; 
-							dy = 0; 
-						}
-					}
-				}
-
-				if (objects[i].name == "SlopeRight")
-				{
-					onGround = true;
-					FloatRect r = objects[i].rect;
-					int y0 = -(rect.left + rect.width / 2 - r.left) * r.height / r.width + r.top + r.height - rect.height;
-					if (rect.top > y0)
-					{
-						if (rect.left + rect.width / 2 < r.left + r.width)
-						{
-							rect.top = y0; 
-							dy = 0; 
-						}
-					}
+					rect.left = level.tileWidth;
+					rect.top = level.tileHeight;
 				}
 			}
 		}
+		//collisionHappened:
+
+
+
+
+		/*if (objects[i].name == "SlopeLeft")
+		{
+			onGround = true;
+			FloatRect r = objects[i].rect;
+			int y0 = (rect.left + rect.width / 2 - r.left) * r.height / r.width + r.top - rect.height;
+			if (rect.top > y0)
+			{
+				if (rect.left + rect.width / 2 > r.left)
+				{
+					rect.top = y0;
+					dy = 0;
+				}
+			}
+		}
+
+		if (objects[i].name == "SlopeRight")
+		{
+			onGround = true;
+			FloatRect r = objects[i].rect;
+			int y0 = -(rect.left + rect.width / 2 - r.left) * r.height / r.width + r.top + r.height - rect.height;
+			if (rect.top > y0)
+			{
+				if (rect.left + rect.width / 2 < r.left + r.width)
+				{
+					rect.top = y0;
+					dy = 0;
+				}
+			}
+		}*/
 	}
 };
 
