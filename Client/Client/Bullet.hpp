@@ -3,15 +3,26 @@
 
 #include "Entity.hpp"
 
-
 class Bullet : public Entity
 {
 public:
 
-	Bullet(AnimationManager& a, Level level, int _health) :
-		Entity(a, level.getObjectVector("bullet"), 0, _health)
+	Bullet(AnimationManager a, Level level, Vector2f vec, int _health, bool _left) :
+		Entity(a, vec, _health)
 	{
-		animationManager.currentAnimation = AnimationType::Move;
+		animationManager.set(AnimationType::Move);
+		animationManager.loop(AnimationType::Move, false);
+		animationManager.loop(AnimationType::Explode, false);
+				
+		left = _left;		
+		if (left)
+		{
+			dx = -0.2f;
+		}
+		else
+		{
+			dx = 0.2f;
+		}
 		objects = level.getAllObjects();
 	}
 
@@ -21,9 +32,12 @@ public:
 
 		for (int i = 0; i < objects.size(); i++)
 		{
-			if (rect.intersects(objects[i].rect))
+			if (objects[i].name == "solid")
 			{
-				health = 0;
+				if (rect.intersects(objects[i].rect))
+				{
+					health = 0;
+				}
 			}
 		}
 
@@ -36,13 +50,12 @@ public:
 		}
 
 		if (health == 0) {
-			animationManager.currentAnimation = AnimationType::Explode;
-			animationManager.loop(false);
+			animationManager.set(AnimationType::Explode);
 			dx = 0;
 
 		}
 
-		animationManager.update(time);
+		animationManager.update(time, left);
 	}
 };
 

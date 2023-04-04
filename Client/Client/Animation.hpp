@@ -154,6 +154,7 @@ public:
 
 				animation.frames_right.push_back(IntRect(x, y, w, h));
 				animation.frames_left.push_back(IntRect(x + w, y, -w, h));
+				animation.sprite.setOrigin(0, h);
 
 				cut = cut->NextSiblingElement("cut");
 			}
@@ -175,11 +176,6 @@ public:
 		return animationList[currentAnimation].isPlaying;
 	}
 
-	void left(bool left)
-	{
-		animationList[currentAnimation].left = left;
-	}
-
 	void set(AnimationType t)
 	{
 		if (t != previousAnimation)
@@ -190,8 +186,9 @@ public:
 		}
 	}
 
-	void update(float time)
+	void update(float time, bool left)
 	{
+		animationList[currentAnimation].left = left;
 		animationList[currentAnimation].update(time);
 	}
 
@@ -205,9 +202,9 @@ public:
 		animationList[name].isPlaying = true;
 	}
 
-	void loop(bool loop)
+	void loop(AnimationType a, bool loop)
 	{
-		animationList[currentAnimation].loop = loop;
+		animationList[a].loop = loop;
 	}
 
 	int getWidth()

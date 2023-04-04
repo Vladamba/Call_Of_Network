@@ -86,7 +86,11 @@ public:
             rect.height = tileHeight;
             while (tileElement)
             {
-                int tileGid = atoi(tileElement->Attribute("gid"));
+                int tileGid = 0;
+                if (tileElement->Attribute("gid") != NULL)
+                {
+                    tileGid = atoi(tileElement->Attribute("gid"));
+                }                 
                 if (tileGid > 0)
                 {
                     rect.left = (tileGid % columns - 1) * tileWidth;

@@ -7,21 +7,25 @@ class Player : public Entity
 {
 public:
 	enum class Key { Left, Right, Up, Down, Space };
-	enum class State { Stand, Run, Jump, Fall, Crawl, Climb } state;
+	enum class State { Stand, Run, Jump, Crawl, Climb } state;
+	float shootTimer;
 	bool onGround, onLadder, shoot, hit;
 	std::map<Key, bool> keys;
 
 	Player(AnimationManager a, Level level, int _health) : 
-		Entity(a, level.getObjectVector("player"), 0, _health)
+		Entity(a, level.getObjectVector("player"), _health)
 	{
 		state = State::Stand;
 		animationManager.set(AnimationType::Stand);
-		animationManager.animationList[AnimationType::Jump].loop = false;
-		animationManager.animationList[AnimationType::Fall].loop = false;
+		animationManager.loop(AnimationType::Jump, false);
+		animationManager.loop(AnimationType::Fall, false);
+
+		shootTimer = 0;
 		onGround = false;
 		onLadder = false;
 		shoot = false;
 		hit = false;
+		left = false;
 		objects = level.getAllObjects();
 	}
 
@@ -31,7 +35,7 @@ public:
 		{
 			left = true;	
 			dx = -0.1f;
-			if (onGround)
+			if (state == State::Stand)
 			{
 				state = State::Run;
 			}
@@ -66,24 +70,25 @@ public:
 		}
 
 		
-
 		if (keys[Key::Up])
 		{
 			if (onLadder)
 			{
 				dy = -0.05f;
 				state = State::Climb;
-			}
-			if (state == State::Stand || state == State::Run)
-			{ 
-				dy = -0.27f; 
-				state = State::Jump;
-			}
-			if (state == State::Crawl)
+			} 
+			else
 			{
-				state = State::Stand;
-			}
-					
+				if (state == State::Stand || state == State::Run)
+				{
+					dy = -0.27f;
+					state = State::Jump;
+				}
+				if (state == State::Crawl)
+				{
+					state = State::Stand;
+				}
+			}							
 		}
 		else
 		{
@@ -94,9 +99,12 @@ public:
 					dy = 0.05f;
 					state = State::Climb;
 				}
-				if (state == State::Stand || state == State::Run)
+				else
 				{
-					state = State::Crawl;
+					if (state == State::Stand || state == State::Run)
+					{
+						state = State::Crawl;
+					}
 				}
 			}
 			else
@@ -107,8 +115,6 @@ public:
 				}
 			}
 		}	
-
-		
 
 		if (keys[Key::Space])
 		{
@@ -143,9 +149,6 @@ public:
 			break;
 		case State::Jump:
 			animationManager.set(AnimationType::Jump);
-			break;
-		case State::Fall:
-			animationManager.set(AnimationType::Fall);
 			break;
 		case State::Crawl:
 			animationManager.set(AnimationType::Crawl);
@@ -182,29 +185,15 @@ public:
 			animationManager.set("hit");
 		}
 		*/
-
-		animationManager.left(left);
-
-		animationManager.update(time);
+		
+		animationManager.update(time, left);
 	}
 
 	void update(float time)
 	{
 		updateKeys();
 
-		if (state == State::Jump)
-		{
-			if (dy >= 0)
-			{
-				state = State::Fall;
-			}
-		}
-
-		//if (state == State::Climb && !onLadder)
-		//{
-		//	state = State::Stand;
-		//}
-		//if (state != State::Climb)
+		if (state != State::Climb)
 		{
 			dy += 0.0005 * time;
 		}
@@ -227,11 +216,31 @@ public:
 			}		
 		}
 
-		if (onGround && dx == 0)
+		if (onGround && dx == 0 && state != State::Crawl)
 		{
 			state = State::Stand;
 		}
 
+		shootTimer += time;
+		if (shoot)
+		{			
+			if (shootTimer > 400)
+			{
+				shootTimer = 0;
+				shoot = true;			
+			}
+			else
+			{
+				shoot = false;
+			}
+		}
+		else
+		{
+			if (shootTimer > 4000)
+			{
+				shootTimer = 400;
+			}
+		}
 
 		updateAnimation(time);
 	}
@@ -256,7 +265,6 @@ public:
 						{
 							rect.top = objects[i].rect.top + objects[i].rect.height;
 							dy = 0;
-							state = State::Fall;
 						}
 					}
 					else
@@ -264,13 +272,12 @@ public:
 						if (dx > 0)
 						{
 							rect.left = objects[i].rect.left - rect.width;
-							state = State::Stand;
 						}
 						if (dx < 0)
 						{
-							rect.left = objects[i].rect.left + objects[i].rect.width;
-							state = State::Stand;
+							rect.left = objects[i].rect.left + objects[i].rect.width;							
 						}
+						dx = 0;
 					}
 				}
 

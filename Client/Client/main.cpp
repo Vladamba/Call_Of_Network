@@ -16,14 +16,13 @@ int main()
 
 	View view(FloatRect(0, 0, 450, 280));
 
-	Level lvl("files/images/tileset1.png", "files/Level1.tmx");
+	Level level("files/images/tileset2.png", "files/mymap.tmx");
 	
 	Texture enemy_t, moveplatform_t, bg;
 	bg.loadFromFile("files/images/bg.png");
-	enemy_t.loadFromFile("files/images/enemy.png");
+
 	moveplatform_t.loadFromFile("files/images/movingPlatform.png");
 
-	//AnimationManager anim2("file\\images\\bullet.png", "files\\bullet.xml");
 
 	//AnimationManager anim4;
 	//anim4.create("move", moveplatform_t, 0, 0, 95, 22, 1, 0);*/
@@ -34,150 +33,118 @@ int main()
 	std::list<Entity*>  entities;
 	std::list<Entity*>::iterator it;
 
-	//std::vector<Object> e = lvl.GetObjects("enemy");
-	//for (int i = 0; i < e.size(); i++)
-		//entities.push_back(new ENEMY(anim3, lvl, e[i].rect.left, e[i].rect.top));
 
 	//e = lvl.GetObjects("MovingPlatform");
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
 
-	AnimationManager playerA("files/images/megaman.png", "files/myanim.xml");
-	Player Mario(playerA, lvl, 100);
+	AnimationManager playerAnimationManager("files/images/megaman.png", "files/myanim.xml");
+	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
+	Player Mario(playerAnimationManager, level, 100);
 
 	//HealthBar healthBar;
 
 	Clock clock;
-
-	/////////////////// основной цикл  /////////////////////
+	
 	while (window.isOpen())
 	{
-		float time = clock.getElapsedTime().asMicroseconds();
-		clock.restart();
-
-		time = time / 500;  // здесь регулируем скорость игры
-
-		if (time > 40) time = 40;
-
-		Event event;
-		while (window.pollEvent(event))
+		if (clock.getElapsedTime().asMilliseconds() > 10)
 		{
-			if (event.type == Event::Closed)
-				window.close();
+			float time = clock.getElapsedTime().asMicroseconds();
+			clock.restart();
 
-			if (event.type == Event::KeyPressed)
+			time = time / 500;
+
+			if (time > 40)
 			{
-				if (event.key.code == Keyboard::Space)
+				time = 40;
+			}
+
+			Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == Event::Closed)
 				{
-					//entities.push_back(new Bullet(anim2, lvl, Mario.x + 18, Mario.y + 18, Mario.left));
+					window.close();
 				}
 			}
-		}
 
 
-		if (Keyboard::isKeyPressed(Keyboard::Left))
-		{
-			Mario.keys[Player::Key::Left] = true;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Right))
-		{
-			Mario.keys[Player::Key::Right] = true;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Up))
-		{
-			Mario.keys[Player::Key::Up] = true;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Down))
-		{
-			Mario.keys[Player::Key::Down] = true;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Space))
-		{
-			Mario.keys[Player::Key::Space] = true;
-		}
-
-
-		for (it = entities.begin(); it != entities.end();)
-		{
-			Entity* b = *it;
-			b->update(time);
-			if (b->isAlive == false) 
-			{ 
-				it = entities.erase(it); 
-				delete b; 
-			}
-			else it++;
-		}
-
-		Mario.update(time);
-		//healthBar.update(Mario.Health);
-
-		/*for (it = entities.begin(); it != entities.end(); it++)
-		{
-			//1. враги
-			if ((*it)->Name == "Enemy")
+			if (Keyboard::isKeyPressed(Keyboard::Left))
 			{
-				Entity* enemy = *it;
+				Mario.keys[Player::Key::Left] = true;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Right))
+			{
+				Mario.keys[Player::Key::Right] = true;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Up))
+			{
+				Mario.keys[Player::Key::Up] = true;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Down))
+			{
+				Mario.keys[Player::Key::Down] = true;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Space))
+			{
+				Mario.keys[Player::Key::Space] = true;
 
-				if (enemy->Health <= 0) continue;
+			}
 
-				if (Mario.getRect().intersects(enemy->getRect()))
-					if (Mario.dy > 0) { enemy->dx = 0; Mario.dy = -0.2; enemy->Health = 0; }
-					else if (!Mario.hit) {
-						Mario.Health -= 5; Mario.hit = true;
-						if (Mario.dir) Mario.x += 10; else Mario.x -= 10;
-					}
-					
+			Mario.update(time);
+			if (Mario.shoot)
+			{
+				entities.push_back(new Bullet(bulletAnimationManager, level, 
+					Vector2f(Mario.rect.left + Mario.rect.width / 2, Mario.rect.top), 1, Mario.left));
+			}
 
-				for (std::list<Entity*>::iterator it2 = entities.begin(); it2 != entities.end(); it2++)
+			it = entities.begin();
+			while (it != entities.end())
+			{
+				(*it)->update(time);
+				if ((*it)->isAlive == false)
 				{
-					Entity* bullet = *it2;
-					if (bullet->name == "Bullet")
-					{					
-						if (bullet->health > 0)
-						{
-							if (bullet->getRect().intersects(enemy->getRect()))
+					it = entities.erase(it);
+				}
+				else it++;
+			}
+
+			//healthBar.update(Mario.Health);
+
+			/*for (it = entities.begin(); it != entities.end(); it++)
+			{
+				//2. движущиеся платформы
+				if ((*it)->Name == "MovingPlatform")
+				{
+					Entity* movPlat = *it;
+					if (Mario.getRect().intersects(movPlat->getRect()))
+						if (Mario.dy > 0)
+							if (Mario.y + Mario.h < movPlat->y + movPlat->h)
 							{
-								bullet->health = 0; enemy->health -= 5;
+								Mario.y = movPlat->y - Mario.h + 3; Mario.x += movPlat->dx * time; Mario.dy = 0; Mario.STATE = PLAYER::stay;
 							}
-						}
-					}
 				}
-			}
+			}*/
 
-			//2. движущиеся платформы
-			if ((*it)->Name == "MovingPlatform")
+
+			view.setCenter(Mario.rect.left, Mario.rect.top);
+			window.setView(view);
+
+			background.setPosition(view.getCenter());
+			window.draw(background);
+
+			level.draw(window);
+
+			for (it = entities.begin(); it != entities.end(); it++)
 			{
-				Entity* movPlat = *it;
-				if (Mario.getRect().intersects(movPlat->getRect()))
-					if (Mario.dy > 0)
-						if (Mario.y + Mario.h < movPlat->y + movPlat->h)
-						{
-							Mario.y = movPlat->y - Mario.h + 3; Mario.x += movPlat->dx * time; Mario.dy = 0; Mario.STATE = PLAYER::stay;
-						}
+				(*it)->draw(window);
 			}
 
-			//3.. и т.д.
-		}*/
+			Mario.draw(window);
+			//healthBar.draw(window);
 
-
-		/////////////////////отображаем на экран/////////////////////
-		view.setCenter(Mario.rect.left, Mario.rect.top);
-		window.setView(view);
-
-		background.setPosition(view.getCenter());
-		window.draw(background);
-
-		lvl.draw(window);
-
-		for (it = entities.begin(); it != entities.end(); it++)
-		{
-			(*it)->draw(window);
+			window.display();
 		}
-
-		Mario.draw(window);
-		//healthBar.draw(window);
-
-		window.display();
 	}
 }
