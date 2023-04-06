@@ -1,6 +1,6 @@
 <!DOCTYPE SpriteDecomposer>
 <sprites image="megaman.png" transparentColor="">
- <animation title="Run" delay="40">
+ <animation title="Run" delay="50">
   <cut w="27" x="86" y="580" h="40" row="1" col="1"/>
   <cut w="23" x="121" y="579" h="41" row="1" col="1"/>
   <cut w="31" x="152" y="579" h="41" row="1" col="1"/>

@@ -3,7 +3,7 @@
 
 #include "Entity.hpp"
 
-const float speed = 0.1f;
+const float run = 0.1f;
 const float jump = 0.27f;
 const float climb = 0.05f;
 const float fall = 0.0005f;
@@ -25,7 +25,6 @@ public:
 		rect.width = animationManager.getWidth();
 		rect.height = animationManager.getHeight();
 		animationManager.loop(AnimationType::Jump, false);
-		animationManager.loop(AnimationType::Fall, false);
 
 		shootTimer = 0;
 		onGround = false;
@@ -40,38 +39,42 @@ public:
 		if (keys[Key::Left])
 		{
 			left = true;
-			dx = -speed;
-			if (state == State::Stand)
-			{
-				state = State::Run;
-			}
 			if (state == State::Climb)
 			{
 				dx = -climb;
 			}
+			else
+			{
+				dx = -run;
+			}
+
+			if (state == State::Stand)
+			{
+				state = State::Run;
+			}		
 		}
 		else
 		{
 			if (keys[Key::Right])
 			{
 				left = false;
-				dx = speed;
-				if (state == State::Stand)
-				{
-					state = State::Run;
-				}
 				if (state == State::Climb)
 				{
 					dx = climb;
+				}
+				else
+				{
+					dx = run;
+				}
+
+				if (state == State::Stand)
+				{
+					state = State::Run;
 				}
 			}
 			else
 			{
 				dx = 0;
-				if (state == State::Run)
-				{
-					state = State::Stand;
-				}
 			}
 		}
 
@@ -85,11 +88,14 @@ public:
 			}
 			else
 			{
-				if (state == State::Stand || state == State::Run)
+				if (onGround)
 				{
-					dy = -jump;
-					state = State::Jump;
-				}
+					if (state == State::Stand || state == State::Run)
+					{
+						dy = -jump;
+						state = State::Jump;
+					}
+				}			
 				if (state == State::Crawl)
 				{
 					state = State::Stand;
@@ -122,25 +128,10 @@ public:
 			}
 		}
 
-		if (keys[Key::Space])
+		if (keys[Key::Space] && state != State::Climb)
 		{
-			if (state == State::Climb)
-			{
-				dy = -jump;
-				state = State::Jump;				
-				onLadder = false;
-			}
-			else
-			{
-				shoot = true;
-			}
+			shoot = true;
 		}
-		else
-		{
-			shoot = false;
-		}
-
-		keys[Key::Left] = keys[Key::Right] = keys[Key::Up] = keys[Key::Down] = keys[Key::Space] = false;
 	}
 
 	void updateAnimation(float time)
@@ -161,19 +152,18 @@ public:
 			break;
 		case State::Climb:
 			animationManager.set(AnimationType::Climb);
+			if (dy == 0)
+			{
+				animationManager.pause();
+			}
+			else
+			{
+				animationManager.play();
+			}
 			break;
 		}
-		/*if (state == State::Climb)
-		{
-			animationManager.set("climb");
-			animationManager.pause();
-			if (dy != 0)
-			{
-				animationManager.play("climb");
-			}
-		}
 
-		if (shoot) {
+		/*if (shoot) {
 			animationManager.set("shoot");
 			if (state == State::Run)
 			{
@@ -199,7 +189,6 @@ public:
 	{
 		//rect.width = animationManager.getWidth();
 		//rect.height = animationManager.getHeight();
-
 		updateKeys();
 
 		onGround = false;
@@ -216,24 +205,25 @@ public:
 			dy += fall * time;
 		}
 
-		if (dy != 0)
+		rect.top += dy * time;
+		collision(false, time, level);
+
+		if (state == State::Climb && !onLadder)
 		{
-			rect.top += dy * time;
-			collision(false, time, level);
+			dy = -jump;
+			state = State::Jump;
 		}
 
-		if (state == State::Climb)
+		if (onGround && state != State::Crawl)
 		{
-			if (!onLadder)
+			if (dx == 0)
 			{
-				dy = jump;
-				state = State::Jump;
+				state = State::Stand;
 			}
-		}
-
-		if (onGround && dx == 0 && state != State::Crawl)
-		{
-			state = State::Stand;
+			else
+			{
+				state = State::Run;
+			}
 		}
 
 		shootTimer += time;
@@ -259,6 +249,7 @@ public:
 
 		updateAnimation(time);
 	}
+
 
 	void collision(bool checkX, float time, Level level)
 	{
@@ -297,26 +288,21 @@ public:
 							else
 							{
 								rect.top = i * level.tileHeight + level.tileHeight;
-
 							}
 							dy = 0;
 						}
 						return;
-						//goto collisionHappened;
 					}
 				}
 				else
 				{
+					//When the player is out of the map, do not know what to do
 					rect.left = level.tileWidth;
 					rect.top = level.tileHeight;
 				}
 			}
 		}
-		//collisionHappened:
-
-
-
-
+		
 		/*if (objects[i].name == "SlopeLeft")
 		{
 			onGround = true;

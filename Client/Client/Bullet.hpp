@@ -48,7 +48,9 @@ public:
 					}
 					else
 					{
-						// choto sdelat nado
+						//When the bullet is out of the map, it is better just to destroy it
+						health = 0;
+						goto collisionHappened;
 					}
 				}
 			}

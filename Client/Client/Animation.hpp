@@ -12,7 +12,7 @@ class Animation
 public:
 	std::vector<IntRect> frames_right, frames_left;
 	float currentFrame, speed;
-	bool loop, left, isPlaying;
+	bool loop, isPlaying;
 	Sprite sprite;
 
 	Animation(){}
@@ -22,45 +22,49 @@ public:
 		currentFrame = 0;
 		speed = 1.0f / delay;
 		loop = true;
-		left = false;
 		isPlaying = true;	
 		sprite.setTexture(t);
 	}
 
-	void update(float time)
+	void update(float time, bool left)
 	{
+		if (left)
+		{
+			sprite.setTextureRect(frames_left[(int)currentFrame]);
+		}
+		else
+		{
+			sprite.setTextureRect(frames_right[(int)currentFrame]);
+		}
+
 		if (isPlaying)
 		{
 			currentFrame += speed * time;
 			if (currentFrame > frames_right.size())
 			{
-				currentFrame -= frames_right.size();
-				if (!loop)
+				
+				if (loop)
 				{
+					currentFrame -= frames_right.size();
+				}
+				else
+				{
+					currentFrame = frames_right.size() - 1;
 					isPlaying = false;
 				}
-			}
-			
-			if (left)
-			{
-				sprite.setTextureRect(frames_left[(int)currentFrame]);
-			}
-			else
-			{
-				sprite.setTextureRect(frames_right[(int)currentFrame]);
-			}
+			}		
 		}		
 	}
 };
 
-enum class AnimationType { Stand, Run, Jump, Fall, Crawl, Climb, Move, Explode };
+enum class AnimationType { Stand, Run, Jump, Crawl, Climb, Move, Explode };
 
 
 class AnimationManager
 {
 public:
 	Texture texture;
-	AnimationType currentAnimation, previousAnimation;
+	AnimationType currentAnimation;
 	std::map<AnimationType, Animation> animationList;
 
 	AnimationManager(){}
@@ -102,42 +106,35 @@ public:
 					}
 					else
 					{
-						if (title == "Fall")
+						if (title == "Crawl")
 						{
-							currentAnimation = AnimationType::Fall;
+							currentAnimation = AnimationType::Crawl;
 						}
 						else
 						{
-							if (title == "Crawl")
+							if (title == "Climb")
 							{
-								currentAnimation = AnimationType::Crawl;
+								currentAnimation = AnimationType::Climb;
 							}
 							else
 							{
-								if (title == "Climb")
+								if (title == "Move")
 								{
-									currentAnimation = AnimationType::Climb;
+									currentAnimation = AnimationType::Move;
 								}
 								else
 								{
-									if (title == "Move")
+									if (title == "Explode")
 									{
-										currentAnimation = AnimationType::Move;
+										currentAnimation = AnimationType::Explode;
 									}
 									else
 									{
-										if (title == "Explode")
-										{
-											currentAnimation = AnimationType::Explode;
-										}
-										else
-										{
-											printf("Found incorrect animation!");
-										}
+										printf("Found incorrect animation!");
 									}
 								}
 							}
-						}						
+						}												
 					}
 				}
 			}		
@@ -154,7 +151,6 @@ public:
 
 				animation.frames_right.push_back(IntRect(x, y, w, h));
 				animation.frames_left.push_back(IntRect(x + w, y, -w, h));
-				//animation.sprite.setOrigin(0, h);
 
 				cut = cut->NextSiblingElement("cut");
 			}
@@ -163,7 +159,6 @@ public:
 
 			animationElement = animationElement->NextSiblingElement("animation");
 		}
-		previousAnimation = currentAnimation;
 	}
 
 	void draw(RenderWindow& window, float x, float y)
@@ -178,18 +173,17 @@ public:
 
 	void set(AnimationType t)
 	{
-		if (t != previousAnimation)
+		if (t != currentAnimation)
 		{
+			animationList[currentAnimation].isPlaying = true;
 			currentAnimation = t;
-			previousAnimation = currentAnimation;
 			animationList[currentAnimation].currentFrame = 0;
 		}
 	}
 
 	void update(float time, bool left)
-	{
-		animationList[currentAnimation].left = left;
-		animationList[currentAnimation].update(time);
+	{		
+		animationList[currentAnimation].update(time, left);
 	}
 
 	void pause()

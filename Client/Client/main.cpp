@@ -72,28 +72,12 @@ int main()
 				}
 			}
 
+			Mario.keys[Player::Key::Left] = Keyboard::isKeyPressed(Keyboard::Left);
+			Mario.keys[Player::Key::Right] = Keyboard::isKeyPressed(Keyboard::Right);
+			Mario.keys[Player::Key::Up] = Keyboard::isKeyPressed(Keyboard::Up);
+			Mario.keys[Player::Key::Down] = Keyboard::isKeyPressed(Keyboard::Down);
+			Mario.keys[Player::Key::Space] = Keyboard::isKeyPressed(Keyboard::Space);
 
-			if (Keyboard::isKeyPressed(Keyboard::Left))
-			{
-				Mario.keys[Player::Key::Left] = true;
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Right))
-			{
-				Mario.keys[Player::Key::Right] = true;
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Up))
-			{
-				Mario.keys[Player::Key::Up] = true;
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Down))
-			{
-				Mario.keys[Player::Key::Down] = true;
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Space))
-			{
-				Mario.keys[Player::Key::Space] = true;
-
-			}
 			//float time, ObjectType** map, int mapWidth, int mapHeight, int tileWidth, int tileHeight
 			Mario.update(time, level);
 			if (Mario.shoot)

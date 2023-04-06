@@ -1,6 +1,6 @@
 <!DOCTYPE SpriteDecomposer>
 <sprites image="megaman.png" transparentColor="">
- <animation title="Run" delay="40">
+ <animation title="Run" delay="50">
   <cut w="27" x="86" y="580" h="40" row="1" col="1"/>
   <cut w="23" x="121" y="579" h="41" row="1" col="1"/>
   <cut w="31" x="152" y="579" h="41" row="1" col="1"/>
@@ -25,15 +25,6 @@
   <cut w="27" x="173" y="702" h="47" row="1" col="1"/>
   <cut w="28" x="205" y="698" h="51" row="1" col="1"/>
   <cut w="32" x="235" y="699" h="50" row="1" col="1"/>
- </animation>
- <animation title="Fall" delay="100">
-  <cut w="29" x="269" y="699" h="50" row="1" col="1"/>
-  <cut w="27" x="302" y="696" h="53" row="1" col="1"/>
-  <cut w="24" x="337" y="694" h="55" row="1" col="1"/>
-  <cut w="25" x="369" y="699" h="50" row="1" col="1"/>
-  <cut w="25" x="403" y="700" h="49" row="1" col="1"/>
-  <cut w="29" x="438" y="702" h="47" row="1" col="1"/>
-  <cut w="31" x="474" y="705" h="44" row="1" col="1"/>
  </animation>
  <animation title="Stand" delay="300">
   <cut w="32" x="235" y="98" h="41" row="1" col="1"/>
