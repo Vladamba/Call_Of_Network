@@ -5,30 +5,34 @@
 
 class Bullet : public Entity
 {
+private:
+	const float move = 0.5;
+
 public:
 
 	Bullet(AnimationManager a, Vector2f vec, int _health, bool _left) :
 		Entity(a, vec, _health)
 	{
 		animationManager.set(AnimationType::Move);
-		rect.width = animationManager.getWidth();
-		rect.height = animationManager.getHeight();
+		rect.width = (float)animationManager.getWidth();
+		rect.height = (float)animationManager.getHeight();
 		animationManager.loop(AnimationType::Move, false);
 		animationManager.loop(AnimationType::Explode, false);
 						
 		left = _left;		
 		if (left)
 		{
-			dx = -0.2f;
+			dx = -move;
 		}
 		else
 		{
-			dx = 0.2f;
+			dx = move;
 		}		
 	}
 
-	Vector2i update(float time, Level level, std::vector<FloatRect> playerRects)
+	Vector2i update(signed __int32 _time, Level level, std::vector<FloatRect> playerRects)
 	{
+		float time = (float)_time;
 		rect.left += dx * time;
 
 		Vector2i vec(0, 0);

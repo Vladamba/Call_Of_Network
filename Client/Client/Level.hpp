@@ -161,6 +161,10 @@ public:
                                 {
                                     objects[i][j] = ObjectType::Player;
                                 }
+                                else
+                                {
+                                    printf("Found incorrect object!");
+                                }
                             }
                         }
                     }

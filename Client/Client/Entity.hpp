@@ -31,7 +31,6 @@ public:
 
 	void draw(RenderWindow& window)
 	{
-		//animationManager.draw(window, rect.left, rect.top + rect.height);
 		animationManager.draw(window, rect.left, rect.top);
 	}
 };

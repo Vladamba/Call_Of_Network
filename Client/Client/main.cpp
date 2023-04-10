@@ -8,15 +8,23 @@
 //#include "MovingPlatform.hpp"
 //#include "HealthBar.hpp"
 
+const int mspf = 1000 / 120;
+
 using namespace sf;
 
 int main()
 {
-	RenderWindow window(VideoMode(450, 280), "Call Of Network");
+	float offsetX = 0;
+	float offsetY = 0;
+	RenderWindow window(VideoMode(400, 200), "Call Of Network");
+	int windowWidthHalf = window.getSize().x / 2;
+	int windowHeightHalf = window.getSize().y / 2;
 
-	View view(FloatRect(0, 0, 450, 280));
+	View view(FloatRect(0, 0, window.getSize().x, window.getSize().y));
 
 	Level level("files/images/tileset2.png", "files/mymap.tmx");
+	int mapWidth = level.mapWidth * level.tileWidth;
+	int mapHeight = level.mapHeight * level.tileHeight;
 	
 	Texture enemy_t, moveplatform_t, bg;
 	bg.loadFromFile("files/images/bg.png");
@@ -33,7 +41,6 @@ int main()
 	std::list<Bullet>  entities;
 	std::list<Bullet>::iterator it;
 
-
 	//e = lvl.GetObjects("MovingPlatform");
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
@@ -48,35 +55,35 @@ int main()
 	//HealthBar healthBar;
 
 	Clock clock;
-	
+	signed __int32 time;
+
 	while (window.isOpen())
 	{
-		//if (clock.getElapsedTime().asMilliseconds() > 10)
+		Event event;
+		while (window.pollEvent(event))
 		{
-			float time = clock.getElapsedTime().asMicroseconds();
+			if (event.type == Event::Closed)
+			{
+				window.close();
+			}
+		}
+
+		Mario.keys[Player::Key::Left] = Keyboard::isKeyPressed(Keyboard::Left);
+		Mario.keys[Player::Key::Right] = Keyboard::isKeyPressed(Keyboard::Right);
+		Mario.keys[Player::Key::Up] = Keyboard::isKeyPressed(Keyboard::Up);
+		Mario.keys[Player::Key::Down] = Keyboard::isKeyPressed(Keyboard::Down);
+		Mario.keys[Player::Key::Space] = Keyboard::isKeyPressed(Keyboard::Space);
+
+		if (clock.getElapsedTime().asMilliseconds() > mspf)
+		{
+
+			time = clock.getElapsedTime().asMilliseconds();
 			clock.restart();
 
-			time = time / 500;
-
-			if (time > 40)
+			if (time > mspf * 2)
 			{
-				time = 40;
+				time = mspf * 2;
 			}
-
-			Event event;
-			while (window.pollEvent(event))
-			{
-				if (event.type == Event::Closed)
-				{
-					window.close();
-				}
-			}
-
-			Mario.keys[Player::Key::Left] = Keyboard::isKeyPressed(Keyboard::Left);
-			Mario.keys[Player::Key::Right] = Keyboard::isKeyPressed(Keyboard::Right);
-			Mario.keys[Player::Key::Up] = Keyboard::isKeyPressed(Keyboard::Up);
-			Mario.keys[Player::Key::Down] = Keyboard::isKeyPressed(Keyboard::Down);
-			Mario.keys[Player::Key::Space] = Keyboard::isKeyPressed(Keyboard::Space);
 
 			//float time, ObjectType** map, int mapWidth, int mapHeight, int tileWidth, int tileHeight
 			Mario.update(time, level);
@@ -96,6 +103,27 @@ int main()
 				else it++;
 			}
 
+			if (Mario.rect.left < windowWidthHalf) {
+				offsetX = windowWidthHalf - Mario.rect.left;
+			}
+			else
+			{
+				if (Mario.rect.left > mapWidth - windowWidthHalf) {
+					offsetX = mapWidth - windowWidthHalf - Mario.rect.left;
+				}
+			}
+
+			if (Mario.rect.top < windowHeightHalf) {
+				offsetY = windowHeightHalf - Mario.rect.top;
+			}
+			else
+			{
+				if (Mario.rect.top > mapHeight - windowHeightHalf) {
+					offsetY = mapHeight - windowHeightHalf - Mario.rect.top;
+				}
+			}
+
+
 			//healthBar.update(Mario.Health);
 
 			/*for (it = entities.begin(); it != entities.end(); it++)
@@ -111,10 +139,20 @@ int main()
 								Mario.y = movPlat->y - Mario.h + 3; Mario.x += movPlat->dx * time; Mario.dy = 0; Mario.STATE = PLAYER::stay;
 							}
 				}
-			}*/
+			}
+			
+			if (((int)characters[0].character->getRect().left > wWidth / 2) &&
+				((int)characters[0].character->getRect().left < mWidth * tsWidth - wWidth / 2)) {
+				offsetX = (characters[0].character->getRect().left - (float)wWidth / 2.0f);
+			}
+			if (((int)characters[0].character->getRect().top > wHeight / 2) &&
+				((int)characters[0].character->getRect().top < mHeight * tsHeight - wHeight / 2)) {
+				offsetY = (characters[0].character->getRect().top - (float)wHeight / 2.0f);
+			}
+			*/
 
-
-			view.setCenter(Mario.rect.left, Mario.rect.top);
+			//window.clear();
+			view.setCenter(Mario.rect.left + offsetX, Mario.rect.top + offsetY);
 			window.setView(view);
 
 			background.setPosition(view.getCenter());

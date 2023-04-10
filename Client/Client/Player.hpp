@@ -3,13 +3,24 @@
 
 #include "Entity.hpp"
 
-const float run = 0.1f;
-const float jump = 0.27f;
-const float climb = 0.05f;
-const float fall = 0.0005f;
+/*const int sHeight = 32;
+const int sWidth = 32;
+const float g = 2.f * (float)sHeight / (200.f * 200.f);
+const float jump = sqrt(2.f * g * 3.f * (float)sHeight);
+const float run = g * 2.f * (float)sWidth / jump;
+const float climb = run / 2;
+*/
 
 class Player : public Entity
 {
+private:
+	const float g = 0.0015f;
+	const float jump = 0.52f;
+	const float ladderJump = 0.42f;
+	const float run = 0.25f;
+	const float climb = 0.1f;
+	const float tShoot = 200.f;
+
 public:
 	enum class Key { Left, Right, Up, Down, Space };
 	enum class State { Stand, Run, Jump, Crawl, Climb } state;
@@ -22,8 +33,8 @@ public:
 	{
 		state = State::Stand;
 		animationManager.set(AnimationType::Stand);
-		rect.width = animationManager.getWidth();
-		rect.height = animationManager.getHeight();
+		rect.width = (float)animationManager.getWidth();
+		rect.height = (float)animationManager.getHeight();
 		animationManager.loop(AnimationType::Jump, false);
 
 		shootTimer = 0;
@@ -134,8 +145,9 @@ public:
 		}
 	}
 
-	void updateAnimation(float time)
+	void updateAnimation(signed __int32 _time)
 	{
+		float time = (float)_time;
 		switch (state)
 		{
 		case State::Stand:
@@ -202,15 +214,19 @@ public:
 
 		if (state != State::Climb)
 		{
-			dy += fall * time;
+			dy += g * time;
+			rect.top += dy * time + g * time * time / 2.f;
+		}
+		else
+		{
+			rect.top += dy * time;
 		}
 
-		rect.top += dy * time;
 		collision(false, time, level);
 
 		if (state == State::Climb && !onLadder)
 		{
-			dy = -jump;
+			dy = -ladderJump;
 			state = State::Jump;
 		}
 
@@ -229,7 +245,7 @@ public:
 		shootTimer += time;
 		if (shoot)
 		{
-			if (shootTimer > 400)
+			if (shootTimer >= tShoot)
 			{
 				shootTimer = 0;
 				shoot = true;
@@ -243,7 +259,7 @@ public:
 		{
 			if (shootTimer > 10000)
 			{
-				shootTimer = 400;
+				shootTimer = tShoot;
 			}
 		}
 
