@@ -3,25 +3,13 @@
 
 #include "Entity.hpp"
 
-/*const int sHeight = 32;
-const int sWidth = 32;
-const float g = 2.f * (float)sHeight / (200.f * 200.f);
-const float jump = sqrt(2.f * g * 3.f * (float)sHeight);
-const float run = g * 2.f * (float)sWidth / jump;
-const float climb = run / 2;
-*/
-
 class Player : public Entity
 {
-private:
-	const float g = 0.0015f;
-	const float jump = 0.52f;
-	const float ladderJump = 0.42f;
-	const float run = 0.25f;
-	const float climb = 0.1f;
-	const float tShoot = 200.f;
-
 public:
+	int sHeight, sWidth;
+	float g, vJump, vLadderJump, vRun, vClimb;
+	float tShoot = 200.f;
+
 	enum class Key { Left, Right, Up, Down, Space };
 	enum class State { Stand, Run, Jump, Crawl, Climb } state;
 	float shootTimer;
@@ -31,6 +19,18 @@ public:
 	Player(AnimationManager a, Level level, int _health) :
 		Entity(a, level.getObjectCoord(ObjectType::Player), _health)
 	{
+		sHeight = level.tileHeight;
+		sWidth = level.tileWidth;
+		g = 2.f * (float)sHeight / (200.f * 200.f);// 0.0016
+		vJump = sqrt(2.f * g * 2.5f * (float)sHeight); // 0.505964
+		vLadderJump = sqrt(2.f * g * 1.5f * (float)sHeight); // 0.391918
+		vRun = g * 2.5f * (float)sWidth / vJump; // 0.252982
+		vClimb = vRun / 2.f; // 0.126491
+		/*printf("g=%f", g);
+		printf("  vJump=%f", vJump);
+		printf("  vLadderJump=%f", vLadderJump);
+		printf("  vRun=%f", vRun);
+		printf("  vClimb=%f", vClimb);*/
 		state = State::Stand;
 		animationManager.set(AnimationType::Stand);
 		rect.width = (float)animationManager.getWidth();
@@ -52,11 +52,11 @@ public:
 			left = true;
 			if (state == State::Climb)
 			{
-				dx = -climb;
+				dx = -vClimb;
 			}
 			else
 			{
-				dx = -run;
+				dx = -vRun;
 			}
 
 			if (state == State::Stand)
@@ -71,11 +71,11 @@ public:
 				left = false;
 				if (state == State::Climb)
 				{
-					dx = climb;
+					dx = vClimb;
 				}
 				else
 				{
-					dx = run;
+					dx = vRun;
 				}
 
 				if (state == State::Stand)
@@ -94,7 +94,7 @@ public:
 		{
 			if (onLadder)
 			{
-				dy = -climb;
+				dy = -vClimb;
 				state = State::Climb;
 			}
 			else
@@ -103,7 +103,7 @@ public:
 				{
 					if (state == State::Stand || state == State::Run)
 					{
-						dy = -jump;
+						dy = -vJump;
 						state = State::Jump;
 					}
 				}			
@@ -119,7 +119,7 @@ public:
 			{
 				if (onLadder)
 				{
-					dy = climb;
+					dy = vClimb;
 					state = State::Climb;
 				}
 				else
@@ -214,7 +214,7 @@ public:
 
 		if (state != State::Climb)
 		{
-			dy += g * time;
+			dy += g * time;			
 			rect.top += dy * time + g * time * time / 2.f;
 		}
 		else
@@ -226,7 +226,7 @@ public:
 
 		if (state == State::Climb && !onLadder)
 		{
-			dy = -ladderJump;
+			dy = -vLadderJump;
 			state = State::Jump;
 		}
 

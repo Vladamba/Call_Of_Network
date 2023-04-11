@@ -19,26 +19,23 @@ int main()
 	RenderWindow window(VideoMode(400, 200), "Call Of Network");
 	int windowWidthHalf = window.getSize().x / 2;
 	int windowHeightHalf = window.getSize().y / 2;
-
 	View view(FloatRect(0, 0, window.getSize().x, window.getSize().y));
 
 	Level level("files/images/tileset2.png", "files/mymap.tmx");
 	int mapWidth = level.mapWidth * level.tileWidth;
 	int mapHeight = level.mapHeight * level.tileHeight;
 	
-	Texture enemy_t, moveplatform_t, bg;
-	bg.loadFromFile("files/images/bg.png");
+	Texture enemy_t, moveplatform_t, tBackground;
+	tBackground.loadFromFile("files/images/bg.png");
 
-	moveplatform_t.loadFromFile("files/images/movingPlatform.png");
-
-
+	//moveplatform_t.loadFromFile("files/images/movingPlatform.png");
 	//AnimationManager anim4;
 	//anim4.create("move", moveplatform_t, 0, 0, 95, 22, 1, 0);*/
 
-	Sprite background(bg);
-	background.setOrigin(bg.getSize().x / 2, bg.getSize().y / 2);
+	Sprite background(tBackground);
+	background.setOrigin(tBackground.getSize().x / 2, tBackground.getSize().y / 2);
 
-	std::list<Bullet>  entities;
+	std::list<Bullet> entities;
 	std::list<Bullet>::iterator it;
 
 	//e = lvl.GetObjects("MovingPlatform");
