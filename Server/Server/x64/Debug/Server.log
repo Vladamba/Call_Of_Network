@@ -1,2 +1,62 @@
 ﻿  main.cpp
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(103,54): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(103,39): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(107,36): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(107,25): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Bullet.hpp(37,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Bullet.hpp(39,16): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(223,14): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(225,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(244,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(257,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(267,23): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(268,22): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
   Server.vcxproj -> C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\x64\Debug\Server.exe

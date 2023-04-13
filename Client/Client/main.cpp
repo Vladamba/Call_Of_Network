@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
-#include <list>
+#include <SFML/Network.hpp>
+#include "Consts.hpp"
 #include "Level.hpp"
 #include "Animation.hpp"
 #include "Entity.hpp"
@@ -12,8 +13,13 @@ const int mspf = 1000 / 120;
 
 using namespace sf;
 
+enum class State { Connection, Informarion, Game };
 int main()
 {
+	State state = State::Connection;
+	TcpSocket socket;
+	Packet rPacket, sPacket;
+
 	float offsetX = 0;
 	float offsetY = 0;
 	RenderWindow window(VideoMode(400, 200), "Call Of Network");
@@ -21,7 +27,7 @@ int main()
 	int windowHeightHalf = window.getSize().y / 2;
 	View view(FloatRect(0, 0, window.getSize().x, window.getSize().y));
 
-	Level level("files/images/tileset2.png", "files/mymap.tmx");
+	Level level("files/images/tileset2.png", "files/mymap.tmx"); // should send just file without image
 	int mapWidth = level.mapWidth * level.tileWidth;
 	int mapHeight = level.mapHeight * level.tileHeight;
 	
@@ -35,19 +41,29 @@ int main()
 	Sprite background(tBackground);
 	background.setOrigin(tBackground.getSize().x / 2, tBackground.getSize().y / 2);
 
-	std::list<Bullet> entities;
-	std::list<Bullet>::iterator it;
+	AnimationManager playerAnimationManager("files/images/megaman.png", "files/myanim.xml");
+	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
+
+	Player** players = new Player*[CLIENTS_SIZE];
+	for (int i = 0; i < CLIENTS_SIZE; i++)
+	{
+		players[i] = new Player(playerAnimationManager, 100);
+	}
+	int playersNumber = 0;
+
+	Bullet** bullets = new  Bullet*[BULLETS_SIZE];
+	for (int i = 0; i < BULLETS_SIZE; i++)
+	{
+		bullets[i] = new Bullet(bulletAnimationManager);
+	}
+	int bulletsNumber = 0;
 
 	//e = lvl.GetObjects("MovingPlatform");
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
 
-	AnimationManager playerAnimationManager("files/images/megaman.png", "files/myanim.xml");
-	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
-	Player Mario(playerAnimationManager, level, 100);
-
-	std::vector<FloatRect> players;
-	players.push_back(Mario.rect);
+	unsigned char playerState;
+	int myIndex = 0;
 
 	//HealthBar healthBar;
 
@@ -65,107 +81,168 @@ int main()
 			}
 		}
 
-		Mario.keys[Player::Key::Left] = Keyboard::isKeyPressed(Keyboard::Left);
-		Mario.keys[Player::Key::Right] = Keyboard::isKeyPressed(Keyboard::Right);
-		Mario.keys[Player::Key::Up] = Keyboard::isKeyPressed(Keyboard::Up);
-		Mario.keys[Player::Key::Down] = Keyboard::isKeyPressed(Keyboard::Down);
-		Mario.keys[Player::Key::Space] = Keyboard::isKeyPressed(Keyboard::Space);
-
-		if (clock.getElapsedTime().asMilliseconds() > mspf)
+		if (state == State::Connection)
 		{
-
-			time = clock.getElapsedTime().asMilliseconds();
-			clock.restart();
-
-			if (time > mspf * 2)
-			{
-				time = mspf * 2;
+			if (socket.connect(IpAddress("192.168.62.172"), 2000, seconds(5)) == Socket::Done)
+			{				
+				socket.setBlocking(false);
+				state = State::Informarion;		
 			}
+		}
 
-			//float time, ObjectType** map, int mapWidth, int mapHeight, int tileWidth, int tileHeight
-			Mario.update(time, level);
-			if (Mario.shoot)
-			{
-				entities.push_back(Bullet(bulletAnimationManager, Vector2f(Mario.rect.left + Mario.rect.width / 2, Mario.rect.top), 1, Mario.left));
-			}
-
-			it = entities.begin();
-			while (it != entities.end())
-			{
-				(*it).update(time, level, players);
-				if ((*it).isAlive == false)
+		if (state == State::Informarion)
+		{
+			if (socket.receive(rPacket) == Socket::Done && rPacket)
+			{		
+				printf("\nReceived!");
+				rPacket >> playersNumber;
+				for (int i = 0; i < playersNumber; i++)
 				{
-					it = entities.erase(it);
+					players[i]->receivePacket(&rPacket);
 				}
-				else it++;
-			}
 
-			if (Mario.rect.left < windowWidthHalf) {
-				offsetX = windowWidthHalf - Mario.rect.left;
-			}
-			else
-			{
-				if (Mario.rect.left > mapWidth - windowWidthHalf) {
-					offsetX = mapWidth - windowWidthHalf - Mario.rect.left;
-				}
-			}
-
-			if (Mario.rect.top < windowHeightHalf) {
-				offsetY = windowHeightHalf - Mario.rect.top;
-			}
-			else
-			{
-				if (Mario.rect.top > mapHeight - windowHeightHalf) {
-					offsetY = mapHeight - windowHeightHalf - Mario.rect.top;
-				}
-			}
-
-
-			//healthBar.update(Mario.Health);
-
-			/*for (it = entities.begin(); it != entities.end(); it++)
-			{
-				//2. движущиеся платформы
-				if ((*it)->Name == "MovingPlatform")
+				rPacket >> bulletsNumber;
+				for (int i = 0; i < bulletsNumber; i++)
 				{
-					Entity* movPlat = *it;
-					if (Mario.getRect().intersects(movPlat->getRect()))
-						if (Mario.dy > 0)
-							if (Mario.y + Mario.h < movPlat->y + movPlat->h)
-							{
-								Mario.y = movPlat->y - Mario.h + 3; Mario.x += movPlat->dx * time; Mario.dy = 0; Mario.STATE = PLAYER::stay;
-							}
+					bullets[i]->receivePacket(&rPacket);
 				}
+
+				rPacket >> myIndex;
+				rPacket.clear();
+				state = State::Game;
+				continue;
 			}
-			
-			if (((int)characters[0].character->getRect().left > wWidth / 2) &&
-				((int)characters[0].character->getRect().left < mWidth * tsWidth - wWidth / 2)) {
-				offsetX = (characters[0].character->getRect().left - (float)wWidth / 2.0f);
-			}
-			if (((int)characters[0].character->getRect().top > wHeight / 2) &&
-				((int)characters[0].character->getRect().top < mHeight * tsHeight - wHeight / 2)) {
-				offsetY = (characters[0].character->getRect().top - (float)wHeight / 2.0f);
-			}
-			*/
+		}
 
-			//window.clear();
-			view.setCenter(Mario.rect.left + offsetX, Mario.rect.top + offsetY);
-			window.setView(view);
-
-			background.setPosition(view.getCenter());
-			window.draw(background);
-
-			level.draw(window);
-
-			for (it = entities.begin(); it != entities.end(); it++)
+		if (state == State::Game)
+		{
+			if (socket.receive(rPacket) == Socket::Done && rPacket)
 			{
-				(*it).draw(window);
+				rPacket >> playersNumber;
+				for (int i = 0; i < playersNumber; i++)
+				{
+					players[i]->receivePacket(&rPacket);
+				}
+
+				rPacket >> bulletsNumber;
+				for (int i = 0; i < bulletsNumber; i++)
+				{
+					bullets[i]->receivePacket(&rPacket);
+				}
+
+				rPacket >> myIndex;
+				rPacket.clear();
 			}
+	
 
-			Mario.draw(window);
-			//healthBar.draw(window);
+			if (clock.getElapsedTime().asMilliseconds() > mspf)
+			{
+				playerState = 0;
+				/*playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Left) << 4);
+				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
+				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Up) << 2);
+				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Down) << 1);
+				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));*/
+				//printf("%d", playerState);
+				//printf("Sent!\n");
+				sPacket << Keyboard::isKeyPressed(Keyboard::Left);
+				sPacket << Keyboard::isKeyPressed(Keyboard::Right);
+				sPacket << Keyboard::isKeyPressed(Keyboard::Up);
+				sPacket << Keyboard::isKeyPressed(Keyboard::Down);
+				sPacket << Keyboard::isKeyPressed(Keyboard::Space);
+				socket.send(sPacket);
+				sPacket.clear();
 
-			window.display();
+				time = clock.getElapsedTime().asMilliseconds();
+				clock.restart();
+
+				if (time > mspf * 2)
+				{
+					time = mspf * 2;
+				}
+				
+				for (int i = 0; i < playersNumber; i++)
+				{
+					players[i]->update(time);
+				}
+
+				for (int i = 0; i < bulletsNumber; i++)
+				{
+					bullets[i]->update(time);
+				}
+
+
+				if (players[myIndex]->rect.left < windowWidthHalf) {
+					offsetX = windowWidthHalf - players[myIndex]->rect.left;
+				}
+				else
+				{
+					if (players[myIndex]->rect.left > mapWidth - windowWidthHalf) {
+						offsetX = mapWidth - windowWidthHalf - players[myIndex]->rect.left;
+					}
+				}
+
+				if (players[myIndex]->rect.top < windowHeightHalf) {
+					offsetY = windowHeightHalf - players[myIndex]->rect.top;
+				}
+				else
+				{
+					if (players[myIndex]->rect.top > mapHeight - windowHeightHalf) {
+						offsetY = mapHeight - windowHeightHalf - players[myIndex]->rect.top;
+					}
+				}
+
+
+				//healthBar.update(Mario.Health);
+
+				/*for (it = entities.begin(); it != entities.end(); it++)
+				{
+					//2. движущиеся платформы
+					if ((*it)->Name == "MovingPlatform")
+					{
+						Entity* movPlat = *it;
+						if (Mario.getRect().intersects(movPlat->getRect()))
+							if (Mario.dy > 0)
+								if (Mario.y + Mario.h < movPlat->y + movPlat->h)
+								{
+									Mario.y = movPlat->y - Mario.h + 3; Mario.x += movPlat->dx * time; Mario.dy = 0; Mario.STATE = PLAYER::stay;
+								}
+					}
+				}
+
+				if (((int)characters[0].character->getRect().left > wWidth / 2) &&
+					((int)characters[0].character->getRect().left < mWidth * tsWidth - wWidth / 2)) {
+					offsetX = (characters[0].character->getRect().left - (float)wWidth / 2.0f);
+				}
+				if (((int)characters[0].character->getRect().top > wHeight / 2) &&
+					((int)characters[0].character->getRect().top < mHeight * tsHeight - wHeight / 2)) {
+					offsetY = (characters[0].character->getRect().top - (float)wHeight / 2.0f);
+				}
+				*/
+
+				//window.clear();
+				view.setCenter(players[myIndex]->rect.left + offsetX, players[myIndex]->rect.top + offsetY);
+				window.setView(view);
+
+				background.setPosition(view.getCenter());
+				window.draw(background);
+
+				level.draw(window);
+
+				for (int i = 0; i < playersNumber; i++)
+				{
+					players[i]->draw(window);
+				}
+
+				for (int i = 0; i < bulletsNumber; i++)
+				{
+					bullets[i]->draw(window);
+				}
+
+				//healthBar.draw(window);
+
+				window.display();
+			}
 		}
 	}
 }
