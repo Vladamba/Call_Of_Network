@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <math.h>
 #include "Entity.hpp"
 
 class Player : public Entity
@@ -10,7 +11,8 @@ public:
 	float g, vJump, vLadderJump, vRun, vClimb;
 	float tShoot = 200.f;
 
-	enum class Key { Left, Right, Up, Down, Space };
+	enum Key { Left, Right, Up, Down, Space };
+	float dy;
 	unsigned char state;
 	float shootTimer;
 	bool onGround, onLadder, shoot;
@@ -148,6 +150,8 @@ public:
 		{
 			shoot = false;
 		}
+
+		//keys[Key::Left] = keys[Key::Right] = keys[Key::Up] = keys[Key::Down] = keys[Key::Space] = false;
 	}
 
 	void update(signed __int32 _time, Level level)
@@ -210,7 +214,7 @@ public:
 		}
 		else
 		{
-			if (shootTimer > 10000)
+			if (shootTimer > 10000) //Just to avoid overflowing
 			{
 				shootTimer = tShoot;
 			}
@@ -263,9 +267,8 @@ public:
 				}
 				else
 				{
-					//When the player is out of the map, do not know what to do
-					rect.left = level.tileWidth;
-					rect.top = level.tileHeight;
+					//When the player is out of the map, it is better just to kill him
+					isAlive = false;
 				}
 			}
 		}

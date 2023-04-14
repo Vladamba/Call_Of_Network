@@ -22,7 +22,7 @@ public:
 	Entity(AnimationManager a)
 	{		
 		rect.left = 0;
-		rect.top = 0;
+		rect.top = 100;
 		animationManager = a;		
 		isAlive = true;
 		left = false;

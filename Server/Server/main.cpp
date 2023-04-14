@@ -36,11 +36,11 @@ int main()
 	Bullet** bullets = new  Bullet*[BULLETS_SIZE];	
 	for (int i = 0; i < BULLETS_SIZE; i++)
 	{
-		bullets[i] = new Bullet(Vector2f(0, 0), 10, false);
+		bullets[i] = new Bullet(NULL_VECTOR2f, 10, false);
 	}		
 	int bulletsNumber = 0;
 
-	Vector2i bulletHit;
+	Vector2i bulletHitVec;
 
 	int clientIndex = 0;
 
@@ -114,8 +114,7 @@ int main()
 						{
 							if (!bullets[i]->isAlive)
 							{
-								bullets[i] = new Bullet(clients[i]->getBulletVec(), 10, clients[i]->player.left);
-								bullets[i]->isAlive = true;
+								bullets[i]->newBullet(clients[i]->getBulletVec(), 10, clients[i]->player.left);
 								bulletsNumber++;
 								break;
 							}
@@ -125,7 +124,7 @@ int main()
 				}
 				else
 				{
-					playersCoord[i] = NULL_VECTOR;
+					playersCoord[i] = NULL_VECTOR2f;
 				}
 			}
 
@@ -133,10 +132,10 @@ int main()
 			{
 				if (bullets[i]->isAlive)
 				{
-					bulletHit = bullets[i]->update(time, level, playersCoord);
-					if (bulletHit.x != 0)
+					bulletHitVec = bullets[i]->update(time, level, playersCoord);
+					if (bulletHitVec != NULL_VECTOR2I)
 					{
-						clients[bulletHit.y]->playerHit(bulletHit.y);
+						clients[bulletHitVec.y]->playerHit(bulletHitVec.x);
 						bulletsNumber--;
 					}
 					else
@@ -180,8 +179,7 @@ int main()
 			}
 			sPacket.clear();
 
-			/*if (clock.getElapsedTime().asMilliseconds() > mspf)
-			{
+			/*
 				healthBar.update(Mario.Health);
 
 				for (it = entities.begin(); it != entities.end(); it++)
@@ -198,7 +196,7 @@ int main()
 								}
 					}
 				}
-			}*/
+			*/
 		}
 	}
 }

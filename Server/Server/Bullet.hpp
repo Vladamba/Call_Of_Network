@@ -26,12 +26,12 @@ public:
 		isAlive = false;
 	}
 
-	Vector2i update(signed __int32 _time, Level level, Vector2f playersCoord[BULLETS_SIZE])
+	Vector2i update(signed __int32 _time, Level level, Vector2f *playersCoord)
 	{
 		float time = (float)_time;
 		rect.left += dx * time;
 
-		Vector2i vec(0, 0);
+		Vector2i vec = NULL_VECTOR2I;
 		if (health > 0)
 		{
 			for (int i = rect.top / level.tileHeight; i < (rect.top + rect.height) / level.tileHeight; i++)
@@ -42,42 +42,53 @@ public:
 					{
 						if (level.objects[i][j] == ObjectType::Solid)
 						{
-							health = 0;
-							goto collisionHappened;
+							isAlive = false;
+							return vec;
 						}
 					}
 					else
 					{
 						//When the bullet is out of the map, it is better just to destroy it
-						health = 0;
-						goto collisionHappened;
+						isAlive = false;
+						return vec;
 					}
 				}
 			}
 
-			for (int i = 0; i < BULLETS_SIZE; i++)
+			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				if (playersCoord[i] != NULL_VECTOR)
+				if (playersCoord[i] != NULL_VECTOR2f)
 				{
 					if (rect.left + rect.width >= playersCoord[i].x && rect.left <= playersCoord[i].x + PLAYER_WIDTH &&
 						rect.top + rect.height >= playersCoord[i].y && rect.top <= playersCoord[i].y + PLAYER_HEIGHT)
 					{
 						vec.x = health;
 						vec.y = i;
-						health = 0;
-						break;
+						isAlive = false;
+						return vec;
 					}
 				}
 			}
 		}
-
-	collisionHappened:
-
-		if (health == 0) {
-			isAlive = false;
-		}
-
 		return vec;
+	}
+
+	void newBullet(Vector2f vec, int _health, bool _left)
+	{
+		rect.left = vec.x;
+		rect.top = vec.y;
+		health = _health;
+
+		left = _left;
+		if (left)
+		{
+			dx = -vMove;
+		}
+		else
+		{
+			dx = vMove;
+		}
+		isAlive = true;
 	}
 
 	void createPacket(Packet* packet)

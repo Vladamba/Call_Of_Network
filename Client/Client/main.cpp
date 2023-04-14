@@ -8,6 +8,7 @@
 #include "Player.hpp"
 //#include "MovingPlatform.hpp"
 //#include "HealthBar.hpp"
+#include <iostream>
 
 const int mspf = 1000 / 120;
 
@@ -16,6 +17,11 @@ using namespace sf;
 enum class State { Connection, Informarion, Game };
 int main()
 {
+	std::string serverIP;
+	int serverPort;
+	std::cin >> serverIP;
+	std::cin >> serverPort;
+
 	State state = State::Connection;
 	TcpSocket socket;
 	Packet rPacket, sPacket;
@@ -27,7 +33,7 @@ int main()
 	int windowHeightHalf = window.getSize().y / 2;
 	View view(FloatRect(0, 0, window.getSize().x, window.getSize().y));
 
-	Level level("files/images/tileset2.png", "files/mymap.tmx"); // should send just file without image
+	Level level("files/images/tileset2.png", "files/mymap.tmx");
 	int mapWidth = level.mapWidth * level.tileWidth;
 	int mapHeight = level.mapHeight * level.tileHeight;
 	
@@ -83,7 +89,7 @@ int main()
 
 		if (state == State::Connection)
 		{
-			if (socket.connect(IpAddress("192.168.62.172"), 2000, seconds(5)) == Socket::Done)
+			if (socket.connect(IpAddress(serverIP), serverPort, seconds(5)) == Socket::Done)
 			{				
 				socket.setBlocking(false);
 				state = State::Informarion;		
@@ -137,7 +143,7 @@ int main()
 
 			if (clock.getElapsedTime().asMilliseconds() > mspf)
 			{
-				playerState = 0;
+				//playerState = 0;
 				/*playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Left) << 4);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Up) << 2);
@@ -220,7 +226,7 @@ int main()
 				}
 				*/
 
-				//window.clear();
+				window.clear();
 				view.setCenter(players[myIndex]->rect.left + offsetX, players[myIndex]->rect.top + offsetY);
 				window.setView(view);
 
@@ -231,8 +237,12 @@ int main()
 
 				for (int i = 0; i < playersNumber; i++)
 				{
-					players[i]->draw(window);
+					if (i != myIndex)
+					{
+						players[i]->draw(window);
+					}				
 				}
+				players[myIndex]->draw(window);
 
 				for (int i = 0; i < bulletsNumber; i++)
 				{

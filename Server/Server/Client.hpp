@@ -41,7 +41,7 @@ public:
 
 	Vector2f getBulletVec()
 	{
-		return Vector2f(player.left ? player.rect.left - 1 : player.rect.left + player.rect.width + 1, player. rect.top  + player.rect.height / 2);
+		return Vector2f(player.left ? player.rect.left - BULLET_WIDTH - 1 : player.rect.left + player.rect.width + 1, player. rect.top  + player.rect.height / 2);
 	}
 
 	void createPacket(Packet *packet)

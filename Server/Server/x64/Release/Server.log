@@ -1,80 +1,57 @@
 ﻿  main.cpp
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Bullet.hpp(36,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(103,54): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Bullet.hpp(38,16): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(103,39): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,16): error C2039: 'getObjectCoord': is not a member of 'Level'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(10,7): message : see declaration of 'Level'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,9): error C2665: 'Entity::Entity': no overloaded function could convert all the argument types
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Entity.hpp(33,1): message : could be 'Entity::Entity(Entity &&)'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,9): message : 'Entity::Entity(Entity &&)': cannot convert argument 1 from 'int' to 'Entity &&'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,52): message : Reason: cannot convert from 'int' to 'Entity'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,52): message : No constructor could take the source type, or constructor overload resolution was ambiguous
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Entity.hpp(33,1): message : or       'Entity::Entity(const Entity &)'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,9): message : 'Entity::Entity(const Entity &)': cannot convert argument 1 from 'int' to 'const Entity &'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,52): message : Reason: cannot convert from 'int' to 'const Entity'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,52): message : No constructor could take the source type, or constructor overload resolution was ambiguous
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(24,9): message : while trying to match the argument list '(int)'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(215,14): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(107,36): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(217,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Level.hpp(107,25): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(236,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Bullet.hpp(37,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(249,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Bullet.hpp(39,16): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(259,23): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(227,14): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(260,22): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(229,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(13,9): error C3646: 'player': unknown override specifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(13,15): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(18,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(18,12): error C2064: term does not evaluate to a function taking 2 arguments
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(24,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(25,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(26,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(27,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(28,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(33,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(34,10): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(39,3): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(44,19): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(44,38): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(44,61): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(44,81): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(49,14): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(50,14): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(51,14): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(52,12): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(54,14): error C2065: 'player': undeclared identifier
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\main.cpp(115,76): error C2039: 'player': is not a member of 'Client'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(9,7): message : see declaration of 'Client'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\main.cpp(115,31): error C2661: 'Bullet::Bullet': no overloaded function takes 2 arguments
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\main.cpp(115,31): message : while trying to match the argument list '(sf::Vector2f, int)'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\main.cpp(121,35): error C2039: 'player': is not a member of 'Client'
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Client.hpp(9,7): message : see declaration of 'Client'
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(248,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\Server\Player.hpp(261,41): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+  Generating code
+  2 of 490 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Server.vcxproj -> C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Server\x64\Release\Server.exe

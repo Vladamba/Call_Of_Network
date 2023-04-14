@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.0" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="19">
- <tileset firstgid="1" source="tileset2.tsx"/>
+<map version="1.10" tiledversion="1.10.0" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="22">
+ <tileset firstgid="1" source="images/tileset2.tsx"/>
  <layer id="3" name="Слой тайлов 2" width="15" height="15">
   <data>
    <tile/>
@@ -87,7 +87,7 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile gid="48"/>
+   <tile/>
    <tile/>
    <tile/>
    <tile/>
@@ -179,7 +179,7 @@
    <tile/>
    <tile/>
    <tile/>
-   <tile/>
+   <tile gid="25"/>
    <tile/>
    <tile/>
    <tile/>
@@ -408,7 +408,7 @@
    <tile gid="52"/>
    <tile/>
    <tile/>
-   <tile/>
+   <tile gid="9"/>
    <tile gid="26"/>
    <tile gid="27"/>
    <tile gid="44"/>
@@ -471,5 +471,6 @@
   <object id="14" name="Ladder" x="128" y="352" width="32" height="96"/>
   <object id="15" name="Ladder" x="224" y="224" width="32" height="96"/>
   <object id="17" name="Player" x="64" y="352" width="32" height="32"/>
+  <object id="21" name="Ladder" x="352" y="352" width="32" height="32"/>
  </objectgroup>
 </map>

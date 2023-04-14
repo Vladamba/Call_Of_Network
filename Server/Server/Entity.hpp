@@ -1,9 +1,9 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <math.h>
-#include "Consts.hpp"
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
+#include "Consts.hpp"
 #include "Level.hpp"
 
 using namespace sf;
@@ -12,7 +12,7 @@ class Entity
 {
 public:
 	FloatRect rect;
-	float dx, dy;	
+	float dx;	
 	bool isAlive, left;
 	int health;
 
