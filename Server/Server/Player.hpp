@@ -10,12 +10,13 @@ public:
 	int sHeight, sWidth;
 	float g, vJump, vLadderJump, vRun, vClimb;
 	float tShoot = 200.f;
+	float tDead = 1000.f;
 
 	enum Key { Left, Right, Up, Down, Space };
 	float dy;
 	unsigned char state;
-	float shootTimer;
-	bool onGround, onLadder, shoot;
+	float shootTimer, deadTimer;
+	bool onGround, onLadder, shoot, respawn;
 	std::map<Key, bool> keys;
 
 	Player() : Entity()
@@ -41,11 +42,34 @@ public:
 		dy = 0;
 		isAlive = true;
 		shootTimer = 0;
+		deadTimer = 0;
 		onGround = false;
 		onLadder = false;
 		shoot = false;
 		//hit = false;
 		left = false;
+		respawn = false;
+	}
+
+	void newPlayer(Level level, int _health)
+	{
+		Vector2f vec = level.getObjectCoord(ObjectType::PlayerSpawner);
+		state = STATE_STAND;
+		rect.left = vec.x;
+		rect.top = vec.y;
+		health = _health;
+
+		dx = 0;
+		dy = 0;
+		isAlive = true;
+		shootTimer = 0;
+		deadTimer = 0;
+		onGround = false;
+		onLadder = false;
+		shoot = false;
+		//hit = false;
+		left = false;
+		respawn = false;
 	}
 
 	void updateKeys()
@@ -156,67 +180,77 @@ public:
 
 	void update(signed __int32 _time, Level level)
 	{
-		updateKeys();
-
 		float time = (float)_time;
-
-		onGround = false;
-		onLadder = false;
-
-		if (dx != 0)
+		if (isAlive)
 		{
-			rect.left += dx * time;
-			collision(true, time, level);
-		}
+			updateKeys();
 
-		if (state != STATE_CLIMB)
-		{
-			dy += g * time;
-			rect.top += dy * time + g * time * time / 2.f;
-		}
-		else
-		{
-			rect.top += dy * time;
-		}
+			onGround = false;
+			onLadder = false;
 
-		collision(false, time, level);
-
-		if (state == STATE_CLIMB && !onLadder)
-		{
-			dy = -vLadderJump;
-			state = STATE_JUMP;
-		}
-
-		if (onGround && state != STATE_CRAWL)
-		{
-			if (dx == 0)
+			if (dx != 0)
 			{
-				state = STATE_STAND;
+				rect.left += dx * time;
+				collision(true, time, level);
+			}
+
+			if (state != STATE_CLIMB)
+			{
+				dy += g * time;
+				rect.top += dy * time + g * time * time / 2.f;
 			}
 			else
 			{
-				state = STATE_RUN;
+				rect.top += dy * time;
 			}
-		}
 
-		shootTimer += time;
-		if (shoot)
-		{
-			if (shootTimer >= tShoot)
+			collision(false, time, level);
+
+			if (state == STATE_CLIMB && !onLadder)
 			{
-				shootTimer = 0;
-				shoot = true;
+				dy = -vLadderJump;
+				state = STATE_JUMP;
+			}
+
+			if (onGround && state != STATE_CRAWL)
+			{
+				if (dx == 0)
+				{
+					state = STATE_STAND;
+				}
+				else
+				{
+					state = STATE_RUN;
+				}
+			}
+
+			shootTimer += time;
+			if (shoot)
+			{
+				if (shootTimer >= tShoot)
+				{
+					shootTimer = 0;
+					shoot = true;
+				}
+				else
+				{
+					shoot = false;
+				}
 			}
 			else
 			{
-				shoot = false;
+				if (shootTimer > 10000) //Just to avoid overflowing
+				{
+					shootTimer = tShoot;
+				}
 			}
 		}
 		else
 		{
-			if (shootTimer > 10000) //Just to avoid overflowing
+			deadTimer += time;
+			if (deadTimer >= 1000)
 			{
-				shootTimer = tShoot;
+				respawn = true;
 			}
 		}
 	}
@@ -309,12 +343,12 @@ public:
 		return Vector2f(rect.left, rect.top);
 	}
 
-	void hit(int damage)
+	void damaged(int damage)
 	{
 		health -= damage;
 		if (health <= 0)
 		{
-			isAlive = false;
+			isAlive = false;			
 		}
 	}
 };

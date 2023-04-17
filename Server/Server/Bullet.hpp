@@ -26,6 +26,24 @@ public:
 		isAlive = false;
 	}
 
+	void newBullet(Vector2f vec, int _health, bool _left)
+	{
+		rect.left = vec.x;
+		rect.top = vec.y;
+		health = _health;
+
+		left = _left;
+		if (left)
+		{
+			dx = -vMove;
+		}
+		else
+		{
+			dx = vMove;
+		}
+		isAlive = true;
+	}
+
 	Vector2i update(signed __int32 _time, Level level, Vector2f *playersCoord)
 	{
 		float time = (float)_time;
@@ -71,24 +89,6 @@ public:
 			}
 		}
 		return vec;
-	}
-
-	void newBullet(Vector2f vec, int _health, bool _left)
-	{
-		rect.left = vec.x;
-		rect.top = vec.y;
-		health = _health;
-
-		left = _left;
-		if (left)
-		{
-			dx = -vMove;
-		}
-		else
-		{
-			dx = vMove;
-		}
-		isAlive = true;
 	}
 
 	void createPacket(Packet* packet)

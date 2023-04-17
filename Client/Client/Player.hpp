@@ -75,7 +75,14 @@ public:
 			animationManager.set("hit");
 		}
 		*/
-
+		if (!isAlive)
+		{
+			animationManager.setRed();
+		}
+		else
+		{
+			animationManager.removeRed();
+		}
 		animationManager.update(time, left);
 	}
 
@@ -86,6 +93,7 @@ public:
 		*packet >> left;
 		*packet >> dy;
 		*packet >> state;
+		*packet >> isAlive;
 	}
 };
 

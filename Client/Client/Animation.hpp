@@ -203,6 +203,16 @@ public:
 		animationList[a].loop = loop;
 	}
 
+	void setRed()
+	{
+		animationList[currentAnimation].sprite.setColor(Color::Red);
+	}
+
+	void removeRed()
+	{
+		animationList[currentAnimation].sprite.setColor(Color::White);
+	}
+
 	int getWidth()
 	{
 		return animationList[currentAnimation].frames_right[(int)animationList[currentAnimation].currentFrame].width;

@@ -36,7 +36,7 @@ public:
 
 	void playerHit(int damage)
 	{
-		player.hit(damage);
+		player.damaged(damage);
 	}
 
 	Vector2f getBulletVec()
@@ -52,6 +52,7 @@ public:
 		bool f = player.dy == 0;
 		*packet << f;
 		*packet << player.state;
+		*packet << player.isAlive;
 	}
 };
 

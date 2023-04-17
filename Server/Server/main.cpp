@@ -110,15 +110,19 @@ int main()
 
 					if (clients[i]->updatePlayer(time, level))
 					{
-						for (int i = 0; i < BULLETS_SIZE; i++)
+						for (int j = 0; j < BULLETS_SIZE; j++)
 						{
-							if (!bullets[i]->isAlive)
+							if (!bullets[j]->isAlive)
 							{
-								bullets[i]->newBullet(clients[i]->getBulletVec(), 10, clients[i]->player.left);
+								bullets[j]->newBullet(clients[i]->getBulletVec(), 10, clients[i]->player.left);
 								bulletsNumber++;
 								break;
 							}
 						}
+					}
+					if (clients[i]->player.respawn)
+					{
+						clients[i]->player.newPlayer(level, 100);
 					}
 					playersCoord[i] = clients[i]->player.getVec();
 				}
