@@ -13,6 +13,9 @@ using namespace sf;
 
 int main()
 {
+	int port = 2000;
+	printf("My IP is: %s", IpAddress::getLocalAddress().toString());
+	printf("\nMy port is: %d", port);
 	TcpListener listener;
 	Packet rPacket, sPacket;
 
@@ -47,7 +50,7 @@ int main()
 	Clock clock;
 	signed __int32 time;
 
-	listener.listen(2000);
+	listener.listen(port);
 	while (true)
 	{
 		for (int i = 0; i < CLIENTS_SIZE; i++)

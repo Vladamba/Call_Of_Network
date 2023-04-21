@@ -18,8 +18,10 @@ enum class State { Connection, Informarion, Game };
 int main()
 {
 	std::string serverIP;
-	int serverPort;
+	unsigned short serverPort;
+	std::cout << "Input server's IP: ";
 	std::cin >> serverIP;
+	std::cout << "Input server's port: ";
 	std::cin >> serverPort;
 
 	State state = State::Connection;
@@ -100,7 +102,7 @@ int main()
 		{
 			if (socket.receive(rPacket) == Socket::Done && rPacket)
 			{		
-				printf("\nReceived!");
+				printf("Connected!");
 				rPacket >> playersNumber;
 				for (int i = 0; i < playersNumber; i++)
 				{
