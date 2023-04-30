@@ -3,28 +3,23 @@
 #include "Consts.hpp"
 #include "Level.hpp"
 #include "Animation.hpp"
-#include "Entity.hpp"
-#include "Bullet.hpp"
 #include "Player.hpp"
+#include "Bullet.hpp"
+#include "HealthBar.hpp"
 //#include "MovingPlatform.hpp"
-//#include "HealthBar.hpp"
 #include <iostream>
 
 const int mspf = 1000 / 120;
 
 using namespace sf;
 
-enum class State { Connection, Informarion, Game };
+enum class Stage { Connection, TeamAsk, TeamAnswer, PlayersInfo, Game };
 int main()
 {
 	std::string serverIP;
 	unsigned short serverPort;
-	std::cout << "Input server's IP: ";
-	std::cin >> serverIP;
-	std::cout << "Input server's port: ";
-	std::cin >> serverPort;
 
-	State state = State::Connection;
+	Stage stage = Stage::Connection;
 	TcpSocket socket;
 	Packet rPacket, sPacket;
 
@@ -39,15 +34,16 @@ int main()
 	int mapWidth = level.mapWidth * level.tileWidth;
 	int mapHeight = level.mapHeight * level.tileHeight;
 	
-	Texture enemy_t, moveplatform_t, tBackground;
+	Texture moveplatform_t, tBackground;
 	tBackground.loadFromFile("files/images/bg.png");
+	Sprite background(tBackground);
+	background.setOrigin(tBackground.getSize().x / 2, tBackground.getSize().y / 2);
+
+	HealthBar healthBar("files/images/healthBar.png");
 
 	//moveplatform_t.loadFromFile("files/images/movingPlatform.png");
 	//AnimationManager anim4;
 	//anim4.create("move", moveplatform_t, 0, 0, 95, 22, 1, 0);*/
-
-	Sprite background(tBackground);
-	background.setOrigin(tBackground.getSize().x / 2, tBackground.getSize().y / 2);
 
 	AnimationManager playerAnimationManager("files/images/megaman.png", "files/myanim.xml");
 	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
@@ -57,23 +53,19 @@ int main()
 	{
 		players[i] = new Player(playerAnimationManager, 100);
 	}
-	int playersNumber = 0;
 
 	Bullet** bullets = new  Bullet*[BULLETS_SIZE];
 	for (int i = 0; i < BULLETS_SIZE; i++)
 	{
 		bullets[i] = new Bullet(bulletAnimationManager);
 	}
-	int bulletsNumber = 0;
 
 	//e = lvl.GetObjects("MovingPlatform");
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
 
-	unsigned char playerState;
-	int myIndex = 0;
-
-	//HealthBar healthBar;
+	//unsigned char playerState;	
+	unsigned char playersNumber = 0, bulletsNumber = 0, myIndex = 0;
 
 	Clock clock;
 	signed __int32 time;
@@ -89,19 +81,48 @@ int main()
 			}
 		}
 
-		if (state == State::Connection)
+		switch (stage)
 		{
-			if (socket.connect(IpAddress(serverIP), serverPort, seconds(5)) == Socket::Done)
-			{				
-				socket.setBlocking(false);
-				state = State::Informarion;		
-			}
-		}
+		case Stage::Connection:
+			std::cout << "Input server's IP: ";
+			std::cin >> serverIP;
+			std::cout << "Input server's port: ";
+			std::cin >> serverPort;
 
-		if (state == State::Informarion)
-		{
+			if (socket.connect(IpAddress(serverIP), serverPort, seconds(5)) == Socket::Done)
+			{
+				socket.setBlocking(false);
+				stage = Stage::TeamAsk;
+			}
+			break;
+
+		case Stage::TeamAsk:
 			if (socket.receive(rPacket) == Socket::Done && rPacket)
-			{		
+			{
+				unsigned char team1 = 0, team2 = 0;
+				rPacket >> team1;
+				rPacket >> team2;
+				rPacket.clear();
+
+				std::cout << "There are " << team1 << " players in the first team and " << team2 << " players in the second one. \nChoose your team (input 1 or 2): ";
+				std::cin >> team1;
+
+				bool team = team1 == 1;
+				sPacket << team;
+				socket.send(sPacket);					
+				sPacket.clear();
+				stage = Stage::TeamAnswer;
+			}			
+			break;
+
+		case Stage::TeamAnswer:
+			// Maybe autobalance
+			stage = Stage::PlayersInfo;
+			break;
+
+		case Stage::PlayersInfo:
+			if (socket.receive(rPacket) == Socket::Done && rPacket)
+			{
 				printf("Connected!");
 				rPacket >> playersNumber;
 				for (int i = 0; i < playersNumber; i++)
@@ -117,13 +138,11 @@ int main()
 
 				rPacket >> myIndex;
 				rPacket.clear();
-				state = State::Game;
-				continue;
+				stage = Stage::Game;
 			}
-		}
+			break;
 
-		if (state == State::Game)
-		{
+		case Stage::Game:
 			if (socket.receive(rPacket) == Socket::Done && rPacket)
 			{
 				rPacket >> playersNumber;
@@ -141,7 +160,7 @@ int main()
 				rPacket >> myIndex;
 				rPacket.clear();
 			}
-	
+
 
 			if (clock.getElapsedTime().asMilliseconds() > mspf)
 			{
@@ -168,10 +187,10 @@ int main()
 				{
 					time = mspf * 2;
 				}
-				
+
 				for (int i = 0; i < playersNumber; i++)
 				{
-					players[i]->update(time);
+					players[i]->update(time, i == myIndex);
 				}
 
 				for (int i = 0; i < bulletsNumber; i++)
@@ -179,33 +198,28 @@ int main()
 					bullets[i]->update(time);
 				}
 
-
-				if (players[myIndex]->rect.left < windowWidthHalf) {
-					offsetX = windowWidthHalf - players[myIndex]->rect.left;
+				if (players[myIndex]->x < windowWidthHalf) {
+					offsetX = windowWidthHalf - players[myIndex]->x;
 				}
 				else
 				{
-					if (players[myIndex]->rect.left > mapWidth - windowWidthHalf) {
-						offsetX = mapWidth - windowWidthHalf - players[myIndex]->rect.left;
+					if (players[myIndex]->x > mapWidth - windowWidthHalf) {
+						offsetX = mapWidth - windowWidthHalf - players[myIndex]->x;
 					}
 				}
 
-				if (players[myIndex]->rect.top < windowHeightHalf) {
-					offsetY = windowHeightHalf - players[myIndex]->rect.top;
+				if (players[myIndex]->y < windowHeightHalf) {
+					offsetY = windowHeightHalf - players[myIndex]->y;
 				}
 				else
 				{
-					if (players[myIndex]->rect.top > mapHeight - windowHeightHalf) {
-						offsetY = mapHeight - windowHeightHalf - players[myIndex]->rect.top;
+					if (players[myIndex]->y > mapHeight - windowHeightHalf) {
+						offsetY = mapHeight - windowHeightHalf - players[myIndex]->y;
 					}
 				}
-
-
-				//healthBar.update(Mario.Health);
 
 				/*for (it = entities.begin(); it != entities.end(); it++)
 				{
-					//2. движущиеся платформы
 					if ((*it)->Name == "MovingPlatform")
 					{
 						Entity* movPlat = *it;
@@ -217,19 +231,10 @@ int main()
 								}
 					}
 				}
-
-				if (((int)characters[0].character->getRect().left > wWidth / 2) &&
-					((int)characters[0].character->getRect().left < mWidth * tsWidth - wWidth / 2)) {
-					offsetX = (characters[0].character->getRect().left - (float)wWidth / 2.0f);
-				}
-				if (((int)characters[0].character->getRect().top > wHeight / 2) &&
-					((int)characters[0].character->getRect().top < mHeight * tsHeight - wHeight / 2)) {
-					offsetY = (characters[0].character->getRect().top - (float)wHeight / 2.0f);
-				}
 				*/
 
 				window.clear();
-				view.setCenter(players[myIndex]->rect.left + offsetX, players[myIndex]->rect.top + offsetY);
+				view.setCenter(players[myIndex]->x + offsetX, players[myIndex]->y + offsetY);
 				window.setView(view);
 
 				background.setPosition(view.getCenter());
@@ -242,7 +247,7 @@ int main()
 					if (i != myIndex)
 					{
 						players[i]->draw(window);
-					}				
+					}
 				}
 				players[myIndex]->draw(window);
 
@@ -251,10 +256,12 @@ int main()
 					bullets[i]->draw(window);
 				}
 
-				//healthBar.draw(window);
+				healthBar.update(players[myIndex]->health);
+				healthBar.draw(window, view.getCenter() - Vector2f(200, 100));
 
 				window.display();
 			}
+			break;
 		}
 	}
 }

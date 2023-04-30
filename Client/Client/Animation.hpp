@@ -15,9 +15,7 @@ public:
 	bool loop, isPlaying;
 	Sprite sprite;
 
-	Animation()
-	{
-	}
+	Animation(){}
 
 	Animation(int delay, Texture& t)
 	{		
@@ -208,9 +206,19 @@ public:
 		animationList[currentAnimation].sprite.setColor(Color::Red);
 	}
 
-	void removeRed()
+	void setGreen()
 	{
-		animationList[currentAnimation].sprite.setColor(Color::White);
+		animationList[currentAnimation].sprite.setColor(Color::Green);
+	}
+
+	void setBlue()
+	{
+		animationList[currentAnimation].sprite.setColor(Color::Blue);
+	}
+
+	void setYellow()
+	{
+		animationList[currentAnimation].sprite.setColor(Color::Yellow);
 	}
 
 	int getWidth()

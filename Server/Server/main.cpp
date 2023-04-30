@@ -2,7 +2,6 @@
 #include <SFML/Network.hpp>
 #include "Consts.hpp"
 #include "Level.hpp"
-#include "Entity.hpp"
 #include "Bullet.hpp"
 #include "Player.hpp"
 #include "Client.hpp"
@@ -14,8 +13,8 @@ using namespace sf;
 int main()
 {
 	int port = 2000;
-	printf("My IP is: %s", IpAddress::getLocalAddress().toString());
-	printf("\nMy port is: %d", port);
+	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString(), port);
+
 	TcpListener listener;
 	Packet rPacket, sPacket;
 
@@ -32,20 +31,17 @@ int main()
 	{		
 		clients[i] = new Client(level, 100);
 	}
-	int clientsNumber = 0;
-
-	Vector2f playersCoord[CLIENTS_SIZE];
 
 	Bullet** bullets = new  Bullet*[BULLETS_SIZE];	
 	for (int i = 0; i < BULLETS_SIZE; i++)
 	{
 		bullets[i] = new Bullet(NULL_VECTOR2f, 10, false);
 	}		
-	int bulletsNumber = 0;
 
+	Vector2f playersCoord[CLIENTS_SIZE];
 	Vector2i bulletHitVec;
-
-	int clientIndex = 0;
+	 
+	unsigned char clientsNumber = 0, bulletsNumber = 0, clientIndex = 0, team1 = 0, team2 = 0;
 
 	Clock clock;
 	signed __int32 time;
@@ -68,15 +64,54 @@ int main()
 					{
 						clients[i]->socket.setBlocking(false);
 					}
-					clients[i]->connected = true;
-					clientsNumber++;
+					clients[i]->connected = true;		
 				}
-			}			
+			}	
+			else 
+			{
+				if (!clients[i]->playing)
+				{
+					if (clients[i]->noTeam)
+					{
+						sPacket << team1;
+						sPacket << team2;
+						clients[i]->socket.send(sPacket);
+						sPacket.clear();
+						clients[i]->noTeam = false;
+					}
+					else
+					{
+						if (clients[i]->socket.isBlocking())
+						{
+							clients[i]->socket.setBlocking(false);
+						}
+
+						Socket::Status s = clients[i]->socket.receive(rPacket);
+						if (s == Socket::Done)
+						{
+							printf("\nConnected!");
+							rPacket >> clients[i]->team;
+							rPacket.clear();
+							clients[i]->newPlayer(level, 100);
+							clients[i]->playing = true;
+							clientsNumber++;
+						}						
+						else
+						{							
+							if (s == Socket::Disconnected || s == Socket::Error)
+							{
+								printf("\nDisconnected!");
+								clients[i]->disconnect();
+								rPacket.clear();
+							}
+						}
+					}
+				}
+			}
 		}
 		
 		if (clock.getElapsedTime().asMilliseconds() > MSPF)
 		{
-
 			time = clock.getElapsedTime().asMilliseconds();
 			clock.restart();
 
@@ -87,7 +122,7 @@ int main()
 
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				if (clients[i]->connected)
+				if (clients[i]->playing)
 				{
 					if (clients[i]->socket.isBlocking())
 					{
@@ -98,8 +133,7 @@ int main()
 					if (s == Socket::Disconnected)
 					{
 						printf("\nDisconnected!");
-						clients[i]->socket.disconnect();
-						clients[i]->connected = false;
+						clients[i]->disconnect();
 						clientsNumber--;
 						rPacket.clear();
 						continue;
@@ -107,11 +141,13 @@ int main()
 					if (s == Socket::Done)
 					{
 						//printf("\nReceived!");
-						clients[i]->updateState(&rPacket);
+						clients[i]->player.receivePacket(&rPacket);
 						rPacket.clear();
 					}
 
-					if (clients[i]->updatePlayer(time, level))
+					clients[i]->player.update(time, level);
+
+					if (clients[i]->player.shoot)
 					{
 						for (int j = 0; j < BULLETS_SIZE; j++)
 						{
@@ -125,7 +161,7 @@ int main()
 					}
 					if (clients[i]->player.respawn)
 					{
-						clients[i]->player.newPlayer(level, 100);
+						clients[i]->newPlayer(level, 100);
 					}
 					playersCoord[i] = clients[i]->player.getVec();
 				}
@@ -142,7 +178,7 @@ int main()
 					bulletHitVec = bullets[i]->update(time, level, playersCoord);
 					if (bulletHitVec != NULL_VECTOR2I)
 					{
-						clients[bulletHitVec.y]->playerHit(bulletHitVec.x);
+						clients[bulletHitVec.y]->player.hit(bulletHitVec.x);
 						bulletsNumber--;
 					}
 					else
@@ -155,15 +191,16 @@ int main()
 				}
 			}
 
+			//Send
 			sPacket << clientsNumber;
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				if (clients[i]->connected)
+				if (clients[i]->playing)
 				{
 					clients[i]->createPacket(&sPacket);
 				}
 			}
-
+			
 			sPacket << bulletsNumber;
 			for (int i = 0; i < BULLETS_SIZE; i++)
 			{
@@ -176,7 +213,7 @@ int main()
 			clientIndex = 0;
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				if (clients[i]->connected)
+				if (clients[i]->playing)
 				{
 					Packet pPacket = sPacket;
 					pPacket << clientIndex;
@@ -188,7 +225,6 @@ int main()
 
 			/*
 				healthBar.update(Mario.Health);
-
 				for (it = entities.begin(); it != entities.end(); it++)
 				{
 					//2. движущиеся платформы

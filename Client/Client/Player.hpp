@@ -1,33 +1,39 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "Entity.hpp"
+#include <SFML/Graphics.hpp>
+#include "Consts.hpp"
+#include "Animation.hpp"
+#include "Level.hpp"
 
-class Player : public Entity
+class Player
 {
 public:
+	AnimationManager animationManager;
 	unsigned char state;
+	float x, y;
+	bool left, isAlive, dy, team;	
 	int health;
-	bool dy;
 
-	Player() : Entity()
-	{
-	}
+	Player(){}
 
-	Player(AnimationManager a, int _health) :
-		Entity(a)
-	{
-		state = STATE_STAND;
+	Player(AnimationManager a, int _health)
+	{	
+		animationManager = a;
 		animationManager.set(AnimationType::Stand);
-		rect.width = (float)animationManager.getWidth();
-		rect.height = (float)animationManager.getHeight();
 		animationManager.loop(AnimationType::Jump, false);
+		state = STATE_STAND;
 
-		health = _health;
+		x = 0;
+		y = 0;
+		left = false;
+		isAlive = true;
 		dy = true;
+
+		health = _health;	
 	}
 
-	void update(signed __int32 _time)
+	void update(signed __int32 _time, bool myPlayer)
 	{
 		float time = (float)_time;
 		switch (state)
@@ -75,25 +81,46 @@ public:
 			animationManager.set("hit");
 		}
 		*/
+
 		if (!isAlive)
 		{
 			animationManager.setRed();
 		}
 		else
 		{
-			animationManager.removeRed();
+			if (myPlayer)
+			{
+				animationManager.setYellow();
+			}
+			else
+			{
+				if (team)
+				{
+					animationManager.setGreen();
+				}
+				else
+				{
+					animationManager.setBlue();
+				}
+			}			
 		}
 		animationManager.update(time, left);
 	}
 
 	void receivePacket(Packet* packet)
 	{
-		*packet >> rect.left;
-		*packet >> rect.top;
+		*packet >> team;
+		*packet >> x;
+		*packet >> y;
 		*packet >> left;
 		*packet >> dy;
 		*packet >> state;
 		*packet >> isAlive;
+	}
+
+	void draw(RenderWindow& window)
+	{
+		animationManager.draw(window, x, y);
 	}
 };
 

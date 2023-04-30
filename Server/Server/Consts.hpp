@@ -6,8 +6,8 @@
 using namespace sf;
 
 const int MSPF = 1000 / 250;
-const int CLIENTS_SIZE = 16;
-const int BULLETS_SIZE = 256;
+const int CLIENTS_SIZE = 8;
+const int BULLETS_SIZE = 64;
 const Vector2f NULL_VECTOR2f = Vector2f(-1, -1);
 const Vector2i NULL_VECTOR2I = Vector2i(-1, -1);
 

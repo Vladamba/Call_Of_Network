@@ -10,49 +10,39 @@ class Client
 {
 public:
 	TcpSocket socket;
+	bool connected, playing, noTeam, team;
 	Player player;
-	bool connected;	
 
 	Client(Level level, int health)
-	{
-		player = Player(level, health);
+	{		
 		connected = false;
+		playing = false;
+		noTeam = true;
+		player = Player(level, health);
 	}
 
-	void updateState(Packet* packet)
+	void disconnect()
 	{
-		*packet >> player.keys[Player::Key::Left];
-		*packet >> player.keys[Player::Key::Right];
-		*packet >> player.keys[Player::Key::Up];
-		*packet >> player.keys[Player::Key::Down];
-		*packet >> player.keys[Player::Key::Space];
+		socket.disconnect();
+		connected = false;
+		playing = false;
+		noTeam = true;
 	}
 
-	bool updatePlayer(signed __int32 time, Level level)
+	void createPacket(Packet* packet)
 	{
-		player.update(time, level);
-		return player.shoot;
+		*packet << team;
+		player.createPacket(packet);
 	}
 
-	void playerHit(int damage)
+	void newPlayer(Level level, int _health)
 	{
-		player.damaged(damage);
+		player.newPlayer(level, team, _health);
 	}
 
 	Vector2f getBulletVec()
 	{
 		return Vector2f(player.left ? player.rect.left - BULLET_WIDTH - 1 : player.rect.left + player.rect.width + 1, player. rect.top  + player.rect.height / 2);
-	}
-
-	void createPacket(Packet *packet)
-	{
-		*packet << player.rect.left;
-		*packet << player.rect.top;
-		*packet << player.left;
-		bool f = player.dy == 0;
-		*packet << f;
-		*packet << player.state;
-		*packet << player.isAlive;
 	}
 };
 

@@ -32,7 +32,7 @@
   <cut w="32" x="305" y="98" h="41" row="1" col="1"/>
   <cut w="32" x="340" y="98" h="41" row="1" col="1"/>
  </animation>
- <animation title="Climb" delay="200">
+ <animation title="Climb" delay="150">
   <cut w="21" x="124" y="392" h="58" row="1" col="1"/>
   <cut w="25" x="148" y="394" h="51" row="1" col="1"/>
   <cut w="34" x="176" y="397" h="47" row="1" col="1"/>

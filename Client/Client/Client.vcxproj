@@ -133,7 +133,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
@@ -141,7 +140,7 @@
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="Consts.hpp" />
-    <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="HealthBar.hpp" />
     <ClInclude Include="Level.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="tinyxml2.h" />

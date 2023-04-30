@@ -20,7 +20,7 @@ public:
         XMLDocument levelFile;
         if (levelFile.LoadFile(file) != XML_SUCCESS)
         {
-            printf("Loading level file failed.");
+            printf("Loading level file failed!");
         }
 
         XMLElement* mapElement;
@@ -45,7 +45,7 @@ public:
         objectGroupElement = mapElement->FirstChildElement("objectgroup");
         if (objectGroupElement == NULL)
         {
-            printf("No object layers found");
+            printf("No object layers found!");
         }
         while (objectGroupElement)
         {

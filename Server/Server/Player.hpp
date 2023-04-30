@@ -1,10 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <SFML/Graphics.hpp>
+#include "Consts.hpp"
+#include "Level.hpp"
 #include <math.h>
-#include "Entity.hpp"
 
-class Player : public Entity
+class Player
 {
 public:
 	int sHeight, sWidth;
@@ -13,63 +15,63 @@ public:
 	float tDead = 1000.f;
 
 	enum Key { Left, Right, Up, Down, Space };
-	float dy;
-	unsigned char state;
-	float shootTimer, deadTimer;
-	bool onGround, onLadder, shoot, respawn;
 	std::map<Key, bool> keys;
+	unsigned char state;
 
-	Player() : Entity()
-	{
-	}
+	FloatRect rect;
+	float dx, dy;
+	float shootTimer, deadTimer;
+	bool left, isAlive, onGround, onLadder, shoot, respawn;
+	int health;
 
-	Player(Level level, int _health) :
-		Entity(level.getObjectCoord(ObjectType::PlayerSpawner), _health)
+	Player(){}
+
+	Player(Level level, int _health)
 	{
-		sHeight = level.tileHeight;
 		sWidth = level.tileWidth;
-		g = 2.f * (float)sHeight / (200.f * 200.f);// 0.0016
+		sHeight = level.tileHeight;
+		g = 2.f * (float)sHeight / (200.f * 200.f); // 0.0016
 		vJump = sqrt(2.f * g * 2.5f * (float)sHeight); // 0.505964
 		vLadderJump = sqrt(2.f * g * 1.5f * (float)sHeight); // 0.391918
 		vRun = g * 2.5f * (float)sWidth / vJump; // 0.252982
 		vClimb = vRun / 2.f; // 0.126491
 
-		state = STATE_STAND;
 		rect.width = PLAYER_WIDTH;
 		rect.height = PLAYER_HEIGHT;
 
-		dx = 0;
-		dy = 0;
-		isAlive = true;
-		shootTimer = 0;
-		deadTimer = 0;
-		onGround = false;
-		onLadder = false;
-		shoot = false;
-		//hit = false;
-		left = false;
-		respawn = false;
+		newPlayer(level, true, _health);
 	}
 
-	void newPlayer(Level level, int _health)
+	void newPlayer(Level level, bool team, int _health)
 	{
-		Vector2f vec = level.getObjectCoord(ObjectType::PlayerSpawner);
-		state = STATE_STAND;
+		Vector2f vec;
+		if (team)
+		{
+			vec = level.getObjectCoord(ObjectType::PlayerSpawner);
+		}
+		else
+		{
+			vec = level.getObjectCoord(ObjectType::PlayerSpawner);
+		}
 		rect.left = vec.x;
 		rect.top = vec.y;
+
+		state = STATE_STAND;
 		health = _health;
+		left = false;
 
 		dx = 0;
 		dy = 0;
-		isAlive = true;
-		shootTimer = 0;
-		deadTimer = 0;
 		onGround = false;
 		onLadder = false;
+
+		shootTimer = 0;
 		shoot = false;
-		//hit = false;
-		left = false;
+
+		isAlive = true;
+		deadTimer = 0;
 		respawn = false;
+		//hit = false;
 	}
 
 	void updateKeys()
@@ -134,10 +136,10 @@ public:
 						state = STATE_JUMP;
 					}
 				}
-				if (state == STATE_CRAWL)
+				/*if (state == STATE_CRAWL)
 				{
 					state = STATE_STAND;
-				}
+				}*/
 			}
 		}
 		else
@@ -149,13 +151,13 @@ public:
 					dy = vClimb;
 					state = STATE_CLIMB;
 				}
-				else
+				/*else
 				{
 					if (state == STATE_STAND || state == STATE_RUN)
 					{
 						state = STATE_CRAWL;
 					}
-				}
+				}*/
 			}
 			else
 			{
@@ -174,13 +176,13 @@ public:
 		{
 			shoot = false;
 		}
-
 		//keys[Key::Left] = keys[Key::Right] = keys[Key::Up] = keys[Key::Down] = keys[Key::Space] = false;
 	}
 
 	void update(signed __int32 _time, Level level)
 	{
 		float time = (float)_time;
+
 		if (isAlive)
 		{
 			updateKeys();
@@ -203,7 +205,6 @@ public:
 			{
 				rect.top += dy * time;
 			}
-
 			collision(false, time, level);
 
 			if (state == STATE_CLIMB && !onLadder)
@@ -212,7 +213,8 @@ public:
 				state = STATE_JUMP;
 			}
 
-			if (onGround && state != STATE_CRAWL)
+			//if (onGround && state != STATE_CRAWL)
+			if (onGround)
 			{
 				if (dx == 0)
 				{
@@ -248,7 +250,7 @@ public:
 		else
 		{
 			deadTimer += time;
-			if (deadTimer >= 1000)
+			if (deadTimer >= tDead)
 			{
 				respawn = true;
 			}
@@ -343,13 +345,33 @@ public:
 		return Vector2f(rect.left, rect.top);
 	}
 
-	void damaged(int damage)
+	void hit(int damage)
 	{
 		health -= damage;
 		if (health <= 0)
 		{
 			isAlive = false;			
 		}
+	}
+
+	void receivePacket(Packet* packet)
+	{
+		*packet >> keys[Player::Key::Left];
+		*packet >> keys[Player::Key::Right];
+		*packet >> keys[Player::Key::Up];
+		*packet >> keys[Player::Key::Down];
+		*packet >> keys[Player::Key::Space];
+	}
+
+	void createPacket(Packet* packet)
+	{
+		*packet << rect.left;
+		*packet << rect.top;
+		*packet << left;
+		bool f = dy == 0;
+		*packet << f;
+		*packet << state;
+		*packet << isAlive;
 	}
 };
 

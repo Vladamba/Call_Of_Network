@@ -1,23 +1,27 @@
 #ifndef BULLET_H
 #define BULLET_H
 
-#include "Entity.hpp"
 
-class Bullet : public Entity
+class Bullet
 {
-private:
-	const float move = 0.5;
-
 public:
+	AnimationManager animationManager;
+	unsigned char state;
+	float x, y;
+	bool left, isAlive;
 
-	Bullet(AnimationManager a) :
-		Entity(a)
+	Bullet(AnimationManager a)
 	{
+		animationManager = a;
 		animationManager.set(AnimationType::Move);
-		rect.width = BULLET_WIDTH;
-		rect.height = BULLET_HEIGHT;
 		animationManager.loop(AnimationType::Move, false);
-		animationManager.loop(AnimationType::Explode, false);			
+		animationManager.loop(AnimationType::Explode, false);
+		state = STATE_STAND;
+
+		x = 0;
+		y = 0;
+		left = false;
+		isAlive = true;					
 	}
 
 	void update(signed __int32 _time)
@@ -33,9 +37,14 @@ public:
 
 	void receivePacket(Packet* packet)
 	{
-		*packet >> rect.left;
-		*packet >> rect.top;
+		*packet >> x;
+		*packet >> y;
 		*packet >> left;
+	}
+
+	void draw(RenderWindow& window)
+	{
+		animationManager.draw(window, x, y);
 	}
 };
 

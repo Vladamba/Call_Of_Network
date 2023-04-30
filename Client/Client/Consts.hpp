@@ -6,8 +6,8 @@
 using namespace sf;
 
 const int MSPF = 1000 / 120;
-const int CLIENTS_SIZE = 16;
-const int BULLETS_SIZE = 256;
+const int CLIENTS_SIZE = 8;
+const int BULLETS_SIZE = 64;
 const Vector2f NULL_VECTOR = Vector2f(-1, -1);
 
 const float PLAYER_WIDTH = 30.f;
