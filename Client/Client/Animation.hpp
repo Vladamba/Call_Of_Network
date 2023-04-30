@@ -41,8 +41,7 @@ public:
 		{
 			currentFrame += speed * time;
 			if (currentFrame > frames_right.size())
-			{
-				
+			{				
 				if (loop)
 				{
 					currentFrame -= frames_right.size();
@@ -201,24 +200,9 @@ public:
 		animationList[a].loop = loop;
 	}
 
-	void setRed()
+	void setColor(Color color)
 	{
-		animationList[currentAnimation].sprite.setColor(Color::Red);
-	}
-
-	void setGreen()
-	{
-		animationList[currentAnimation].sprite.setColor(Color::Green);
-	}
-
-	void setBlue()
-	{
-		animationList[currentAnimation].sprite.setColor(Color::Blue);
-	}
-
-	void setYellow()
-	{
-		animationList[currentAnimation].sprite.setColor(Color::Yellow);
+		animationList[currentAnimation].sprite.setColor(color);
 	}
 
 	int getWidth()

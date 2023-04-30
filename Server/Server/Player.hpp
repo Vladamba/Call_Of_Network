@@ -14,19 +14,19 @@ public:
 	float tShoot = 200.f;
 	float tDead = 1000.f;
 
-	enum Key { Left, Right, Up, Down, Space };
+	enum Key { Left, Right, Up, Down, Space, RShift };
 	std::map<Key, bool> keys;
 	unsigned char state;
 
 	FloatRect rect;
 	float dx, dy;
-	float shootTimer, deadTimer;
+	float shootTimer;
 	bool left, isAlive, onGround, onLadder, shoot, respawn;
 	int health;
 
 	Player(){}
 
-	Player(Level level, int _health)
+	Player(Level level)
 	{
 		sWidth = level.tileWidth;
 		sHeight = level.tileHeight;
@@ -38,8 +38,9 @@ public:
 
 		rect.width = PLAYER_WIDTH;
 		rect.height = PLAYER_HEIGHT;
-
-		newPlayer(level, true, _health);
+		isAlive = false;
+		respawn = false;
+		//newPlayer(level, true, _health);
 	}
 
 	void newPlayer(Level level, bool team, int _health)
@@ -69,7 +70,6 @@ public:
 		shoot = false;
 
 		isAlive = true;
-		deadTimer = 0;
 		respawn = false;
 		//hit = false;
 	}
@@ -181,10 +181,10 @@ public:
 
 	void update(signed __int32 _time, Level level)
 	{
-		float time = (float)_time;
-
 		if (isAlive)
 		{
+			float time = (float)_time;
+
 			updateKeys();
 
 			onGround = false;
@@ -207,7 +207,7 @@ public:
 			}
 			collision(false, time, level);
 
-			if (state == STATE_CLIMB && !onLadder)
+			if (state == STATE_CLIMB && !onLadder && !keys[Key::Down])
 			{
 				dy = -vLadderJump;
 				state = STATE_JUMP;
@@ -249,8 +249,7 @@ public:
 		}
 		else
 		{
-			deadTimer += time;
-			if (deadTimer >= tDead)
+			if (keys[Key::RShift])
 			{
 				respawn = true;
 			}
@@ -347,20 +346,28 @@ public:
 
 	void hit(int damage)
 	{
-		health -= damage;
-		if (health <= 0)
+		if (isAlive)
 		{
-			isAlive = false;			
+			health -= damage;
+			if (health <= 0)
+			{
+				isAlive = false;
+			}
 		}
 	}
 
 	void receivePacket(Packet* packet)
 	{
-		*packet >> keys[Player::Key::Left];
-		*packet >> keys[Player::Key::Right];
-		*packet >> keys[Player::Key::Up];
-		*packet >> keys[Player::Key::Down];
-		*packet >> keys[Player::Key::Space];
+		unsigned char playerState = 0;
+		*packet >> playerState;
+		keys[Player::Key::Left] = playerState & KEY_LEFT;
+		keys[Player::Key::Right] = playerState & KEY_RIGHT;
+
+		keys[Player::Key::Up] = playerState & KEY_UP;
+		keys[Player::Key::Down] = playerState & KEY_DOWN;
+
+		keys[Player::Key::Space] = playerState & KEY_SPACE;
+		keys[Player::Key::RShift] = playerState & KEY_RSHIFT;
 	}
 
 	void createPacket(Packet* packet)
@@ -368,6 +375,7 @@ public:
 		*packet << rect.left;
 		*packet << rect.top;
 		*packet << left;
+		*packet << health;
 		bool f = dy == 0;
 		*packet << f;
 		*packet << state;

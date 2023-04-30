@@ -5,7 +5,7 @@
 
 using namespace sf;
 
-const int MSPF = 1000 / 250;
+const int MSPF = 1000 / 120;
 const int CLIENTS_SIZE = 8;
 const int BULLETS_SIZE = 64;
 const Vector2f NULL_VECTOR2f = Vector2f(-1, -1);
@@ -21,5 +21,12 @@ const unsigned char STATE_RUN = 1;
 const unsigned char STATE_JUMP = 2;
 const unsigned char STATE_CRAWL = 3;
 const unsigned char STATE_CLIMB = 4;
+
+const unsigned char KEY_LEFT = 1;
+const unsigned char KEY_RIGHT = 2;
+const unsigned char KEY_UP = 4;
+const unsigned char KEY_DOWN = 8;
+const unsigned char KEY_SPACE = 16;
+const unsigned char KEY_RSHIFT = 32;
 
 #endif CONSTS_H

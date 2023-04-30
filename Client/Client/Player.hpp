@@ -63,15 +63,7 @@ public:
 			break;
 		}
 
-		/*if (shoot) {
-			animationManager.set("shoot");
-			if (state == State::Run)
-			{
-				animationManager.set("shootAndWalk");
-			}
-		}
-
-		if (hit) {
+		/*if (hit) {
 			timer += time;
 			if (timer > 1000)
 			{
@@ -79,28 +71,27 @@ public:
 				timer = 0;
 			}
 			animationManager.set("hit");
-		}
-		*/
+		}*/
 
 		if (!isAlive)
 		{
-			animationManager.setRed();
+			animationManager.setColor(Color::Red);
 		}
 		else
 		{
 			if (myPlayer)
 			{
-				animationManager.setYellow();
+				animationManager.setColor(Color::Yellow);
 			}
 			else
 			{
 				if (team)
 				{
-					animationManager.setGreen();
+					animationManager.setColor(Color(0, 64, 255, 255));
 				}
 				else
 				{
-					animationManager.setBlue();
+					animationManager.setColor(Color(0, 255, 64, 255));
 				}
 			}			
 		}
@@ -113,6 +104,7 @@ public:
 		*packet >> x;
 		*packet >> y;
 		*packet >> left;
+		*packet >> health;
 		*packet >> dy;
 		*packet >> state;
 		*packet >> isAlive;

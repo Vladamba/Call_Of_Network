@@ -10,15 +10,15 @@ class Client
 {
 public:
 	TcpSocket socket;
-	bool connected, playing, noTeam, team;
+	bool connected, playing, teamed, team;
 	Player player;
 
-	Client(Level level, int health)
+	Client(Level level)
 	{		
 		connected = false;
 		playing = false;
-		noTeam = true;
-		player = Player(level, health);
+		teamed = false;
+		player = Player(level);
 	}
 
 	void disconnect()
@@ -26,7 +26,7 @@ public:
 		socket.disconnect();
 		connected = false;
 		playing = false;
-		noTeam = true;
+		teamed = false;
 	}
 
 	void createPacket(Packet* packet)

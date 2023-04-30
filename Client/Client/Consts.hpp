@@ -21,4 +21,11 @@ const unsigned char STATE_JUMP = 2;
 const unsigned char STATE_CRAWL = 3;
 const unsigned char STATE_CLIMB = 4;
 
+const unsigned char KEY_LEFT = 1;
+const unsigned char KEY_RIGHT = 2;
+const unsigned char KEY_UP = 4;
+const unsigned char KEY_DOWN = 8;
+const unsigned char KEY_SPACE = 16;
+const unsigned char KEY_RSHIFT = 32;
+
 #endif CONSTS_H

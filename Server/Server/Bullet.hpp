@@ -11,19 +11,19 @@ public:
 
 	FloatRect rect;
 	float dx;
-	bool isAlive, left;
+	bool isAlive, left, team;
 	int health;
 
-	Bullet(Vector2f vec, int _health, bool _left)
+	Bullet(Vector2f vec, int _health, bool _left, bool _team)
 	{		
 		rect.width = BULLET_WIDTH;
 		rect.height = BULLET_HEIGHT;
 
-		newBullet(vec, _health, _left);
+		newBullet(vec, _health, _left, _team);
 		isAlive = false;
 	}
 
-	void newBullet(Vector2f vec, int _health, bool _left)
+	void newBullet(Vector2f vec, int _health, bool _left, bool _team)
 	{
 		rect.left = vec.x;
 		rect.top = vec.y;
@@ -39,6 +39,7 @@ public:
 			dx = vMove;
 		}
 		isAlive = true;
+		team = _team;
 	}
 
 	Vector2i update(signed __int32 _time, Level level, Vector2f *playersCoord)

@@ -29,13 +29,13 @@ int main()
 	Client** clients = new Client*[CLIENTS_SIZE];
 	for (int i = 0; i < CLIENTS_SIZE; i++)
 	{		
-		clients[i] = new Client(level, 100);
+		clients[i] = new Client(level);
 	}
 
 	Bullet** bullets = new  Bullet*[BULLETS_SIZE];	
 	for (int i = 0; i < BULLETS_SIZE; i++)
 	{
-		bullets[i] = new Bullet(NULL_VECTOR2f, 10, false);
+		bullets[i] = new Bullet(NULL_VECTOR2f, 10, false, true);
 	}		
 
 	Vector2f playersCoord[CLIENTS_SIZE];
@@ -55,7 +55,7 @@ int main()
 			{
 				if (listener.accept(clients[i]->socket) == Socket::Done)
 				{
-					printf("\nAccepted!");
+					printf("\nAccepted New player!");
 					if (listener.isBlocking())
 					{
 						listener.setBlocking(false);
@@ -71,13 +71,13 @@ int main()
 			{
 				if (!clients[i]->playing)
 				{
-					if (clients[i]->noTeam)
+					if (!clients[i]->teamed)
 					{
 						sPacket << team1;
 						sPacket << team2;
 						clients[i]->socket.send(sPacket);
 						sPacket.clear();
-						clients[i]->noTeam = false;
+						clients[i]->teamed = true;
 					}
 					else
 					{
@@ -89,10 +89,39 @@ int main()
 						Socket::Status s = clients[i]->socket.receive(rPacket);
 						if (s == Socket::Done)
 						{
-							printf("\nConnected!");
+							printf("\nNew player is playing!");
 							rPacket >> clients[i]->team;
 							rPacket.clear();
-							clients[i]->newPlayer(level, 100);
+
+							bool autoBalanced = false;
+							if (clients[i]->team)
+							{
+								team1++;
+								if (team1 - team2 > 1)
+								{
+									team1--;
+									team2++;
+									clients[i]->team = false;
+									autoBalanced = true;
+								}
+							}
+							else
+							{
+								team2++;
+								if (team2 - team1 > 1)
+								{
+									team2--;
+									team1++;
+									clients[i]->team = true;
+									autoBalanced = true;
+								}
+							}	
+
+							sPacket << autoBalanced;
+							clients[i]->socket.send(sPacket);
+							sPacket.clear();
+
+							//clients[i]->newPlayer(level, 100);
 							clients[i]->playing = true;
 							clientsNumber++;
 						}						
@@ -100,7 +129,7 @@ int main()
 						{							
 							if (s == Socket::Disconnected || s == Socket::Error)
 							{
-								printf("\nDisconnected!");
+								printf("\nNew player Disconnected!");
 								clients[i]->disconnect();
 								rPacket.clear();
 							}
@@ -132,7 +161,7 @@ int main()
 					Socket::Status s = clients[i]->socket.receive(rPacket);
 					if (s == Socket::Disconnected)
 					{
-						printf("\nDisconnected!");
+						printf("\nNew player Disconnected!");
 						clients[i]->disconnect();
 						clientsNumber--;
 						rPacket.clear();
@@ -147,22 +176,24 @@ int main()
 
 					clients[i]->player.update(time, level);
 
+					if (clients[i]->player.respawn)
+					{
+						clients[i]->newPlayer(level, 100);
+					}
+
 					if (clients[i]->player.shoot)
 					{
 						for (int j = 0; j < BULLETS_SIZE; j++)
 						{
 							if (!bullets[j]->isAlive)
 							{
-								bullets[j]->newBullet(clients[i]->getBulletVec(), 10, clients[i]->player.left);
+								bullets[j]->newBullet(clients[i]->getBulletVec(), 10, clients[i]->player.left, clients[i]->team);
 								bulletsNumber++;
 								break;
 							}
 						}
 					}
-					if (clients[i]->player.respawn)
-					{
-						clients[i]->newPlayer(level, 100);
-					}
+
 					playersCoord[i] = clients[i]->player.getVec();
 				}
 				else
@@ -178,8 +209,11 @@ int main()
 					bulletHitVec = bullets[i]->update(time, level, playersCoord);
 					if (bulletHitVec != NULL_VECTOR2I)
 					{
-						clients[bulletHitVec.y]->player.hit(bulletHitVec.x);
-						bulletsNumber--;
+						if (clients[bulletHitVec.y]->team != bullets[i]->team)
+						{
+							clients[bulletHitVec.y]->player.hit(bulletHitVec.x);
+							bulletsNumber--;
+						}					
 					}
 					else
 					{

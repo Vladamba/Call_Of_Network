@@ -65,7 +65,7 @@ int main()
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
 
 	//unsigned char playerState;	
-	unsigned char playersNumber = 0, bulletsNumber = 0, myIndex = 0;
+	unsigned char playersNumber = 0, bulletsNumber = 0, myIndex = 0, playerState = 0;
 
 	Clock clock;
 	signed __int32 time;
@@ -99,15 +99,19 @@ int main()
 		case Stage::TeamAsk:
 			if (socket.receive(rPacket) == Socket::Done && rPacket)
 			{
-				unsigned char team1 = 0, team2 = 0;
-				rPacket >> team1;
-				rPacket >> team2;
+				unsigned char uTeam = 0;
+				int iTeam;
+				rPacket >> uTeam;
+				iTeam = uTeam;
+				std::cout << "There are " << iTeam << " players in the first team and ";
+
+				rPacket >> uTeam;
 				rPacket.clear();
+				iTeam = uTeam;
+				std::cout << iTeam << " players in the second one. \nChoose your team (input 1 or 2): ";
+				std::cin >> iTeam;
 
-				std::cout << "There are " << team1 << " players in the first team and " << team2 << " players in the second one. \nChoose your team (input 1 or 2): ";
-				std::cin >> team1;
-
-				bool team = team1 == 1;
+				bool team = iTeam == 1;
 				sPacket << team;
 				socket.send(sPacket);					
 				sPacket.clear();
@@ -116,14 +120,25 @@ int main()
 			break;
 
 		case Stage::TeamAnswer:
-			// Maybe autobalance
-			stage = Stage::PlayersInfo;
+			if (socket.receive(rPacket) == Socket::Done && rPacket)
+			{
+				bool autoBalanced;
+				rPacket >> autoBalanced;
+				rPacket.clear();
+
+				if (autoBalanced)
+				{
+					std::cout << "You were autobalanced into another team.\n";
+				}
+				std::cout << "Fight!";
+
+				stage = Stage::PlayersInfo;
+			}
 			break;
 
 		case Stage::PlayersInfo:
 			if (socket.receive(rPacket) == Socket::Done && rPacket)
 			{
-				printf("Connected!");
 				rPacket >> playersNumber;
 				for (int i = 0; i < playersNumber; i++)
 				{
@@ -164,12 +179,39 @@ int main()
 
 			if (clock.getElapsedTime().asMilliseconds() > mspf)
 			{
-				//playerState = 0;
+				playerState = 0;
+				if (Keyboard::isKeyPressed(Keyboard::Left))
+				{
+					playerState = playerState | KEY_LEFT;
+				}
+				if (Keyboard::isKeyPressed(Keyboard::Right))
+				{
+					playerState = playerState | KEY_RIGHT;
+				}
+
+				if (Keyboard::isKeyPressed(Keyboard::Up))
+				{
+					playerState = playerState | KEY_UP;
+				}
+				if (Keyboard::isKeyPressed(Keyboard::Down))
+				{
+					playerState = playerState | KEY_DOWN;
+				}
+
+				if (Keyboard::isKeyPressed(Keyboard::Space))
+				{
+					playerState = playerState | KEY_SPACE;
+				}
+				if (Keyboard::isKeyPressed(Keyboard::RShift))
+				{
+					playerState = playerState | KEY_RSHIFT;
+				}
+				sPacket << playerState;
 				/*playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Left) << 4);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Up) << 2);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Down) << 1);
-				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));*/
+				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));
 				//printf("%d", playerState);
 				//printf("Sent!\n");
 				sPacket << Keyboard::isKeyPressed(Keyboard::Left);
@@ -177,6 +219,7 @@ int main()
 				sPacket << Keyboard::isKeyPressed(Keyboard::Up);
 				sPacket << Keyboard::isKeyPressed(Keyboard::Down);
 				sPacket << Keyboard::isKeyPressed(Keyboard::Space);
+				sPacket << Keyboard::isKeyPressed(Keyboard::Enter);*/
 				socket.send(sPacket);
 				sPacket.clear();
 
@@ -217,21 +260,6 @@ int main()
 						offsetY = mapHeight - windowHeightHalf - players[myIndex]->y;
 					}
 				}
-
-				/*for (it = entities.begin(); it != entities.end(); it++)
-				{
-					if ((*it)->Name == "MovingPlatform")
-					{
-						Entity* movPlat = *it;
-						if (Mario.getRect().intersects(movPlat->getRect()))
-							if (Mario.dy > 0)
-								if (Mario.y + Mario.h < movPlat->y + movPlat->h)
-								{
-									Mario.y = movPlat->y - Mario.h + 3; Mario.x += movPlat->dx * time; Mario.dy = 0; Mario.STATE = PLAYER::stay;
-								}
-					}
-				}
-				*/
 
 				window.clear();
 				view.setCenter(players[myIndex]->x + offsetX, players[myIndex]->y + offsetY);
