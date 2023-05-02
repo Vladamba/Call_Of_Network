@@ -16,22 +16,33 @@ struct Layer
 class Level
 {
 public:
-    Texture texture;
+    Texture tTileset, tBackground;
     int mapWidth, mapHeight, tileWidth, tileHeight;    
     std::vector<Layer> layers;
+    Sprite sBackground;  
 
-    Level(const char* image, const char* file)
+    Level() {}
+
+    Level(std::string map, std::string tileset, std::string background)
     {
-        if (!texture.loadFromFile(image))
+        if (!tBackground.loadFromFile(background.c_str()))
         {
-            printf("Loading level image failed!");
+            printf("Loading background failed!");
         }
-        texture.setSmooth(false);
+        tBackground.setSmooth(false);
+        sBackground.setTexture(tBackground);
+        sBackground.setOrigin(tBackground.getSize().x / 2, tBackground.getSize().y / 2);
+
+        if (!tTileset.loadFromFile(tileset.c_str()))
+        {
+            printf("Loading tileset failed!");
+        }
+        tTileset.setSmooth(false);
 
         XMLDocument levelFile;
-        if (levelFile.LoadFile(file) != XML_SUCCESS)
+        if (levelFile.LoadFile(map.c_str()) != XML_SUCCESS)
         {
-            printf("Loading level file failed.");
+            printf("Loading map failed.");
         }
 
         XMLElement* mapElement;       
@@ -70,7 +81,7 @@ public:
                 printf("Bad map. No tile information found.");
             }
 
-            int columns = texture.getSize().x / tileWidth;
+            int columns = tTileset.getSize().x / tileWidth;
             int x = 0;
             int y = 0;
             IntRect rect;
@@ -89,7 +100,7 @@ public:
                     rect.top = (tileGid / columns) * tileHeight;
 
                     Sprite sprite;
-                    sprite.setTexture(texture);
+                    sprite.setTexture(tTileset);
                     sprite.setTextureRect(rect);
                     sprite.setPosition(x * tileWidth, y * tileHeight);
                     sprite.setColor(Color(255, 255, 255, layer.opacity));
@@ -114,8 +125,11 @@ public:
     }
 
 
-    void draw(RenderWindow& window)
+    void draw(RenderWindow& window, Vector2f vec)
     {
+        sBackground.setPosition(vec);
+        window.draw(sBackground);
+
         for (int layer = 0; layer < layers.size(); layer++)
         {
             for (int tile = 0; tile < layers[layer].tiles.size(); tile++)

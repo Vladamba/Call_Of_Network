@@ -8,14 +8,15 @@
 #include "HealthBar.hpp"
 //#include "MovingPlatform.hpp"
 #include <iostream>
+#include <fstream>
 
 const int mspf = 1000 / 120;
 
 using namespace sf;
 
-enum class Stage { Connection, TeamAsk, TeamAnswer, PlayersInfo, Game };
 int main()
 {
+	enum Stage { Connection, CheckFiles, TeamAsk, TeamAnswer, NameAsk, NameAnswer, Initialisation, Playing, Error };
 	std::string serverIP;
 	unsigned short serverPort;
 
@@ -23,28 +24,17 @@ int main()
 	TcpSocket socket;
 	Packet rPacket, sPacket;
 
-	float offsetX = 0;
-	float offsetY = 0;
-	RenderWindow window(VideoMode(400, 200), "Call Of Network");
-	int windowWidthHalf = window.getSize().x / 2;
-	int windowHeightHalf = window.getSize().y / 2;
-	View view(FloatRect(0, 0, window.getSize().x, window.getSize().y));
-
-	Level level("files/images/tileset2.png", "files/mymap.tmx");
-	int mapWidth = level.mapWidth * level.tileWidth;
-	int mapHeight = level.mapHeight * level.tileHeight;
-	
-	Texture moveplatform_t, tBackground;
-	tBackground.loadFromFile("files/images/bg.png");
-	Sprite background(tBackground);
-	background.setOrigin(tBackground.getSize().x / 2, tBackground.getSize().y / 2);
-
-	HealthBar healthBar("files/images/healthBar.png");
+	float offsetX, offsetY;	
+	RenderWindow window;
+	int windowWidthHalf = 0, windowHeightHalf = 0, mapWidth = 0, mapHeight = 0;
+	View view;
+	Level level;
 
 	//moveplatform_t.loadFromFile("files/images/movingPlatform.png");
 	//AnimationManager anim4;
 	//anim4.create("move", moveplatform_t, 0, 0, 95, 22, 1, 0);*/
 
+	HealthBar healthBar("files/images/healthBar.png");
 	AnimationManager playerAnimationManager("files/images/megaman.png", "files/myanim.xml");
 	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
 
@@ -66,24 +56,24 @@ int main()
 
 	//unsigned char playerState;	
 	unsigned char playersNumber = 0, bulletsNumber = 0, myIndex = 0, playerState = 0;
+	std::string mapFileName, tilesetFileName, backgroundFileName, myName;
 
 	Clock clock;
 	signed __int32 time;
 
-	while (window.isOpen())
+	while (true)
 	{
-		Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == Event::Closed)
-			{
-				window.close();
-			}
-		}
-
 		switch (stage)
 		{
-		case Stage::Connection:
+		case Stage::Error:
+			rPacket.clear();
+			socket.disconnect();
+			std::cout << "Disconnected from the server.\n\n";			
+			stage = Stage::Connection;
+			break;
+
+		case Stage::Connection:		
+			std::cout.flush();
 			std::cout << "Input server's IP: ";
 			std::cin >> serverIP;
 			std::cout << "Input server's port: ";
@@ -92,6 +82,56 @@ int main()
 			if (socket.connect(IpAddress(serverIP), serverPort, seconds(5)) == Socket::Done)
 			{
 				socket.setBlocking(false);
+				stage = Stage::CheckFiles;
+			}
+			else
+			{
+				stage = Stage::Error;
+			}
+			break;
+
+		case Stage::CheckFiles:
+			if (socket.receive(rPacket) == Socket::Done && rPacket)
+			{		
+				rPacket >> mapFileName;				
+				std::ifstream file("files/" + mapFileName);
+				if (!file.is_open())
+				{
+					std::cout << "You miss the map file. Go download it from https://CallOfNetwork.com/maps\n";
+					stage = Stage::Error;
+					break;
+				}
+				else 
+				{
+					file.close();
+				}
+
+				rPacket >> tilesetFileName;
+				new(&file) std::ifstream("files/images/" + tilesetFileName);
+				if (!file.is_open())
+				{
+					std::cout << "You miss the tileset file. Go download it from https://CallOfNetwork.com/tilesets\n";
+					stage = Stage::Error;
+					break;
+				}
+				else
+				{
+					file.close();
+				}
+
+				rPacket >> backgroundFileName;
+				rPacket.clear();
+				new(&file) std::ifstream("files/images/" + backgroundFileName);
+				if (!file.is_open())
+				{
+					std::cout << "You miss the background file. Go download it from https://CallOfNetwork.com/backgrounds\n";
+					stage = Stage::Error;
+					break;
+				}
+				else
+				{
+					file.close();
+				}
 				stage = Stage::TeamAsk;
 			}
 			break;
@@ -130,13 +170,39 @@ int main()
 				{
 					std::cout << "You were autobalanced into another team.\n";
 				}
-				std::cout << "Fight!";
-
-				stage = Stage::PlayersInfo;
+				stage = Stage::NameAsk;
 			}
 			break;
 
-		case Stage::PlayersInfo:
+		case Stage::NameAsk:			
+			std::cout << "Enter you name: ";
+			std::cin >> myName;
+
+			sPacket << myName;
+			socket.send(sPacket);
+			sPacket.clear();
+
+			stage = Stage::NameAnswer;
+			break;
+
+		case Stage::NameAnswer:
+			if (socket.receive(rPacket) == Socket::Done && rPacket)
+			{
+				bool anotherName;
+				rPacket >> anotherName;
+				if (anotherName)
+				{
+					std::cout << "Your name changed to: ";
+					rPacket >> myName;
+					std::cout << myName;
+				}			
+				rPacket.clear();
+				
+				stage = Stage::Initialisation;
+			}
+			break;
+
+		case Stage::Initialisation:
 			if (socket.receive(rPacket) == Socket::Done && rPacket)
 			{
 				rPacket >> playersNumber;
@@ -153,12 +219,40 @@ int main()
 
 				rPacket >> myIndex;
 				rPacket.clear();
-				stage = Stage::Game;
+
+				offsetX = 0;
+				offsetY = 0;
+				new(&window) RenderWindow(VideoMode(400, 200), "Call Of Network");
+				windowWidthHalf = window.getSize().x / 2;
+				windowHeightHalf = window.getSize().y / 2;
+				new(&view) View(FloatRect(0, 0, window.getSize().x, window.getSize().y));
+
+				new(&level) Level("files/" + mapFileName, "files/images/" + tilesetFileName, "files/images/" + backgroundFileName);
+				mapWidth = level.mapWidth * level.tileWidth;
+				mapHeight = level.mapHeight * level.tileHeight;
+				
+				std::cout << "Press Right Shift to respawn.\n";
+				stage = Stage::Playing;
 			}
 			break;
 
-		case Stage::Game:
-			if (socket.receive(rPacket) == Socket::Done && rPacket)
+		case Stage::Playing:
+		{
+			Event event;
+			while (window.pollEvent(event))
+			{
+				if (event.type == Event::Closed)
+				{
+					window.close();
+					stage = Stage::Error;
+				}
+			}
+			Socket::Status s = socket.receive(rPacket);
+			if (s == Socket::Disconnected || s == Socket::Error)
+			{
+				stage = Stage::Error;
+			}
+			if (s == Socket::Done && rPacket)
 			{
 				rPacket >> playersNumber;
 				for (int i = 0; i < playersNumber; i++)
@@ -211,15 +305,7 @@ int main()
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Up) << 2);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Down) << 1);
-				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));
-				//printf("%d", playerState);
-				//printf("Sent!\n");
-				sPacket << Keyboard::isKeyPressed(Keyboard::Left);
-				sPacket << Keyboard::isKeyPressed(Keyboard::Right);
-				sPacket << Keyboard::isKeyPressed(Keyboard::Up);
-				sPacket << Keyboard::isKeyPressed(Keyboard::Down);
-				sPacket << Keyboard::isKeyPressed(Keyboard::Space);
-				sPacket << Keyboard::isKeyPressed(Keyboard::Enter);*/
+				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));*/
 				socket.send(sPacket);
 				sPacket.clear();
 
@@ -265,10 +351,7 @@ int main()
 				view.setCenter(players[myIndex]->x + offsetX, players[myIndex]->y + offsetY);
 				window.setView(view);
 
-				background.setPosition(view.getCenter());
-				window.draw(background);
-
-				level.draw(window);
+				level.draw(window, view.getCenter());
 
 				for (int i = 0; i < playersNumber; i++)
 				{
@@ -290,6 +373,7 @@ int main()
 				window.display();
 			}
 			break;
+		}
 		}
 	}
 }

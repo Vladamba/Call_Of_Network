@@ -1,9 +1,21 @@
 ﻿  main.cpp
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(52,45): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(94,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(94,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Animation.hpp(52,41): warning C4244: '=': conversion from 'unsigned __int64' to 'float', possible loss of data
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(31,64): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(34,84): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(34,55): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(63,45): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(105,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Level.hpp(105,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\Animation.hpp(51,41): warning C4244: '=': conversion from 'unsigned __int64' to 'float', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\HealthBar.hpp(36,33): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\HealthBar.hpp(37,20): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(227,73): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
           with
           [
               T=unsigned int
@@ -12,7 +24,7 @@ C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp
           [
               T=float
           ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(31,44): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(227,53): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
           with
           [
               T=unsigned int
@@ -20,15 +32,5 @@ C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp
           and
           [
               T=float
-          ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(40,76): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
-          with
-          [
-              T=unsigned int
-          ]
-C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\Client\main.cpp(40,47): warning C4244: 'argument': conversion from 'T' to 'float', possible loss of data
-          with
-          [
-              T=unsigned int
           ]
   Client.vcxproj -> C:\Users\Lenovo\Desktop\ПОИТ\КСИС\Call Of Network\Client\x64\Debug\Client.exe

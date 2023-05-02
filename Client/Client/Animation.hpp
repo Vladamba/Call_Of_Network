@@ -15,7 +15,7 @@ public:
 	bool loop, isPlaying;
 	Sprite sprite;
 
-	Animation(){}
+	Animation() {}
 
 	Animation(int delay, Texture& t)
 	{		

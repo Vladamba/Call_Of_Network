@@ -15,10 +15,10 @@ public:
     int mapWidth, mapHeight, tileWidth, tileHeight;
     ObjectType** objects;    
 
-    Level(const char* file)
+    Level(std::string file)
     {
         XMLDocument levelFile;
-        if (levelFile.LoadFile(file) != XML_SUCCESS)
+        if (levelFile.LoadFile(file.c_str()) != XML_SUCCESS)
         {
             printf("Loading level file failed!");
         }

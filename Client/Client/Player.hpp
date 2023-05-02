@@ -15,7 +15,7 @@ public:
 	bool left, isAlive, dy, team;	
 	int health;
 
-	Player(){}
+	Player() {}
 
 	Player(AnimationManager a, int _health)
 	{	
@@ -81,17 +81,17 @@ public:
 		{
 			if (myPlayer)
 			{
-				animationManager.setColor(Color::Yellow);
+				animationManager.setColor(Color(0, 64, 64, 255));
 			}
 			else
 			{
 				if (team)
 				{
-					animationManager.setColor(Color(0, 64, 255, 255));
+					animationManager.setColor(Color(0, 128, 0, 128));
 				}
 				else
 				{
-					animationManager.setColor(Color(0, 255, 64, 255));
+					animationManager.setColor(Color(0, 0, 128, 255));
 				}
 			}			
 		}

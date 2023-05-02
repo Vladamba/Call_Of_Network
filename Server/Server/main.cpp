@@ -18,7 +18,8 @@ int main()
 	TcpListener listener;
 	Packet rPacket, sPacket;
 
-	Level level("files/mymap.tmx");
+	std::string mapFileName = "mymap.tmx", tilesetFileName = "tileset2.png", backgroundFileName = "bg.png";
+	Level level("files/" + mapFileName);
 	int mapWidth = level.mapWidth * level.tileWidth;
 	int mapHeight = level.mapHeight * level.tileHeight;
 
@@ -49,96 +50,6 @@ int main()
 	listener.listen(port);
 	while (true)
 	{
-		for (int i = 0; i < CLIENTS_SIZE; i++)
-		{
-			if (!clients[i]->connected)
-			{
-				if (listener.accept(clients[i]->socket) == Socket::Done)
-				{
-					printf("\nAccepted New player!");
-					if (listener.isBlocking())
-					{
-						listener.setBlocking(false);
-					}
-					if (clients[i]->socket.isBlocking())
-					{
-						clients[i]->socket.setBlocking(false);
-					}
-					clients[i]->connected = true;		
-				}
-			}	
-			else 
-			{
-				if (!clients[i]->playing)
-				{
-					if (!clients[i]->teamed)
-					{
-						sPacket << team1;
-						sPacket << team2;
-						clients[i]->socket.send(sPacket);
-						sPacket.clear();
-						clients[i]->teamed = true;
-					}
-					else
-					{
-						if (clients[i]->socket.isBlocking())
-						{
-							clients[i]->socket.setBlocking(false);
-						}
-
-						Socket::Status s = clients[i]->socket.receive(rPacket);
-						if (s == Socket::Done)
-						{
-							printf("\nNew player is playing!");
-							rPacket >> clients[i]->team;
-							rPacket.clear();
-
-							bool autoBalanced = false;
-							if (clients[i]->team)
-							{
-								team1++;
-								if (team1 - team2 > 1)
-								{
-									team1--;
-									team2++;
-									clients[i]->team = false;
-									autoBalanced = true;
-								}
-							}
-							else
-							{
-								team2++;
-								if (team2 - team1 > 1)
-								{
-									team2--;
-									team1++;
-									clients[i]->team = true;
-									autoBalanced = true;
-								}
-							}	
-
-							sPacket << autoBalanced;
-							clients[i]->socket.send(sPacket);
-							sPacket.clear();
-
-							//clients[i]->newPlayer(level, 100);
-							clients[i]->playing = true;
-							clientsNumber++;
-						}						
-						else
-						{							
-							if (s == Socket::Disconnected || s == Socket::Error)
-							{
-								printf("\nNew player Disconnected!");
-								clients[i]->disconnect();
-								rPacket.clear();
-							}
-						}
-					}
-				}
-			}
-		}
-		
 		if (clock.getElapsedTime().asMilliseconds() > MSPF)
 		{
 			time = clock.getElapsedTime().asMilliseconds();
@@ -151,25 +62,146 @@ int main()
 
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				if (clients[i]->playing)
+				playersCoord[i] = NULL_VECTOR2f;
+
+				switch (clients[i]->stage)
 				{
-					if (clients[i]->socket.isBlocking())
+				case Stage::Error:
+					rPacket.clear();
+					printf("\n%s Disconnected!", clients[i]->name);
+					clients[i]->disconnect();								
+					break;
+
+				case Stage::Connection:
+					if (listener.accept(clients[i]->socket) == Socket::Done)
 					{
-						clients[i]->socket.setBlocking(false);
+						printf("\nAccepted new player!");
+						if (listener.isBlocking())
+						{
+							listener.setBlocking(false);
+						}
+						if (clients[i]->socket.isBlocking())
+						{
+							clients[i]->socket.setBlocking(false);
+						}
+						clients[i]->stage = Stage::CheckFiles;
+					}
+					break;
+
+				case Stage::CheckFiles:
+					sPacket << mapFileName;
+					sPacket << tilesetFileName;
+					sPacket << backgroundFileName;
+					clients[i]->socket.send(sPacket);
+					rPacket.clear();
+					clients[i]->stage = Stage::TeamAsk;
+					break;
+
+				case Stage::TeamAsk:
+					sPacket << team1;
+					sPacket << team2;
+					clients[i]->socket.send(sPacket);
+					rPacket.clear();
+					clients[i]->stage = Stage::TeamAnswer;
+					break;
+
+				case Stage::TeamAnswer:
+				{
+					Socket::Status s = clients[i]->socket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						clients[i]->stage = Stage::Error;
+						break;
 					}
 
-					Socket::Status s = clients[i]->socket.receive(rPacket);
-					if (s == Socket::Disconnected)
-					{
-						printf("\nNew player Disconnected!");
-						clients[i]->disconnect();
-						clientsNumber--;
-						rPacket.clear();
-						continue;
-					}
 					if (s == Socket::Done)
 					{
-						//printf("\nReceived!");
+						rPacket >> clients[i]->team;
+						rPacket.clear();
+
+						bool autoBalanced = false;
+						if (clients[i]->team)
+						{
+							team1++;
+							if (team1 - team2 > 1)
+							{
+								team1--;
+								team2++;
+								clients[i]->team = false;
+								autoBalanced = true;
+							}
+						}
+						else
+						{
+							team2++;
+							if (team2 - team1 > 1)
+							{
+								team2--;
+								team1++;
+								clients[i]->team = true;
+								autoBalanced = true;
+							}
+						}
+
+						sPacket << autoBalanced;
+						clients[i]->socket.send(sPacket);
+						sPacket.clear();
+						clients[i]->stage = Stage::NameAsk;
+					}
+					break;
+				}
+
+				case Stage::NameAsk:
+				{
+					Socket::Status s = clients[i]->socket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						clients[i]->stage = Stage::Error;
+						break;
+					}
+
+					if (s == Socket::Done)
+					{
+						rPacket >> clients[i]->name;
+						rPacket.clear();
+
+						bool anotherName = false;
+						for (int j = 0; j < CLIENTS_SIZE; j++)
+						{
+							if (i != j && clients[i]->name == clients[j]->name)
+							{
+								anotherName = true;
+								clients[i]->name = clients[i]->name + "2";
+								break;
+							}
+						}
+
+						sPacket << anotherName;
+						sPacket << clients[i]->name;
+						clients[i]->socket.send(sPacket);
+						sPacket.clear();
+
+						clients[i]->stage = Stage::Playing;
+						clients[i]->newPlayer(level, 100);
+						clientsNumber++;
+					}
+					break;
+				}
+
+				case Stage::Playing:
+				{
+					Socket::Status s = clients[i]->socket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						rPacket.clear();
+						printf("\n%s Disconnected!", clients[i]->name);
+						clients[i]->disconnect();
+						clientsNumber--;
+						break;
+					}
+
+					if (s == Socket::Done)
+					{
 						clients[i]->player.receivePacket(&rPacket);
 						rPacket.clear();
 					}
@@ -193,12 +225,9 @@ int main()
 							}
 						}
 					}
-
 					playersCoord[i] = clients[i]->player.getVec();
+					break;
 				}
-				else
-				{
-					playersCoord[i] = NULL_VECTOR2f;
 				}
 			}
 
@@ -213,7 +242,7 @@ int main()
 						{
 							clients[bulletHitVec.y]->player.hit(bulletHitVec.x);
 							bulletsNumber--;
-						}					
+						}
 					}
 					else
 					{
@@ -229,12 +258,12 @@ int main()
 			sPacket << clientsNumber;
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				if (clients[i]->playing)
+				if (clients[i]->stage == Stage::Playing)
 				{
 					clients[i]->createPacket(&sPacket);
 				}
 			}
-			
+
 			sPacket << bulletsNumber;
 			for (int i = 0; i < BULLETS_SIZE; i++)
 			{
@@ -247,7 +276,7 @@ int main()
 			clientIndex = 0;
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				if (clients[i]->playing)
+				if (clients[i]->stage == Stage::Playing)
 				{
 					Packet pPacket = sPacket;
 					pPacket << clientIndex;
@@ -256,24 +285,6 @@ int main()
 				}
 			}
 			sPacket.clear();
-
-			/*
-				healthBar.update(Mario.Health);
-				for (it = entities.begin(); it != entities.end(); it++)
-				{
-					//2. движущиеся платформы
-					if ((*it)->Name == "MovingPlatform")
-					{
-						Entity* movPlat = *it;
-						if (Mario.getRect().intersects(movPlat->getRect()))
-							if (Mario.dy > 0)
-								if (Mario.y + Mario.h < movPlat->y + movPlat->h)
-								{
-									Mario.y = movPlat->y - Mario.h + 3; Mario.x += movPlat->dx * time; Mario.dy = 0; Mario.STATE = PLAYER::stay;
-								}
-					}
-				}
-			*/
 		}
 	}
 }

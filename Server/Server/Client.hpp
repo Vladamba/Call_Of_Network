@@ -5,28 +5,29 @@
 #include "Player.hpp"
 
 using namespace sf;
-
+enum Stage { Connection, CheckFiles, TeamAsk, TeamAnswer, NameAsk, NameAnswer, Initialisation, Playing, Error };
 class Client
 {
 public:
+	
 	TcpSocket socket;
-	bool connected, playing, teamed, team;
+	Stage stage;
+	bool team;
+	std::string name;
 	Player player;
 
 	Client(Level level)
 	{		
-		connected = false;
-		playing = false;
-		teamed = false;
+		stage = Stage::Connection;
+		name = "New player";
 		player = Player(level);
 	}
 
 	void disconnect()
 	{
 		socket.disconnect();
-		connected = false;
-		playing = false;
-		teamed = false;
+		stage = Stage::Connection;
+		name = "New player";
 	}
 
 	void createPacket(Packet* packet)
