@@ -5,6 +5,10 @@
 
 using namespace sf;
 
+const std::string MAP_FILENAME = "mymap.tmx";
+const std::string TILESET_FILENAME = "tileset2.png";
+const std::string BACKGROUND_FILENAME = "bg.png";
+
 const int MSPF = 1000 / 120;
 const int CLIENTS_SIZE = 8;
 const int BULLETS_SIZE = 64;

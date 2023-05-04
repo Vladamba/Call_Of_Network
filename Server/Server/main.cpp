@@ -5,24 +5,21 @@
 #include "Bullet.hpp"
 #include "Player.hpp"
 #include "Client.hpp"
+#include <thread>
 //#include "MovingPlatform.hpp"
 //#include "HealthBar.hpp"
 
 using namespace sf;
 
+void newClient(Level* level, Client** clients, unsigned short port, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber);
+void updateClients(Level* level, Client** clients, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber);
+
 int main()
 {
-	int port = 2000;
+	unsigned short port = 2000;
 	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString(), port);
 
-	TcpListener listener;
-	Packet rPacket, sPacket;
-
-	std::string mapFileName = "mymap.tmx", tilesetFileName = "tileset2.png", backgroundFileName = "bg.png";
-	Level level("files/" + mapFileName);
-	int mapWidth = level.mapWidth * level.tileWidth;
-	int mapHeight = level.mapHeight * level.tileHeight;
-
+	Level level("files/" + MAP_FILENAME);
 	//e = lvl.GetObjects("MovingPlatform");
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
@@ -32,47 +29,43 @@ int main()
 	{		
 		clients[i] = new Client(level);
 	}
-
-	Bullet** bullets = new  Bullet*[BULLETS_SIZE];	
-	for (int i = 0; i < BULLETS_SIZE; i++)
-	{
-		bullets[i] = new Bullet(NULL_VECTOR2f, 10, false, true);
-	}		
-
-	Vector2f playersCoord[CLIENTS_SIZE];
-	Vector2i bulletHitVec;
 	 
-	unsigned char clientsNumber = 0, bulletsNumber = 0, clientIndex = 0, team1 = 0, team2 = 0;
+	unsigned char clientsNumber = 0, team1 = 0, team2 = 0;
 
-	Clock clock;
-	signed __int32 time;
+	std::thread tNewClient(newClient, &level, clients, port, &team1, &team2, &clientsNumber);
+	std::thread tUpdateClients(updateClients, &level, clients, &team1, &team2, &clientsNumber);
+	
+	//tNewClient.detach();
+	tNewClient.join();
+	//tUpdateClients.detach();
+	tUpdateClients.join();
+	return 0;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+void newClient(Level* level, Client** clients, unsigned short port, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber)
+{
+	TcpListener listener;
+	Packet rPacket, sPacket;
 
 	listener.listen(port);
 	while (true)
 	{
-		if (clock.getElapsedTime().asMilliseconds() > MSPF)
+		for (int i = 0; i < CLIENTS_SIZE; i++)
 		{
-			time = clock.getElapsedTime().asMilliseconds();
-			clock.restart();
-
-			if (time > MSPF * 2)
+			switch (clients[i]->stage)
 			{
-				time = MSPF * 2;
-			}
-
-			for (int i = 0; i < CLIENTS_SIZE; i++)
-			{
-				playersCoord[i] = NULL_VECTOR2f;
-
-				switch (clients[i]->stage)
-				{
 				case Stage::Error:
+				{
 					rPacket.clear();
-					printf("\n%s Disconnected!", clients[i]->name);
-					clients[i]->disconnect();								
+					printf("\n%s disconnected!", clients[i]->name);
+					clients[i]->disconnect();
 					break;
+				}
 
 				case Stage::Connection:
+				{
 					if (listener.accept(clients[i]->socket) == Socket::Done)
 					{
 						printf("\nAccepted new player!");
@@ -87,23 +80,28 @@ int main()
 						clients[i]->stage = Stage::CheckFiles;
 					}
 					break;
+				}					
 
 				case Stage::CheckFiles:
-					sPacket << mapFileName;
-					sPacket << tilesetFileName;
-					sPacket << backgroundFileName;
+				{
+					sPacket << MAP_FILENAME;
+					sPacket << TILESET_FILENAME;
+					sPacket << BACKGROUND_FILENAME;
 					clients[i]->socket.send(sPacket);
-					rPacket.clear();
+					sPacket.clear();
 					clients[i]->stage = Stage::TeamAsk;
 					break;
+				}
 
 				case Stage::TeamAsk:
-					sPacket << team1;
-					sPacket << team2;
+				{
+					sPacket << *team1;
+					sPacket << *team2;
 					clients[i]->socket.send(sPacket);
-					rPacket.clear();
+					sPacket.clear();
 					clients[i]->stage = Stage::TeamAnswer;
 					break;
+				}
 
 				case Stage::TeamAnswer:
 				{
@@ -122,22 +120,22 @@ int main()
 						bool autoBalanced = false;
 						if (clients[i]->team)
 						{
-							team1++;
-							if (team1 - team2 > 1)
+							(*team1)++;
+							if (*team1 - *team2 > 1)
 							{
-								team1--;
-								team2++;
+								(*team1)--;
+								(*team2)++;
 								clients[i]->team = false;
 								autoBalanced = true;
 							}
 						}
 						else
 						{
-							team2++;
-							if (team2 - team1 > 1)
+							(*team2)++;
+							if (*team2 - *team1 > 1)
 							{
-								team2--;
-								team1++;
+								(*team2)--;
+								(*team1)++;
 								clients[i]->team = true;
 								autoBalanced = true;
 							}
@@ -171,7 +169,7 @@ int main()
 							if (i != j && clients[i]->name == clients[j]->name)
 							{
 								anotherName = true;
-								clients[i]->name = clients[i]->name + "2";
+								clients[i]->name = clients[i]->name + "_2";
 								break;
 							}
 						}
@@ -181,14 +179,51 @@ int main()
 						clients[i]->socket.send(sPacket);
 						sPacket.clear();
 
+						//clients[i]->newPlayer(*level, 100);
 						clients[i]->stage = Stage::Playing;
-						clients[i]->newPlayer(level, 100);
-						clientsNumber++;
+						(*clientsNumber)++;
 					}
 					break;
 				}
+			}
+		}
+	}
+}
 
-				case Stage::Playing:
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+void updateClients(Level* level, Client** clients, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber)
+{	
+	Packet rPacket, sPacket;
+
+	Bullet** bullets = new  Bullet * [BULLETS_SIZE];
+	for (int i = 0; i < BULLETS_SIZE; i++)
+	{
+		bullets[i] = new Bullet(NULL_VECTOR2f, 10, false, true);
+	}
+
+	Vector2f playersCoord[CLIENTS_SIZE];
+	Vector2i bulletHitVec;
+
+	unsigned char bulletsNumber = 0, clientIndex = 0;
+
+	Clock clock;
+	signed __int32 time;
+	while (true)
+	{
+		if (clock.getElapsedTime().asMilliseconds() > MSPF)
+		{
+			time = clock.getElapsedTime().asMilliseconds();
+			clock.restart();
+
+			if (time > MSPF * 2)
+			{
+				time = MSPF * 2;
+			}
+
+			for (int i = 0; i < CLIENTS_SIZE; i++)
+			{
+				if (clients[i]->stage == Stage::Playing)
 				{
 					Socket::Status s = clients[i]->socket.receive(rPacket);
 					if (s == Socket::Disconnected || s == Socket::Error)
@@ -196,21 +231,29 @@ int main()
 						rPacket.clear();
 						printf("\n%s Disconnected!", clients[i]->name);
 						clients[i]->disconnect();
-						clientsNumber--;
+						if (clients[i]->team)
+						{
+							(*team1)--;
+						}
+						else
+						{
+							(*team2)--;
+						}
+						(*clientsNumber)--;
 						break;
 					}
 
 					if (s == Socket::Done)
-					{
+					{						
 						clients[i]->player.receivePacket(&rPacket);
 						rPacket.clear();
 					}
 
-					clients[i]->player.update(time, level);
+					clients[i]->player.update(time, *level);
 
 					if (clients[i]->player.respawn)
 					{
-						clients[i]->newPlayer(level, 100);
+						clients[i]->newPlayer(*level, 100);
 					}
 
 					if (clients[i]->player.shoot)
@@ -226,8 +269,10 @@ int main()
 						}
 					}
 					playersCoord[i] = clients[i]->player.getVec();
-					break;
 				}
+				else
+				{
+					playersCoord[i] = NULL_VECTOR2f;
 				}
 			}
 
@@ -235,7 +280,7 @@ int main()
 			{
 				if (bullets[i]->isAlive)
 				{
-					bulletHitVec = bullets[i]->update(time, level, playersCoord);
+					bulletHitVec = bullets[i]->update(time, *level, playersCoord);
 					if (bulletHitVec != NULL_VECTOR2I)
 					{
 						if (clients[bulletHitVec.y]->team != bullets[i]->team)
@@ -255,7 +300,7 @@ int main()
 			}
 
 			//Send
-			sPacket << clientsNumber;
+			sPacket << *clientsNumber;
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
 				if (clients[i]->stage == Stage::Playing)

@@ -68,27 +68,33 @@ int main()
 		case Stage::Error:
 			rPacket.clear();
 			socket.disconnect();
+			new(&socket) TcpSocket;
 			std::cout << "Disconnected from the server.\n\n";			
 			stage = Stage::Connection;
 			break;
 
 		case Stage::Connection:		
+		{
 			std::cout.flush();
 			std::cout << "Input server's IP: ";
 			std::cin >> serverIP;
 			std::cout << "Input server's port: ";
 			std::cin >> serverPort;
 
-			if (socket.connect(IpAddress(serverIP), serverPort, seconds(5)) == Socket::Done)
+			Socket::Status s = socket.connect(IpAddress(serverIP), serverPort, seconds(5));
+			if (s == Socket::Disconnected || s == Socket::Error)
+			{
+				stage = Stage::Error;
+				break;
+			}
+
+			if (s == Socket::Done)
 			{
 				socket.setBlocking(false);
 				stage = Stage::CheckFiles;
 			}
-			else
-			{
-				stage = Stage::Error;
-			}
 			break;
+		}
 
 		case Stage::CheckFiles:
 			if (socket.receive(rPacket) == Socket::Done && rPacket)
@@ -251,7 +257,9 @@ int main()
 			if (s == Socket::Disconnected || s == Socket::Error)
 			{
 				stage = Stage::Error;
+				break;
 			}
+			
 			if (s == Socket::Done && rPacket)
 			{
 				rPacket >> playersNumber;
@@ -268,11 +276,10 @@ int main()
 
 				rPacket >> myIndex;
 				rPacket.clear();
-			}
+			//}
 
-
-			if (clock.getElapsedTime().asMilliseconds() > mspf)
-			{
+			//if (clock.getElapsedTime().asMilliseconds() > mspf)
+			//{
 				playerState = 0;
 				if (Keyboard::isKeyPressed(Keyboard::Left))
 				{
@@ -299,7 +306,7 @@ int main()
 				if (Keyboard::isKeyPressed(Keyboard::RShift))
 				{
 					playerState = playerState | KEY_RSHIFT;
-				}
+				}				
 				sPacket << playerState;
 				/*playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Left) << 4);
 				playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
