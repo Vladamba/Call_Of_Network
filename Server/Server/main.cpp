@@ -17,7 +17,7 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 int main()
 {
 	unsigned short port = 2000;
-	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString(), port);
+	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString().c_str(), port);
 
 	Level level("files/" + MAP_FILENAME);
 	//e = lvl.GetObjects("MovingPlatform");
@@ -59,23 +59,23 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 				case Stage::Error:
 				{
 					rPacket.clear();
-					printf("\n%s disconnected!", clients[i]->name);
+					printf("\n%s disconnected!", clients[i]->name.c_str());
 					clients[i]->disconnect();
 					break;
 				}
 
 				case Stage::Connection:
 				{
-					if (listener.accept(clients[i]->socket) == Socket::Done)
+					if (listener.accept(clients[i]->tcpSocket) == Socket::Done)
 					{
 						printf("\nAccepted new player!");
 						if (listener.isBlocking())
 						{
 							listener.setBlocking(false);
 						}
-						if (clients[i]->socket.isBlocking())
+						if (clients[i]->tcpSocket.isBlocking())
 						{
-							clients[i]->socket.setBlocking(false);
+							clients[i]->tcpSocket.setBlocking(false);
 						}
 						clients[i]->stage = Stage::CheckFiles;
 					}
@@ -87,7 +87,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 					sPacket << MAP_FILENAME;
 					sPacket << TILESET_FILENAME;
 					sPacket << BACKGROUND_FILENAME;
-					clients[i]->socket.send(sPacket);
+					clients[i]->tcpSocket.send(sPacket);
 					sPacket.clear();
 					clients[i]->stage = Stage::TeamAsk;
 					break;
@@ -97,7 +97,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 				{
 					sPacket << *team1;
 					sPacket << *team2;
-					clients[i]->socket.send(sPacket);
+					clients[i]->tcpSocket.send(sPacket);
 					sPacket.clear();
 					clients[i]->stage = Stage::TeamAnswer;
 					break;
@@ -105,7 +105,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 
 				case Stage::TeamAnswer:
 				{
-					Socket::Status s = clients[i]->socket.receive(rPacket);
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
 					if (s == Socket::Disconnected || s == Socket::Error)
 					{
 						clients[i]->stage = Stage::Error;
@@ -142,7 +142,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 						}
 
 						sPacket << autoBalanced;
-						clients[i]->socket.send(sPacket);
+						clients[i]->tcpSocket.send(sPacket);
 						sPacket.clear();
 						clients[i]->stage = Stage::NameAsk;
 					}
@@ -151,7 +151,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 
 				case Stage::NameAsk:
 				{
-					Socket::Status s = clients[i]->socket.receive(rPacket);
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
 					if (s == Socket::Disconnected || s == Socket::Error)
 					{
 						clients[i]->stage = Stage::Error;
@@ -176,15 +176,44 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 
 						sPacket << anotherName;
 						sPacket << clients[i]->name;
-						clients[i]->socket.send(sPacket);
+						clients[i]->tcpSocket.send(sPacket);
 						sPacket.clear();
 
-						//clients[i]->newPlayer(*level, 100);
-						clients[i]->stage = Stage::Playing;
-						(*clientsNumber)++;
+						clients[i]->stage = Stage::PortAsk;						
 					}
 					break;
 				}
+
+				case Stage::PortAsk:
+				{
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						clients[i]->stage = Stage::Error;
+						break;
+					}
+
+					if (s == Socket::Done)
+					{
+						rPacket >> clients[i]->clientPort;
+						rPacket.clear();
+
+						clients[i]->udpSocket.setBlocking(false);
+						clients[i]->udpSocket.bind(Socket::AnyPort);
+
+						clients[i]->ip = clients[i]->tcpSocket.getRemoteAddress();
+						clients[i]->serverPort = clients[i]->udpSocket.getLocalPort();
+
+						sPacket << clients[i]->serverPort;
+						clients[i]->tcpSocket.send(sPacket);
+						sPacket.clear();
+
+						//printf("ip: %s, port: %d, my port: %d", clients[i]->ip.toString().c_str(), clients[i]->clientPort, clients[i]->udpSocket.getLocalPort());
+						clients[i]->stage = Stage::Playing;
+						(*clientsNumber)++;
+					}		
+					break;
+				}	
 			}
 		}
 	}
@@ -215,7 +244,6 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 		{
 			time = clock.getElapsedTime().asMilliseconds();
 			clock.restart();
-
 			if (time > MSPF * 2)
 			{
 				time = MSPF * 2;
@@ -225,11 +253,11 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 			{
 				if (clients[i]->stage == Stage::Playing)
 				{
-					Socket::Status s = clients[i]->socket.receive(rPacket);
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
 					if (s == Socket::Disconnected || s == Socket::Error)
 					{
 						rPacket.clear();
-						printf("\n%s Disconnected!", clients[i]->name);
+						printf("\n%s Disconnected!", clients[i]->name.c_str());
 						clients[i]->disconnect();
 						if (clients[i]->team)
 						{
@@ -242,9 +270,9 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 						(*clientsNumber)--;
 						break;
 					}
-
-					if (s == Socket::Done)
-					{						
+					
+					if (clients[i]->udpSocket.receive(rPacket, clients[i]->ip, clients[i]->serverPort) == Socket::Done)
+					{										
 						clients[i]->player.receivePacket(&rPacket);
 						rPacket.clear();
 					}
@@ -325,7 +353,7 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 				{
 					Packet pPacket = sPacket;
 					pPacket << clientIndex;
-					clients[i]->socket.send(pPacket);
+					clients[i]->udpSocket.send(pPacket, clients[i]->ip, clients[i]->clientPort);
 					clientIndex++;
 				}
 			}

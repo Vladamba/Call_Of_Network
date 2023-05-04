@@ -5,13 +5,17 @@
 #include "Player.hpp"
 
 using namespace sf;
-enum Stage { Connection, CheckFiles, TeamAsk, TeamAnswer, NameAsk, NameAnswer, Initialisation, Playing, Error };
+enum Stage { Connection, CheckFiles, TeamAsk, TeamAnswer, NameAsk, NameAnswer, PortAsk, PortAnswer, Playing, Error };
 class Client
 {
 public:
 	
-	TcpSocket socket;
+	TcpSocket tcpSocket;
 	Stage stage;
+	UdpSocket udpSocket;
+	IpAddress ip;
+	unsigned short clientPort, serverPort;
+
 	bool team;
 	std::string name;
 	Player player;
@@ -25,7 +29,7 @@ public:
 
 	void disconnect()
 	{
-		socket.disconnect();
+		tcpSocket.disconnect();
 		stage = Stage::Connection;
 		name = "New player";
 	}
