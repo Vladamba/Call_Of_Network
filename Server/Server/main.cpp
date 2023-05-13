@@ -6,6 +6,7 @@
 #include "Player.hpp"
 #include "Client.hpp"
 #include <thread>
+#include <fstream>
 //#include "MovingPlatform.hpp"
 //#include "HealthBar.hpp"
 
@@ -19,7 +20,7 @@ int main()
 	unsigned short port = 2000;
 	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString().c_str(), port);
 
-	Level level("files/" + MAP_FILENAME);
+	Level level(MAP_FILENAME);
 	//e = lvl.GetObjects("MovingPlatform");
 	//for (int i = 0; i < e.size(); i++)
 		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
@@ -73,33 +74,108 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 						{
 							listener.setBlocking(false);
 						}
-						if (clients[i]->tcpSocket.isBlocking())
-						{
-							clients[i]->tcpSocket.setBlocking(false);
-						}
-						clients[i]->stage = Stage::CheckFiles;
+						clients[i]->tcpSocket.setBlocking(false);
+						
+						clients[i]->filename = MAP_FILENAME;
+						clients[i]->stage = Stage::FileAsk;
 					}
 					break;
 				}					
 
-				case Stage::CheckFiles:
+				case Stage::FileAsk:
 				{
-					sPacket << MAP_FILENAME;
-					sPacket << TILESET_FILENAME;
-					sPacket << BACKGROUND_FILENAME;
-					clients[i]->tcpSocket.send(sPacket);
-					sPacket.clear();
-					clients[i]->stage = Stage::TeamAsk;
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						clients[i]->stage = Stage::Error;
+						break;
+					}
+
+					if (s == Socket::Done)
+					{
+						rPacket.clear();
+						sPacket << clients[i]->filename;
+						clients[i]->tcpSocket.send(sPacket);
+						sPacket.clear();
+						clients[i]->stage = Stage::FileAnswer;
+					}
+					break;
+				}
+
+				case Stage::FileAnswer:
+				{
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						clients[i]->stage = Stage::Error;
+						break;
+					}
+
+					if (s == Socket::Done)
+					{
+						bool need;
+						rPacket >> need;
+						rPacket.clear();
+
+						if (need)
+						{					
+							clients[i]->tcpSocket.setBlocking(true);
+							std::ifstream file(clients[i]->filename, std::ios::binary);
+							file.seekg(0, std::ios::end);
+							int fileSize = file.tellg();
+							file.close();
+
+							sPacket << fileSize;
+							clients[i]->tcpSocket.send(sPacket);
+							sPacket.clear();
+
+							file.open(clients[i]->filename, std::ios::binary);
+							char buffer[1024];
+							while (file.good())
+							{
+								file.read(buffer, sizeof(buffer));
+								clients[i]->tcpSocket.send(buffer, file.gcount());
+							}
+							clients[i]->tcpSocket.setBlocking(false);
+						}
+
+						if (clients[i]->filename == BACKGROUND_FILENAME)
+						{
+							clients[i]->stage = Stage::TeamAsk;
+							break;
+						}
+
+						if (clients[i]->filename == TILESET_FILENAME)
+						{
+							clients[i]->filename = BACKGROUND_FILENAME;
+						}
+
+						if (clients[i]->filename == MAP_FILENAME)
+						{
+							clients[i]->filename = TILESET_FILENAME;
+						}
+						clients[i]->stage = Stage::FileAsk;
+					}
 					break;
 				}
 
 				case Stage::TeamAsk:
 				{
-					sPacket << *team1;
-					sPacket << *team2;
-					clients[i]->tcpSocket.send(sPacket);
-					sPacket.clear();
-					clients[i]->stage = Stage::TeamAnswer;
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						clients[i]->stage = Stage::Error;
+						break;
+					}
+
+					if (s == Socket::Done)
+					{
+						sPacket << *team1;
+						sPacket << *team2;
+						clients[i]->tcpSocket.send(sPacket);
+						sPacket.clear();
+						clients[i]->stage = Stage::TeamAnswer;
+					}
 					break;
 				}
 

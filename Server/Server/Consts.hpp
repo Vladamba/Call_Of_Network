@@ -5,9 +5,9 @@
 
 using namespace sf;
 
-const std::string MAP_FILENAME = "mymap.tmx";
-const std::string TILESET_FILENAME = "tileset2.png";
-const std::string BACKGROUND_FILENAME = "bg.png";
+const std::string MAP_FILENAME = "files/mymap.tmx";
+const std::string TILESET_FILENAME = "files/images/tileset2.png";
+const std::string BACKGROUND_FILENAME = "files/images/bg.png";
 
 const int MSPF = 1000 / 120;
 const int CLIENTS_SIZE = 8;

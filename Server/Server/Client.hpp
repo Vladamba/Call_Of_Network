@@ -5,7 +5,7 @@
 #include "Player.hpp"
 
 using namespace sf;
-enum Stage { Connection, CheckFiles, TeamAsk, TeamAnswer, NameAsk, NameAnswer, PortAsk, PortAnswer, Playing, Error };
+enum Stage { Connection, FileAsk, FileAnswer, TeamAsk, TeamAnswer, NameAsk, NameAnswer, PortAsk, PortAnswer, Playing, Error };
 class Client
 {
 public:
@@ -17,7 +17,7 @@ public:
 	unsigned short clientPort, serverPort;
 
 	bool team;
-	std::string name;
+	std::string filename, name;
 	Player player;
 
 	Client(Level level)

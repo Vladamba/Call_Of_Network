@@ -16,7 +16,8 @@ using namespace sf;
 
 int main()
 {
-	enum Stage { Connection, CheckFiles, TeamAsk, TeamAnswer, NameAsk, NameAnswer, PortAsk, PortAnswer, Playing, Error };
+	enum Stage { Connection, FileAsk, FileAnswer,
+		TeamAsk, TeamAnswer, NameAsk, NameAnswer, PortAsk, PortAnswer, Playing, Error };
 	IpAddress serverIp;
 	unsigned short serverPort, myPort;
 
@@ -57,7 +58,7 @@ int main()
 
 	//unsigned char playerState;	
 	unsigned char playersNumber = 0, bulletsNumber = 0, myIndex = 0, playerState = 0;
-	std::string mapFileName, tilesetFileName, backgroundFileName, myName;
+	std::string mapFilename, tilesetFilename, backgroundFilename, myName;
 
 	Clock clock;
 	signed __int32 time;
@@ -77,16 +78,16 @@ int main()
 			}
 
 			case Stage::Connection:		
-			{
-				std::cout.flush();
+			{				
 				std::cout << "Input server's IP: ";
+				std::cout.flush();
 				std::string sServerIp;
 				std::cin >> sServerIp;
 				serverIp = IpAddress(sServerIp);
 				std::cout << "Input server's port: ";
 				std::cin >> serverPort;
 
-				Socket::Status s = tcpSocket.connect(serverIp, serverPort, seconds(5));
+				Socket::Status s = tcpSocket.connect(serverIp, serverPort, seconds(2));
 				if (s == Socket::Disconnected || s == Socket::Error)
 				{
 					stage = Stage::Error;
@@ -95,56 +96,152 @@ int main()
 
 				if (s == Socket::Done)
 				{
-					tcpSocket.setBlocking(false);
-					stage = Stage::CheckFiles;
+					//tcpSocket.setBlocking(false);
+					mapFilename = "";
+					tilesetFilename = "";
+					backgroundFilename = "";
+
+					stage = Stage::FileAsk;
+					sPacket << true;
+					tcpSocket.send(sPacket);
+					sPacket.clear();					
 				}
 				break;
 			}
 
-			case Stage::CheckFiles:
+			case Stage::FileAsk:
 			{
-				if (tcpSocket.receive(rPacket) == Socket::Done && rPacket)
+				Socket::Status s = tcpSocket.receive(rPacket);
+				if (s == Socket::Disconnected || s == Socket::Error)
 				{
-					rPacket >> mapFileName;
-					std::ifstream file("files/" + mapFileName);
-					if (!file.is_open())
+					stage = Stage::Error;
+					break;
+				}
+
+				if (s == Socket::Done)
+				{
+					bool need = true;
+					std::string path;
+					if (mapFilename == "") 
 					{
-						std::cout << "You miss the map file. Go download it from https://CallOfNetwork.com/maps\n";
-						stage = Stage::Error;
-						break;
+						rPacket >> mapFilename;
+						path = mapFilename;
 					}
 					else
 					{
-						file.close();
+						if (tilesetFilename == "")
+						{
+							rPacket >> tilesetFilename;
+							path = tilesetFilename;
+						}
+						else
+						{
+							rPacket >> backgroundFilename;
+							path = backgroundFilename;
+						}
 					}
-
-					rPacket >> tilesetFileName;
-					new(&file) std::ifstream("files/images/" + tilesetFileName);
-					if (!file.is_open())
-					{
-						std::cout << "You miss the tileset file. Go download it from https://CallOfNetwork.com/tilesets\n";
-						stage = Stage::Error;
-						break;
-					}
-					else
-					{
-						file.close();
-					}
-
-					rPacket >> backgroundFileName;
 					rPacket.clear();
-					new(&file) std::ifstream("files/images/" + backgroundFileName);
-					if (!file.is_open())
+					
+					std::ifstream file(path, std::ios::binary);
+					if (file.good())
+					{																		
+						file.close();
+						need = false;
+					}
+					else
+					{			
+						std::cout << "Downloading needed file.\n";
+						stage = Stage::FileAnswer;
+					}
+					
+					sPacket << need;
+					tcpSocket.send(sPacket);
+					sPacket.clear();
+
+					if (!need)
 					{
-						std::cout << "You miss the background file. Go download it from https://CallOfNetwork.com/backgrounds\n";
-						stage = Stage::Error;
-						break;
+						sPacket << true;
+						tcpSocket.send(sPacket);
+						sPacket.clear();
+
+						if (tilesetFilename != "" && backgroundFilename != "")
+						{
+							stage = Stage::TeamAsk;
+						}
+					}
+				}
+				break;
+			}
+
+			case Stage::FileAnswer:
+			{
+				Socket::Status s = tcpSocket.receive(rPacket);
+				if (s == Socket::Disconnected || s == Socket::Error)
+				{
+					stage = Stage::Error;
+					break;
+				}
+
+				if (s == Socket::Done)
+				{
+					int fileSize;
+					rPacket >> fileSize;
+					rPacket.clear();
+
+					std::string path;
+					if (backgroundFilename != "")
+					{
+						path += backgroundFilename;
 					}
 					else
 					{
-						file.close();
+						if (tilesetFilename != "")
+						{
+							path += tilesetFilename;
+						}
+						else
+						{
+							path += mapFilename;
+						}
 					}
-					stage = Stage::TeamAsk;
+
+					char buffer[1024];
+					std::size_t recieved = 0;
+					std::ofstream file(path, std::ios::binary);
+					while (true)
+					{
+						Socket::Status s = tcpSocket.receive(buffer, sizeof(buffer), recieved);
+						if (s == Socket::Disconnected || s == Socket::Error)
+						{
+							file.close();
+							std::remove(path.c_str());							
+							stage = Stage::Error;
+							break;
+						}
+						if (s == Socket::Done)
+						{						
+							file.write(buffer, recieved);							
+
+							fileSize -= recieved;
+							if (fileSize <= 0)
+							{
+								file.close();
+								if (backgroundFilename == "")
+								{									
+									stage = Stage::FileAsk;
+								}
+								else
+								{
+									stage = Stage::TeamAsk;
+								}
+
+								sPacket << true;
+								tcpSocket.send(sPacket);
+								sPacket.clear();
+								break;
+							}
+						}
+					}
 				}
 				break;
 			}
@@ -258,11 +355,11 @@ int main()
 					windowHeightHalf = window.getSize().y / 2;
 					new(&view) View(FloatRect(0, 0, window.getSize().x, window.getSize().y));
 
-					new(&level) Level("files/" + mapFileName, "files/images/" + tilesetFileName, "files/images/" + backgroundFileName);
+					new(&level) Level(mapFilename, tilesetFilename, backgroundFilename);
 					mapWidth = level.mapWidth * level.tileWidth;
 					mapHeight = level.mapHeight * level.tileHeight;
 
-					std::cout << "Press Right Shift to respawn.\n";
+					std::cout << "Press Right Shift to respawn.\n";					
 					stage = Stage::Playing;
 				}
 				break;
@@ -299,42 +396,46 @@ int main()
 
 				//if (clock.getElapsedTime().asMilliseconds() > mspf)
 				//{
-					playerState = 0;
-					if (Keyboard::isKeyPressed(Keyboard::Left))
+					if (true)
 					{
-						playerState = playerState | KEY_LEFT;
-					}
-					if (Keyboard::isKeyPressed(Keyboard::Right))
-					{
-						playerState = playerState | KEY_RIGHT;
-					}
+						playerState = 0;
+						if (Keyboard::isKeyPressed(Keyboard::Left))
+						{
+							playerState = playerState | KEY_LEFT;
+						}
+						if (Keyboard::isKeyPressed(Keyboard::Right))
+						{
+							playerState = playerState | KEY_RIGHT;
+						}
 
-					if (Keyboard::isKeyPressed(Keyboard::Up))
-					{
-						playerState = playerState | KEY_UP;
-					}
-					if (Keyboard::isKeyPressed(Keyboard::Down))
-					{
-						playerState = playerState | KEY_DOWN;
-					}
+						if (Keyboard::isKeyPressed(Keyboard::Up))
+						{
+							playerState = playerState | KEY_UP;
+						}
+						if (Keyboard::isKeyPressed(Keyboard::Down))
+						{
+							playerState = playerState | KEY_DOWN;
+						}
 
-					if (Keyboard::isKeyPressed(Keyboard::Space))
-					{
-						playerState = playerState | KEY_SPACE;
-					}
-					if (Keyboard::isKeyPressed(Keyboard::RShift))
-					{
-						playerState = playerState | KEY_RSHIFT;
-					}				
-					sPacket << playerState;
-					/*playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Left) << 4);
-					playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
-					playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Up) << 2);
-					playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Down) << 1);
-					playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));*/
-					udpSocket.send(sPacket, serverIp, serverPort);					
-					sPacket.clear();
+						if (Keyboard::isKeyPressed(Keyboard::Space))
+						{
+							playerState = playerState | KEY_SPACE;
+						}
+						if (Keyboard::isKeyPressed(Keyboard::RShift))
+						{
+							playerState = playerState | KEY_RSHIFT;
+						}
+						sPacket << playerState;
+						/*playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Left) << 4);
+						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
+						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Up) << 2);
+						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Down) << 1);
+						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));*/
+						udpSocket.send(sPacket, serverIp, serverPort);
+						sPacket.clear();
 
+					}
+					
 					time = clock.getElapsedTime().asMilliseconds();
 					clock.restart();
 
