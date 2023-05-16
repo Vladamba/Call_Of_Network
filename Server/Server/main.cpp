@@ -245,7 +245,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 							if (i != j && clients[i]->name == clients[j]->name)
 							{
 								anotherName = true;
-								clients[i]->name = clients[i]->name + "_2";
+								clients[i]->name = clients[i]->name + "_1";
 								break;
 							}
 						}
