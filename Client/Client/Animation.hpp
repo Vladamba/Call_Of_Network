@@ -30,17 +30,17 @@ public:
 	{
 		if (left)
 		{
-			sprite.setTextureRect(frames_left[(int)currentFrame]);
+			sprite.setTextureRect(frames_left[currentFrame]);
 		}
 		else
 		{
-			sprite.setTextureRect(frames_right[(int)currentFrame]);
+			sprite.setTextureRect(frames_right[currentFrame]);
 		}
 
 		if (isPlaying)
 		{
 			currentFrame += speed * time;
-			if (currentFrame > frames_right.size())
+			if (currentFrame >= frames_right.size())
 			{				
 				if (loop)
 				{
@@ -56,8 +56,7 @@ public:
 	}
 };
 
-enum class AnimationType { Stand, Run, Jump, Crawl, Climb, Move, Explode };
-
+enum class AnimationType { Stand, Run, Jump, Climb, Move, Explode };
 
 class AnimationManager
 {
@@ -105,35 +104,30 @@ public:
 					}
 					else
 					{
-						if (title == "Crawl")
+						if (title == "Climb")
 						{
-							currentAnimation = AnimationType::Crawl;
+							currentAnimation = AnimationType::Climb;
 						}
 						else
 						{
-							if (title == "Climb")
+							if (title == "Move")
 							{
-								currentAnimation = AnimationType::Climb;
+								currentAnimation = AnimationType::Move;
 							}
 							else
 							{
-								if (title == "Move")
+								if (title == "Explode")
 								{
-									currentAnimation = AnimationType::Move;
+									currentAnimation = AnimationType::Explode;
 								}
 								else
 								{
-									if (title == "Explode")
-									{
-										currentAnimation = AnimationType::Explode;
-									}
-									else
-									{
-										printf("Found incorrect animation!");
-									}
+									printf("Found incorrect animation!");
+									animationElement = animationElement->NextSiblingElement("animation");
+									continue;
 								}
 							}
-						}												
+						}																		
 					}
 				}
 			}		
@@ -153,7 +147,6 @@ public:
 
 				cut = cut->NextSiblingElement("cut");
 			}
-
 			animationList[currentAnimation] = animation;
 
 			animationElement = animationElement->NextSiblingElement("animation");
@@ -164,10 +157,6 @@ public:
 	{
 		animationList[currentAnimation].sprite.setPosition(x, y);
 		window.draw(animationList[currentAnimation].sprite);
-	}
-
-	bool isPlaying() {
-		return animationList[currentAnimation].isPlaying;
 	}
 
 	void set(AnimationType t)
@@ -205,6 +194,10 @@ public:
 		animationList[currentAnimation].sprite.setColor(color);
 	}
 
+	/*bool isPlaying() {
+		return animationList[currentAnimation].isPlaying;
+	}
+	
 	int getWidth()
 	{
 		return animationList[currentAnimation].frames_right[(int)animationList[currentAnimation].currentFrame].width;
@@ -213,7 +206,7 @@ public:
 	int getHeight()
 	{
 		return animationList[currentAnimation].frames_right[(int)animationList[currentAnimation].currentFrame].height;
-	}
+	}*/
 };
 
 #endif ANIMATION_H

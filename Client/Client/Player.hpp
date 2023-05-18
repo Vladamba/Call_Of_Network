@@ -1,10 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <SFML/Graphics.hpp>
-#include "Consts.hpp"
-#include "Animation.hpp"
-#include "Level.hpp"
+//#include <SFML/Graphics.hpp>
+//#include "Consts.hpp"
+//#include "Animation.hpp"
+//#include "Level.hpp"
 
 class Player
 {
@@ -36,6 +36,7 @@ public:
 	void update(signed __int32 _time, bool myPlayer)
 	{
 		float time = (float)_time;
+
 		switch (state)
 		{
 		case STATE_STAND:
@@ -46,9 +47,6 @@ public:
 			break;
 		case STATE_JUMP:
 			animationManager.set(AnimationType::Jump);
-			break;
-		case STATE_CRAWL:
-			animationManager.set(AnimationType::Crawl);
 			break;
 		case STATE_CLIMB:
 			animationManager.set(AnimationType::Climb);
@@ -63,16 +61,6 @@ public:
 			break;
 		}
 
-		/*if (hit) {
-			timer += time;
-			if (timer > 1000)
-			{
-				hit = false;
-				timer = 0;
-			}
-			animationManager.set("hit");
-		}*/
-
 		if (!isAlive)
 		{
 			animationManager.setColor(Color::Red);
@@ -81,17 +69,17 @@ public:
 		{
 			if (myPlayer)
 			{
-				animationManager.setColor(Color(0, 64, 64, 255));
+				animationManager.setColor(Color::White);
 			}
 			else
 			{
 				if (team)
 				{
-					animationManager.setColor(Color(0, 128, 0, 128));
+					animationManager.setColor(Color::Blue);
 				}
 				else
 				{
-					animationManager.setColor(Color(0, 0, 128, 255));
+					animationManager.setColor(Color::Green);
 				}
 			}			
 		}

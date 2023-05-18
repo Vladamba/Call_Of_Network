@@ -42,7 +42,7 @@ public:
         XMLDocument levelFile;
         if (levelFile.LoadFile(map.c_str()) != XML_SUCCESS)
         {
-            printf("Loading map failed.");
+            printf("Loading map failed!");
         }
 
         XMLElement* mapElement;       
@@ -71,14 +71,14 @@ public:
             layerDataElement = layerElement->FirstChildElement("data");
             if (layerDataElement == NULL)
             {
-                printf("Bad map. No layer information found.");
+                printf("Bad map. No layer information found!");
             }
             
             XMLElement* tileElement;
             tileElement = layerDataElement->FirstChildElement("tile");
             if (tileElement == NULL)
             {
-                printf("Bad map. No tile information found.");
+                printf("Bad map. No tile information found!");
             }
 
             int columns = tTileset.getSize().x / tileWidth;

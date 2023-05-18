@@ -78,7 +78,6 @@ public:
 				{
 					vec.x = health;
 					vec.y = i;
-					isAlive = false;
 					return vec;
 				}
 			}

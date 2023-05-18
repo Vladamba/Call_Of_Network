@@ -6,24 +6,75 @@
 #include "Player.hpp"
 #include "Client.hpp"
 #include <thread>
+#include <iostream>
 #include <fstream>
-//#include "MovingPlatform.hpp"
-//#include "HealthBar.hpp"
 
 using namespace sf;
 
-void newClient(Level* level, Client** clients, unsigned short port, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber);
+void newClient(Level* level, Client** clients, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber);
 void updateClients(Level* level, Client** clients, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber);
 
 int main()
-{
-	unsigned short port = 2000;
-	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString().c_str(), port);
+{	
+	std::string mapFilename = "", tilesetFilename = "", backgroundFilename = "";
 
-	Level level(MAP_FILENAME);
-	//e = lvl.GetObjects("MovingPlatform");
-	//for (int i = 0; i < e.size(); i++)
-		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
+	while (backgroundFilename == "")
+	{		
+		bool f = true;
+		std::string path;
+		while (f)
+		{
+			if (mapFilename == "")
+			{
+				printf("Input map filename: ");
+			}
+			else
+			{
+				if (tilesetFilename == "")
+				{
+					printf("Input tileset filename: ");
+				}
+				else
+				{
+					printf("Input background filename: ");
+				}
+			}
+			
+			std::cin >> path;
+			std::ifstream file(path, std::ios::binary);
+			if (file.good())
+			{
+				file.close();
+				f = false;
+			}
+			else
+			{
+				printf("No file found! Try again.\n");
+			}
+		}
+
+		if (mapFilename == "")
+		{
+			mapFilename = path;
+		}
+		else
+		{
+			if (tilesetFilename == "")
+			{
+				tilesetFilename = path;
+			}
+			else
+			{
+				backgroundFilename = path;
+			}
+		}
+	}
+
+	Level level(mapFilename, tilesetFilename, backgroundFilename);
+	mapFilename = "";
+	tilesetFilename = "";
+	backgroundFilename = "";
+
 
 	Client** clients = new Client*[CLIENTS_SIZE];
 	for (int i = 0; i < CLIENTS_SIZE; i++)
@@ -33,24 +84,24 @@ int main()
 	 
 	unsigned char clientsNumber = 0, team1 = 0, team2 = 0;
 
-	std::thread tNewClient(newClient, &level, clients, port, &team1, &team2, &clientsNumber);
+	std::thread tNewClient(newClient, &level, clients, &team1, &team2, &clientsNumber);
 	std::thread tUpdateClients(updateClients, &level, clients, &team1, &team2, &clientsNumber);
 	
-	//tNewClient.detach();
 	tNewClient.join();
-	//tUpdateClients.detach();
 	tUpdateClients.join();
 	return 0;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-void newClient(Level* level, Client** clients, unsigned short port, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber)
+void newClient(Level* level, Client** clients, unsigned char* team1, unsigned char* team2, unsigned char* clientsNumber)
 {
 	TcpListener listener;
 	Packet rPacket, sPacket;
 
-	listener.listen(port);
+	listener.listen(Socket::AnyPort);	
+	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString().c_str(), listener.getLocalPort());
+
 	while (true)
 	{
 		for (int i = 0; i < CLIENTS_SIZE; i++)
@@ -76,7 +127,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 						}
 						clients[i]->tcpSocket.setBlocking(false);
 						
-						clients[i]->filename = MAP_FILENAME;
+						clients[i]->filename = level->mapFilename;
 						clients[i]->stage = Stage::FileAsk;
 					}
 					break;
@@ -139,20 +190,20 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 							clients[i]->tcpSocket.setBlocking(false);
 						}
 
-						if (clients[i]->filename == BACKGROUND_FILENAME)
+						if (clients[i]->filename == level->backgroundFilename)
 						{
 							clients[i]->stage = Stage::TeamAsk;
 							break;
 						}
 
-						if (clients[i]->filename == TILESET_FILENAME)
+						if (clients[i]->filename == level->tilesetFilename)
 						{
-							clients[i]->filename = BACKGROUND_FILENAME;
+							clients[i]->filename = level->backgroundFilename;
 						}
 
-						if (clients[i]->filename == MAP_FILENAME)
+						if (clients[i]->filename == level->mapFilename)
 						{
-							clients[i]->filename = TILESET_FILENAME;
+							clients[i]->filename = level->tilesetFilename;
 						}
 						clients[i]->stage = Stage::FileAsk;
 					}
@@ -283,8 +334,7 @@ void newClient(Level* level, Client** clients, unsigned short port, unsigned cha
 						sPacket << clients[i]->serverPort;
 						clients[i]->tcpSocket.send(sPacket);
 						sPacket.clear();
-
-						//printf("ip: %s, port: %d, my port: %d", clients[i]->ip.toString().c_str(), clients[i]->clientPort, clients[i]->udpSocket.getLocalPort());
+					
 						clients[i]->stage = Stage::Playing;
 						(*clientsNumber)++;
 					}		
@@ -310,7 +360,7 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 	Vector2f playersCoord[CLIENTS_SIZE];
 	Vector2i bulletHitVec;
 
-	unsigned char bulletsNumber = 0, clientIndex = 0;
+	unsigned char bulletsNumber = 0, clientIndex = 0, score1 = 0, score2 = 0;
 
 	Clock clock;
 	signed __int32 time;
@@ -346,9 +396,10 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 						(*clientsNumber)--;
 						break;
 					}
-					
-					if (clients[i]->udpSocket.receive(rPacket, clients[i]->ip, clients[i]->serverPort) == Socket::Done)
-					{										
+
+					IpAddress ip;
+					if (clients[i]->udpSocket.receive(rPacket, ip, clients[i]->serverPort) == Socket::Done)
+					{												
 						clients[i]->player.receivePacket(&rPacket);
 						rPacket.clear();
 					}
@@ -389,7 +440,18 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 					{
 						if (clients[bulletHitVec.y]->team != bullets[i]->team)
 						{
-							clients[bulletHitVec.y]->player.hit(bulletHitVec.x);
+							bullets[i]->isAlive = false;
+							if (clients[bulletHitVec.y]->player.hit(bulletHitVec.x))
+							{
+								if (bullets[i]->team)
+								{
+									score1++;
+								}
+								else
+								{
+									score2++;
+								}
+							}
 							bulletsNumber--;
 						}
 					}
@@ -403,7 +465,9 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 				}
 			}
 
-			//Send
+
+			sPacket << score1;
+			sPacket << score2;
 			sPacket << *clientsNumber;
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{

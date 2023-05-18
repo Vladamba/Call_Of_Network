@@ -5,10 +5,6 @@
 
 using namespace sf;
 
-const std::string MAP_FILENAME = "files/mymap.tmx";
-const std::string TILESET_FILENAME = "files/images/tileset2.png";
-const std::string BACKGROUND_FILENAME = "files/images/bg.png";
-
 const int MSPF = 1000 / 120;
 const int CLIENTS_SIZE = 8;
 const int BULLETS_SIZE = 64;
@@ -23,8 +19,7 @@ const float BULLET_HEIGHT = 6.0f;
 const unsigned char STATE_STAND = 0;
 const unsigned char STATE_RUN = 1;
 const unsigned char STATE_JUMP = 2;
-const unsigned char STATE_CRAWL = 3;
-const unsigned char STATE_CLIMB = 4;
+const unsigned char STATE_CLIMB = 3;
 
 const unsigned char KEY_LEFT = 1;
 const unsigned char KEY_RIGHT = 2;

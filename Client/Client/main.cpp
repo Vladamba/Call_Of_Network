@@ -6,18 +6,15 @@
 #include "Player.hpp"
 #include "Bullet.hpp"
 #include "HealthBar.hpp"
-//#include "MovingPlatform.hpp"
+#include "Score.hpp"
 #include <iostream>
 #include <fstream>
-
-const int mspf = 1000 / 120;
 
 using namespace sf;
 
 int main()
 {
-	enum Stage { Connection, FileAsk, FileAnswer,
-		TeamAsk, TeamAnswer, NameAsk, NameAnswer, PortAsk, PortAnswer, Playing, Error };
+	enum Stage { Connection, FileAsk, FileAnswer, TeamAsk, TeamAnswer, NameAsk, NameAnswer, PortAsk, PortAnswer, Playing, Error };
 	IpAddress serverIp;
 	unsigned short serverPort, myPort;
 
@@ -32,13 +29,11 @@ int main()
 	View view;
 	Level level;
 
-	//moveplatform_t.loadFromFile("files/images/movingPlatform.png");
-	//AnimationManager anim4;
-	//anim4.create("move", moveplatform_t, 0, 0, 95, 22, 1, 0);*/
-
 	HealthBar healthBar("files/images/healthBar.png");
 	AnimationManager playerAnimationManager("files/images/megaman.png", "files/myanim.xml");
 	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
+
+	Score score("files/OpenSans-Regular.ttf");
 
 	Player** players = new Player*[CLIENTS_SIZE];
 	for (int i = 0; i < CLIENTS_SIZE; i++)
@@ -51,16 +46,11 @@ int main()
 	{
 		bullets[i] = new Bullet(bulletAnimationManager);
 	}
-
-	//e = lvl.GetObjects("MovingPlatform");
-	//for (int i = 0; i < e.size(); i++)
-		//entities.push_back(new MovingPlatform(anim4, lvl, e[i].rect.left, e[i].rect.top));
-
-	//unsigned char playerState;	
-	unsigned char playersNumber = 0, bulletsNumber = 0, myIndex = 0, playerState = 0;
+	
+	unsigned char playersNumber = 0, bulletsNumber = 0, myIndex = 0, playerState = 0, score1 = 0, score2 = 0;
 	std::string mapFilename, tilesetFilename, backgroundFilename, myName;
 
-	Clock clock;
+	Clock clock;	
 	signed __int32 time;
 
 	while (true)
@@ -79,8 +69,8 @@ int main()
 
 			case Stage::Connection:		
 			{				
+				std::fflush(stdin);
 				std::cout << "Input server's IP: ";
-				std::cout.flush();
 				std::string sServerIp;
 				std::cin >> sServerIp;
 				serverIp = IpAddress(sServerIp);
@@ -248,7 +238,14 @@ int main()
 
 			case Stage::TeamAsk:
 			{
-				if (tcpSocket.receive(rPacket) == Socket::Done && rPacket)
+				Socket::Status s = tcpSocket.receive(rPacket);
+				if (s == Socket::Disconnected || s == Socket::Error)
+				{
+					stage = Stage::Error;
+					break;
+				}
+
+				if (s == Socket::Done)
 				{
 					unsigned char uTeam = 0;
 					int iTeam;
@@ -262,6 +259,12 @@ int main()
 					std::cout << iTeam << " players in the second one. \nChoose your team (input 1 or 2): ";
 					std::cin >> iTeam;
 
+					while (iTeam != 1 && iTeam != 2)
+					{
+						std::cout << "Incorrect input! Try again: ";
+						std::cin >> iTeam;
+					}
+
 					bool team = iTeam == 1;
 					sPacket << team;
 					tcpSocket.send(sPacket);
@@ -273,7 +276,14 @@ int main()
 
 			case Stage::TeamAnswer:
 			{
-				if (tcpSocket.receive(rPacket) == Socket::Done && rPacket)
+				Socket::Status s = tcpSocket.receive(rPacket);
+				if (s == Socket::Disconnected || s == Socket::Error)
+				{
+					stage = Stage::Error;
+					break;
+				}
+
+				if (s == Socket::Done)
 				{
 					bool autoBalanced;
 					rPacket >> autoBalanced;
@@ -293,6 +303,15 @@ int main()
 				std::cout << "Enter you name: ";
 				std::cin >> myName;
 
+				while (myName.length() > 8)
+				{
+					if (myName.length() > 8)
+					{
+						std::cout << "Name is too long! Try again: ";
+					}				
+					std::cin >> myName;
+				}
+
 				sPacket << myName;
 				tcpSocket.send(sPacket);
 				sPacket.clear();
@@ -303,7 +322,14 @@ int main()
 
 			case Stage::NameAnswer:
 			{
-				if (tcpSocket.receive(rPacket) == Socket::Done && rPacket)
+				Socket::Status s = tcpSocket.receive(rPacket);
+				if (s == Socket::Disconnected || s == Socket::Error)
+				{
+					stage = Stage::Error;
+					break;
+				}
+
+				if (s == Socket::Done)
 				{
 					bool anotherName;
 					rPacket >> anotherName;
@@ -311,7 +337,7 @@ int main()
 					{
 						std::cout << "Your name changed to: ";
 						rPacket >> myName;
-						std::cout << myName;
+						std::cout << myName + "\n";
 					}
 					rPacket.clear();
 
@@ -336,7 +362,14 @@ int main()
 
 			case Stage::PortAnswer:
 			{
-				if (tcpSocket.receive(rPacket) == Socket::Done && rPacket)
+				Socket::Status s = tcpSocket.receive(rPacket);
+				if (s == Socket::Disconnected || s == Socket::Error)
+				{
+					stage = Stage::Error;
+					break;
+				}
+
+				if (s == Socket::Done)
 				{
 					rPacket >> serverPort;
 					rPacket.clear();
@@ -344,9 +377,7 @@ int main()
 					playerState = 0;
 					sPacket << playerState;
 					udpSocket.send(sPacket, serverIp, serverPort);
-					sPacket.clear();
-
-					//printf("ip: %s, port: %d, my port: %d", serverIp.toString().c_str(), serverPort, udpSocket.getLocalPort());
+					sPacket.clear();					
 
 					offsetX = 0;
 					offsetY = 0;
@@ -358,6 +389,8 @@ int main()
 					new(&level) Level(mapFilename, tilesetFilename, backgroundFilename);
 					mapWidth = level.mapWidth * level.tileWidth;
 					mapHeight = level.mapHeight * level.tileHeight;
+
+					new(&clock) Clock();
 
 					std::cout << "Press Right Shift to respawn.\n";					
 					stage = Stage::Playing;
@@ -376,8 +409,19 @@ int main()
 						stage = Stage::Error;
 					}
 				}
-				if (udpSocket.receive(rPacket, serverIp, myPort) == Socket::Done && rPacket)
+
+				IpAddress ip;
+				Socket::Status s = udpSocket.receive(rPacket, ip, myPort);
+				if (s == Socket::Disconnected || s == Socket::Error)
+				{
+					stage = Stage::Error;
+					break;
+				}
+
+				if (s == Socket::Done)
 				{					
+					rPacket >> score1;
+					rPacket >> score2;
 					rPacket >> playersNumber;
 					for (int i = 0; i < playersNumber; i++)
 					{
@@ -392,56 +436,47 @@ int main()
 
 					rPacket >> myIndex;
 					rPacket.clear();
-				//}
 
-				//if (clock.getElapsedTime().asMilliseconds() > mspf)
-				//{
-					if (true)
+					playerState = 0;
+					if (Keyboard::isKeyPressed(Keyboard::Left))
 					{
-						playerState = 0;
-						if (Keyboard::isKeyPressed(Keyboard::Left))
-						{
-							playerState = playerState | KEY_LEFT;
-						}
-						if (Keyboard::isKeyPressed(Keyboard::Right))
-						{
-							playerState = playerState | KEY_RIGHT;
-						}
-
-						if (Keyboard::isKeyPressed(Keyboard::Up))
-						{
-							playerState = playerState | KEY_UP;
-						}
-						if (Keyboard::isKeyPressed(Keyboard::Down))
-						{
-							playerState = playerState | KEY_DOWN;
-						}
-
-						if (Keyboard::isKeyPressed(Keyboard::Space))
-						{
-							playerState = playerState | KEY_SPACE;
-						}
-						if (Keyboard::isKeyPressed(Keyboard::RShift))
-						{
-							playerState = playerState | KEY_RSHIFT;
-						}
-						sPacket << playerState;
-						/*playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Left) << 4);
-						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Right) << 3);
-						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Up) << 2);
-						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Down) << 1);
-						playerState = playerState | ((unsigned char)Keyboard::isKeyPressed(Keyboard::Space));*/
-						udpSocket.send(sPacket, serverIp, serverPort);
-						sPacket.clear();
-
+						playerState = playerState | KEY_LEFT;
 					}
-					
+					if (Keyboard::isKeyPressed(Keyboard::Right))
+					{
+						playerState = playerState | KEY_RIGHT;
+					}
+
+					if (Keyboard::isKeyPressed(Keyboard::Up))
+					{
+						playerState = playerState | KEY_UP;
+					}
+					if (Keyboard::isKeyPressed(Keyboard::Down))
+					{
+						playerState = playerState | KEY_DOWN;
+					}
+
+					if (Keyboard::isKeyPressed(Keyboard::Space))
+					{
+						playerState = playerState | KEY_SPACE;
+					}
+					if (Keyboard::isKeyPressed(Keyboard::RShift))
+					{
+						playerState = playerState | KEY_RSHIFT;
+					}
+					sPacket << playerState;
+					udpSocket.send(sPacket, serverIp, serverPort);  
+					sPacket.clear();
+				}
+
+				if (clock.getElapsedTime().asMilliseconds() > MSPF)
+				{								
 					time = clock.getElapsedTime().asMilliseconds();
 					clock.restart();
 
-					if (time > mspf * 2)
+					if (time > MSPF * 2)
 					{
-						time = mspf * 2;
+						time = MSPF * 2;
 					}
 
 					for (int i = 0; i < playersNumber; i++)
@@ -496,6 +531,9 @@ int main()
 
 					healthBar.update(players[myIndex]->health);
 					healthBar.draw(window, view.getCenter() - Vector2f(200, 100));
+
+					score.update(score1, score2);
+					score.draw(window, view.getCenter() - Vector2f(0, 100));
 
 					window.display();
 				}

@@ -344,7 +344,7 @@ public:
 		return Vector2f(rect.left, rect.top);
 	}
 
-	void hit(int damage)
+	bool hit(int damage)
 	{
 		if (isAlive)
 		{
@@ -352,8 +352,10 @@ public:
 			if (health <= 0)
 			{
 				isAlive = false;
+				return true;
 			}
 		}
+		return false;
 	}
 
 	void receivePacket(Packet* packet)

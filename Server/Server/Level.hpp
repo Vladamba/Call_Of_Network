@@ -14,11 +14,16 @@ class Level
 public:    
     int mapWidth, mapHeight, tileWidth, tileHeight;
     ObjectType** objects;    
+    std::string mapFilename, tilesetFilename, backgroundFilename;
 
-    Level(std::string file)
+    Level(std::string _mapFilename, std::string _tilesetFilename, std::string _backgroundFilename)
     {
+        mapFilename = _mapFilename;
+        tilesetFilename = _tilesetFilename;
+        backgroundFilename = _backgroundFilename;
+
         XMLDocument levelFile;
-        if (levelFile.LoadFile(file.c_str()) != XML_SUCCESS)
+        if (levelFile.LoadFile(mapFilename.c_str()) != XML_SUCCESS)
         {
             printf("Loading level file failed!");
         }
