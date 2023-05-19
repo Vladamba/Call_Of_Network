@@ -1,11 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-//#include <SFML/Graphics.hpp>
-//#include "Consts.hpp"
-//#include "Animation.hpp"
-//#include "Level.hpp"
-
 class Player
 {
 public:

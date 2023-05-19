@@ -1,9 +1,6 @@
 #ifndef SCORE_H
 #define SCORE_H
 
-#include <SFML/Graphics.hpp>
-#include "Consts.hpp"
-
 using namespace sf;
 
 class Score
@@ -17,7 +14,7 @@ public:
 	{
 		if (!font.loadFromFile(fontFile))
 		{
-			printf("Loading font failed!");
+			std::cout << "Loading font failed!\n";
 		}
 		new(&text) Text("0 | 0", font, 16);				
 	}

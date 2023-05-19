@@ -1,9 +1,6 @@
 #ifndef BULLET_H
 #define BULLET_H
 
-#include <SFML/Graphics.hpp>
-#include "Consts.hpp"
-
 class Bullet
 {
 public:

@@ -1,5 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
+
+#include <iostream>
+#include <fstream>
+
 #include "Consts.hpp"
 #include "Level.hpp"
 #include "Animation.hpp"
@@ -7,8 +11,6 @@
 #include "Bullet.hpp"
 #include "HealthBar.hpp"
 #include "Score.hpp"
-#include <iostream>
-#include <fstream>
 
 using namespace sf;
 
@@ -29,11 +31,10 @@ int main()
 	View view;
 	Level level;
 
-	HealthBar healthBar("files/images/healthBar.png");
-	AnimationManager playerAnimationManager("files/images/megaman.png", "files/myanim.xml");
-	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");
-
 	Score score("files/OpenSans-Regular.ttf");
+	HealthBar healthBar("files/images/healthBar.png");
+	AnimationManager playerAnimationManager("files/images/megaman.png", "files/megaman.xml");
+	AnimationManager bulletAnimationManager("files/images/bullet.png", "files/bullet.xml");	
 
 	Player** players = new Player*[CLIENTS_SIZE];
 	for (int i = 0; i < CLIENTS_SIZE; i++)
@@ -59,6 +60,7 @@ int main()
 		{
 			case Stage::Error:
 			{
+				window.close();
 				rPacket.clear();
 				tcpSocket.disconnect();
 				new(&tcpSocket) TcpSocket;
@@ -70,6 +72,7 @@ int main()
 			case Stage::Connection:		
 			{				
 				std::fflush(stdin);
+				std::fflush(stdout);
 				std::cout << "Input server's IP: ";
 				std::string sServerIp;
 				std::cin >> sServerIp;
@@ -85,11 +88,11 @@ int main()
 				}
 
 				if (s == Socket::Done)
-				{
-					//tcpSocket.setBlocking(false);
+				{					
 					mapFilename = "";
 					tilesetFilename = "";
 					backgroundFilename = "";
+					myName = "";
 
 					stage = Stage::FileAsk;
 					sPacket << true;
@@ -126,8 +129,17 @@ int main()
 						}
 						else
 						{
-							rPacket >> backgroundFilename;
-							path = backgroundFilename;
+							// Use myName to store the path to tileset.tsx because it will not be needed
+							if (myName == "")
+							{
+								rPacket >> myName;
+								path = myName;
+							}
+							else
+							{
+								rPacket >> backgroundFilename;
+								path = backgroundFilename;
+							}
 						}
 					}
 					rPacket.clear();
@@ -154,7 +166,7 @@ int main()
 						tcpSocket.send(sPacket);
 						sPacket.clear();
 
-						if (tilesetFilename != "" && backgroundFilename != "")
+						if (backgroundFilename != "")
 						{
 							stage = Stage::TeamAsk;
 						}
@@ -185,14 +197,21 @@ int main()
 					}
 					else
 					{
-						if (tilesetFilename != "")
+						if (myName != "")
 						{
-							path += tilesetFilename;
+							path += myName;
 						}
 						else
 						{
-							path += mapFilename;
-						}
+							if (tilesetFilename != "")
+							{
+								path += tilesetFilename;
+							}
+							else
+							{
+								path += mapFilename;
+							}
+						}						
 					}
 
 					char buffer[1024];
@@ -374,10 +393,12 @@ int main()
 					rPacket >> serverPort;
 					rPacket.clear();
 
+					tcpSocket.setBlocking(false);	
+
 					playerState = 0;
 					sPacket << playerState;
 					udpSocket.send(sPacket, serverIp, serverPort);
-					sPacket.clear();					
+					sPacket.clear();
 
 					offsetX = 0;
 					offsetY = 0;
@@ -410,16 +431,16 @@ int main()
 					}
 				}
 
-				IpAddress ip;
-				Socket::Status s = udpSocket.receive(rPacket, ip, myPort);
+				Socket::Status s = tcpSocket.receive(rPacket);
 				if (s == Socket::Disconnected || s == Socket::Error)
 				{
 					stage = Stage::Error;
 					break;
 				}
 
-				if (s == Socket::Done)
-				{					
+				IpAddress ip;
+				if (udpSocket.receive(rPacket, ip, myPort) == Socket::Done)
+				{
 					rPacket >> score1;
 					rPacket >> score2;
 					rPacket >> playersNumber;
@@ -464,13 +485,14 @@ int main()
 					{
 						playerState = playerState | KEY_RSHIFT;
 					}
+
 					sPacket << playerState;
-					udpSocket.send(sPacket, serverIp, serverPort);  
+					udpSocket.send(sPacket, serverIp, serverPort);
 					sPacket.clear();
 				}
-
+			
 				if (clock.getElapsedTime().asMilliseconds() > MSPF)
-				{								
+				{		
 					time = clock.getElapsedTime().asMilliseconds();
 					clock.restart();
 
@@ -531,11 +553,10 @@ int main()
 
 					healthBar.update(players[myIndex]->health);
 					healthBar.draw(window, view.getCenter() - Vector2f(200, 100));
-
 					score.update(score1, score2);
 					score.draw(window, view.getCenter() - Vector2f(0, 100));
 
-					window.display();
+					window.display();					
 				}
 				break;
 			}

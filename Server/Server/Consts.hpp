@@ -1,8 +1,6 @@
 #ifndef CONSTS_H
 #define CONSTS_H
 
-#include <SFML/Graphics.hpp>
-
 using namespace sf;
 
 const int MSPF = 1000 / 120;

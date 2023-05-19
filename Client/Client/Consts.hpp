@@ -1,11 +1,9 @@
 #ifndef CONSTS_H
 #define CONSTS_H
 
-#include <SFML/Graphics.hpp>
-
 using namespace sf;
 
-const int MSPF = 1000 / 60;
+const int MSPF = 1000 / 120;
 const int CLIENTS_SIZE = 8;
 const int BULLETS_SIZE = 64;
 const Vector2f NULL_VECTOR = Vector2f(-1, -1);

@@ -1,11 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <SFML/Graphics.hpp>
-#include "Consts.hpp"
-#include "Level.hpp"
-#include <math.h>
-
 class Player
 {
 public:
@@ -40,7 +35,6 @@ public:
 		rect.height = PLAYER_HEIGHT;
 		isAlive = false;
 		respawn = false;
-		//newPlayer(level, true, _health);
 	}
 
 	void newPlayer(Level level, bool team, int _health)
@@ -48,11 +42,11 @@ public:
 		Vector2f vec;
 		if (team)
 		{
-			vec = level.getObjectCoord(ObjectType::PlayerSpawner);
+			vec = level.getObjectCoord(ObjectType::Spawner1);
 		}
 		else
 		{
-			vec = level.getObjectCoord(ObjectType::PlayerSpawner);
+			vec = level.getObjectCoord(ObjectType::Spawner2);
 		}
 		rect.left = vec.x;
 		rect.top = vec.y;
@@ -71,7 +65,6 @@ public:
 
 		isAlive = true;
 		respawn = false;
-		//hit = false;
 	}
 
 	void updateKeys()
@@ -136,10 +129,6 @@ public:
 						state = STATE_JUMP;
 					}
 				}
-				/*if (state == STATE_CRAWL)
-				{
-					state = STATE_STAND;
-				}*/
 			}
 		}
 		else
@@ -151,13 +140,6 @@ public:
 					dy = vClimb;
 					state = STATE_CLIMB;
 				}
-				/*else
-				{
-					if (state == STATE_STAND || state == STATE_RUN)
-					{
-						state = STATE_CRAWL;
-					}
-				}*/
 			}
 			else
 			{
@@ -176,7 +158,6 @@ public:
 		{
 			shoot = false;
 		}
-		//keys[Key::Left] = keys[Key::Right] = keys[Key::Up] = keys[Key::Down] = keys[Key::Space] = false;
 	}
 
 	void update(signed __int32 _time, Level level)
@@ -213,7 +194,6 @@ public:
 				state = STATE_JUMP;
 			}
 
-			//if (onGround && state != STATE_CRAWL)
 			if (onGround)
 			{
 				if (dx == 0)

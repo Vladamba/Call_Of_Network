@@ -2,19 +2,19 @@
 #define LEVEL_H
 
 #include "tinyxml2.h"
-#include <SFML/Graphics.hpp>
+#include <iostream>
 
 using namespace tinyxml2;
 using namespace sf;
 
-enum ObjectType { None, Solid, Ladder, PlayerSpawner };
+enum ObjectType { None, Solid, Ladder, Spawner1, Spawner2 };
 
 class Level
 {
 public:    
     int mapWidth, mapHeight, tileWidth, tileHeight;
     ObjectType** objects;    
-    std::string mapFilename, tilesetFilename, backgroundFilename;
+    std::string mapFilename, tilesetFilename, tilesetTsxFilename, backgroundFilename;
 
     Level(std::string _mapFilename, std::string _tilesetFilename, std::string _backgroundFilename)
     {
@@ -25,11 +25,14 @@ public:
         XMLDocument levelFile;
         if (levelFile.LoadFile(mapFilename.c_str()) != XML_SUCCESS)
         {
-            printf("Loading level file failed!");
+            std::cout << "Loading level file failed!";
         }
 
         XMLElement* mapElement;
         mapElement = levelFile.FirstChildElement("map");
+
+        tilesetTsxFilename = "files/";
+        tilesetTsxFilename += mapElement->FirstChildElement("tileset")->Attribute("source");
 
         mapWidth = atoi(mapElement->Attribute("width"));
         mapHeight = atoi(mapElement->Attribute("height"));
@@ -50,7 +53,7 @@ public:
         objectGroupElement = mapElement->FirstChildElement("objectgroup");
         if (objectGroupElement == NULL)
         {
-            printf("No object layers found!");
+            std::cout << "No object layers found!";
         }
         while (objectGroupElement)
         {
@@ -77,13 +80,20 @@ public:
                             }
                             else
                             {
-                                if (name == "Player")
+                                if (name == "Spawner1")
                                 {
-                                    objects[i][j] = ObjectType::PlayerSpawner;
+                                    objects[i][j] = ObjectType::Spawner1;
                                 }
                                 else
                                 {
-                                    printf("Found incorrect object!");
+                                    if (name == "Spawner2")
+                                    {
+                                        objects[i][j] = ObjectType::Spawner2;
+                                    }
+                                    else
+                                    {
+                                        std::cout << "Found incorrect object!";
+                                    }
                                 }
                             }
                         }

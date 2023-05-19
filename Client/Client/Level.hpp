@@ -1,7 +1,6 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
-#include <SFML/Graphics.hpp>
 #include "tinyxml2.h"
 
 using namespace sf;
@@ -27,7 +26,7 @@ public:
     {
         if (!tBackground.loadFromFile(background.c_str()))
         {
-            printf("Loading background failed!");
+            std::cout << "Loading background failed!\n";
         }
         tBackground.setSmooth(false);
         sBackground.setTexture(tBackground);
@@ -35,14 +34,14 @@ public:
 
         if (!tTileset.loadFromFile(tileset.c_str()))
         {
-            printf("Loading tileset failed!");
+            std::cout << "Loading tileset failed!\n";
         }
         tTileset.setSmooth(false);
 
         XMLDocument levelFile;
         if (levelFile.LoadFile(map.c_str()) != XML_SUCCESS)
         {
-            printf("Loading map failed!");
+            std::cout << "Loading map failed!\n";
         }
 
         XMLElement* mapElement;       
@@ -71,14 +70,14 @@ public:
             layerDataElement = layerElement->FirstChildElement("data");
             if (layerDataElement == NULL)
             {
-                printf("Bad map. No layer information found!");
+                std::cout << "No layer information found!\n";
             }
             
             XMLElement* tileElement;
             tileElement = layerDataElement->FirstChildElement("tile");
             if (tileElement == NULL)
             {
-                printf("Bad map. No tile information found!");
+                std::cout << "No tile information found!\n";
             }
 
             int columns = tTileset.getSize().x / tileWidth;
@@ -113,7 +112,9 @@ public:
                     x = 0;
                     y++;
                     if (y >= mapHeight)
+                    {
                         y = 0;
+                    }
                 }
 
                 tileElement = tileElement->NextSiblingElement("tile");

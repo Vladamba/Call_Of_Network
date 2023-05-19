@@ -1,13 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
+
+#include <thread>
+#include <iostream>
+#include <fstream>
+
 #include "Consts.hpp"
 #include "Level.hpp"
 #include "Bullet.hpp"
 #include "Player.hpp"
 #include "Client.hpp"
-#include <thread>
-#include <iostream>
-#include <fstream>
 
 using namespace sf;
 
@@ -26,17 +28,17 @@ int main()
 		{
 			if (mapFilename == "")
 			{
-				printf("Input map filename: ");
+				std::cout << "Input map filename: ";
 			}
 			else
 			{
 				if (tilesetFilename == "")
 				{
-					printf("Input tileset filename: ");
+					std::cout << "Input tileset filename: ";
 				}
 				else
 				{
-					printf("Input background filename: ");
+					std::cout << "Input background filename: ";
 				}
 			}
 			
@@ -49,7 +51,7 @@ int main()
 			}
 			else
 			{
-				printf("No file found! Try again.\n");
+				std::cout << "No file found! Try again.\n";
 			}
 		}
 
@@ -100,7 +102,7 @@ void newClient(Level* level, Client** clients, unsigned char* team1, unsigned ch
 	Packet rPacket, sPacket;
 
 	listener.listen(Socket::AnyPort);	
-	printf("My IP is: %s\nMy port is: %d", IpAddress::getLocalAddress().toString().c_str(), listener.getLocalPort());
+	std::cout << "My IP is: " <<  IpAddress::getLocalAddress().toString() << "\nMy port is: " << listener.getLocalPort();
 
 	while (true)
 	{
@@ -111,7 +113,7 @@ void newClient(Level* level, Client** clients, unsigned char* team1, unsigned ch
 				case Stage::Error:
 				{
 					rPacket.clear();
-					printf("\n%s disconnected!", clients[i]->name.c_str());
+					std::cout << "\n" << clients[i]->name << " disconnected!";
 					clients[i]->disconnect();
 					break;
 				}
@@ -120,7 +122,7 @@ void newClient(Level* level, Client** clients, unsigned char* team1, unsigned ch
 				{
 					if (listener.accept(clients[i]->tcpSocket) == Socket::Done)
 					{
-						printf("\nAccepted new player!");
+						std::cout << "\nAccepted new player!";
 						if (listener.isBlocking())
 						{
 							listener.setBlocking(false);
@@ -196,9 +198,14 @@ void newClient(Level* level, Client** clients, unsigned char* team1, unsigned ch
 							break;
 						}
 
-						if (clients[i]->filename == level->tilesetFilename)
+						if (clients[i]->filename == level->tilesetTsxFilename)
 						{
 							clients[i]->filename = level->backgroundFilename;
+						}
+
+						if (clients[i]->filename == level->tilesetFilename)
+						{
+							clients[i]->filename = level->tilesetTsxFilename;
 						}
 
 						if (clients[i]->filename == level->mapFilename)
@@ -383,7 +390,7 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 					if (s == Socket::Disconnected || s == Socket::Error)
 					{
 						rPacket.clear();
-						printf("\n%s Disconnected!", clients[i]->name.c_str());
+						std::cout << "\n" << clients[i]->name << " disconnected!";
 						clients[i]->disconnect();
 						if (clients[i]->team)
 						{

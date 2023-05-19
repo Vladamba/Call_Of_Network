@@ -1,9 +1,6 @@
 #ifndef HEALTHBAR_H
 #define HEALTHBAR_H
 
-#include <SFML/Graphics.hpp>
-#include "Consts.hpp"
-
 using namespace sf;
 
 class HealthBar
@@ -18,7 +15,7 @@ public:
 	{
 		if (!texture.loadFromFile(image))
 		{
-			printf("Loading health bar image failed!");
+			std::cout << "Loading health bar image failed!\n";
 		}
 		texture.setSmooth(false);
 		sprite.setTexture(texture);

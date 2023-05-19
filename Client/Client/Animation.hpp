@@ -1,7 +1,6 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include <SFML/Graphics.hpp>
 #include "tinyxml2.h"
 
 using namespace sf;
@@ -71,14 +70,14 @@ public:
 	{
 		if (!texture.loadFromFile(image))
 		{
-			printf("Loading animation image failed!");
+			std::cout << "Loading animation image failed!\n";
 		}
 		texture.setSmooth(false);
 
 		XMLDocument animationFile;
 		if (animationFile.LoadFile(file) != XML_SUCCESS)
 		{
-			printf("Loading animation file failed!");			
+			std::cout << "Loading animation file failed!\n";
 		}
 
 		XMLElement* animationElement;
@@ -122,7 +121,7 @@ public:
 								}
 								else
 								{
-									printf("Found incorrect animation!");
+									std::cout << "Found incorrect animation!\n";
 									animationElement = animationElement->NextSiblingElement("animation");
 									continue;
 								}
@@ -193,20 +192,6 @@ public:
 	{
 		animationList[currentAnimation].sprite.setColor(color);
 	}
-
-	/*bool isPlaying() {
-		return animationList[currentAnimation].isPlaying;
-	}
-	
-	int getWidth()
-	{
-		return animationList[currentAnimation].frames_right[(int)animationList[currentAnimation].currentFrame].width;
-	}
-
-	int getHeight()
-	{
-		return animationList[currentAnimation].frames_right[(int)animationList[currentAnimation].currentFrame].height;
-	}*/
 };
 
 #endif ANIMATION_H
