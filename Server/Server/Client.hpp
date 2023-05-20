@@ -27,6 +27,7 @@ public:
 	void disconnect()
 	{
 		tcpSocket.disconnect();
+		udpSocket.unbind();
 		stage = Stage::Connection;
 		name = "New player";
 	}

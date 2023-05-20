@@ -457,38 +457,6 @@ int main()
 
 					rPacket >> myIndex;
 					rPacket.clear();
-
-					playerState = 0;
-					if (Keyboard::isKeyPressed(Keyboard::Left))
-					{
-						playerState = playerState | KEY_LEFT;
-					}
-					if (Keyboard::isKeyPressed(Keyboard::Right))
-					{
-						playerState = playerState | KEY_RIGHT;
-					}
-
-					if (Keyboard::isKeyPressed(Keyboard::Up))
-					{
-						playerState = playerState | KEY_UP;
-					}
-					if (Keyboard::isKeyPressed(Keyboard::Down))
-					{
-						playerState = playerState | KEY_DOWN;
-					}
-
-					if (Keyboard::isKeyPressed(Keyboard::Space))
-					{
-						playerState = playerState | KEY_SPACE;
-					}
-					if (Keyboard::isKeyPressed(Keyboard::RShift))
-					{
-						playerState = playerState | KEY_RSHIFT;
-					}
-
-					sPacket << playerState;
-					udpSocket.send(sPacket, serverIp, serverPort);
-					sPacket.clear();
 				}
 			
 				if (clock.getElapsedTime().asMilliseconds() > MSPF)
@@ -558,6 +526,38 @@ int main()
 
 					window.display();					
 				}
+
+				playerState = 0;
+				if (Keyboard::isKeyPressed(Keyboard::Left))
+				{
+					playerState = playerState | KEY_LEFT;
+				}
+				if (Keyboard::isKeyPressed(Keyboard::Right))
+				{
+					playerState = playerState | KEY_RIGHT;
+				}
+
+				if (Keyboard::isKeyPressed(Keyboard::Up))
+				{
+					playerState = playerState | KEY_UP;
+				}
+				if (Keyboard::isKeyPressed(Keyboard::Down))
+				{
+					playerState = playerState | KEY_DOWN;
+				}
+
+				if (Keyboard::isKeyPressed(Keyboard::Space))
+				{
+					playerState = playerState | KEY_SPACE;
+				}
+				if (Keyboard::isKeyPressed(Keyboard::RShift))
+				{
+					playerState = playerState | KEY_RSHIFT;
+				}
+
+				sPacket << playerState;
+				udpSocket.send(sPacket, serverIp, serverPort);
+				sPacket.clear();
 				break;
 			}
 		}
