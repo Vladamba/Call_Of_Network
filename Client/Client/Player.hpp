@@ -12,20 +12,12 @@ public:
 
 	Player() {}
 
-	Player(AnimationManager a, int _health)
+	Player(AnimationManager a)
 	{	
 		animationManager = a;
 		animationManager.set(AnimationType::Stand);
 		animationManager.loop(AnimationType::Jump, false);
 		state = STATE_STAND;
-
-		x = 0;
-		y = 0;
-		left = false;
-		isAlive = true;
-		dy = true;
-
-		health = _health;	
 	}
 
 	void update(signed __int32 _time, bool myPlayer)

@@ -4,10 +4,8 @@
 class Player
 {
 public:
-	int sHeight, sWidth;
 	float g, vJump, vLadderJump, vRun, vClimb;
 	float tShoot = 200.f;
-	float tDead = 1000.f;
 
 	enum Key { Left, Right, Up, Down, Space, RShift };
 	std::map<Key, bool> keys;
@@ -23,12 +21,10 @@ public:
 
 	Player(Level level)
 	{
-		sWidth = level.tileWidth;
-		sHeight = level.tileHeight;
-		g = 2.f * (float)sHeight / (200.f * 200.f); // 0.0016
-		vJump = sqrt(2.f * g * 2.5f * (float)sHeight); // 0.505964
-		vLadderJump = sqrt(2.f * g * 1.5f * (float)sHeight); // 0.391918
-		vRun = g * 2.5f * (float)sWidth / vJump; // 0.252982
+		g = 2.f * (float)level.tileHeight / (200.f * 200.f); // 0.0016
+		vJump = sqrt(2.f * g * 2.5f * (float)level.tileHeight); // 0.505964
+		vLadderJump = sqrt(2.f * g * 1.5f * (float)level.tileHeight); // 0.391918
+		vRun = g * 2.5f * (float)level.tileWidth / vJump; // 0.252982
 		vClimb = vRun / 2.f; // 0.126491
 
 		rect.width = PLAYER_WIDTH;

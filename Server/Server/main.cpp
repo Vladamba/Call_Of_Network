@@ -77,7 +77,6 @@ int main()
 	tilesetFilename = "";
 	backgroundFilename = "";
 
-
 	Client** clients = new Client*[CLIENTS_SIZE];
 	for (int i = 0; i < CLIENTS_SIZE; i++)
 	{		
@@ -303,7 +302,7 @@ void newClient(Level* level, Client** clients, unsigned char* team1, unsigned ch
 							if (i != j && clients[i]->name == clients[j]->name)
 							{
 								anotherName = true;
-								clients[i]->name = clients[i]->name + "_1";
+								clients[i]->name = clients[i]->name + "_2";
 								break;
 							}
 						}
@@ -373,38 +372,6 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 	signed __int32 time;
 	while (true)
 	{
-		for (int i = 0; i < CLIENTS_SIZE; i++)
-		{
-			if (clients[i]->stage == Stage::Playing)
-			{
-				Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
-				if (s == Socket::Disconnected || s == Socket::Error)
-				{
-					rPacket.clear();
-					std::cout << "\n" << clients[i]->name << " disconnected!";
-					clients[i]->disconnect();
-					if (clients[i]->team)
-					{
-						(*team1)--;
-					}
-					else
-					{
-						(*team2)--;
-					}
-					(*clientsNumber)--;
-					break;
-				}
-
-				IpAddress ip;
-				if (clients[i]->udpSocket.receive(rPacket, ip, clients[i]->serverPort) == Socket::Done)
-				{
-					clients[i]->player.receivePacket(&rPacket);
-					rPacket.clear();
-				}
-			}
-		}
-
-
 		if (clock.getElapsedTime().asMilliseconds() > MSPF)
 		{
 			time = clock.getElapsedTime().asMilliseconds();
@@ -416,6 +383,34 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 
 			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
+				if (clients[i]->stage == Stage::Playing)
+				{
+					Socket::Status s = clients[i]->tcpSocket.receive(rPacket);
+					if (s == Socket::Disconnected || s == Socket::Error)
+					{
+						rPacket.clear();
+						std::cout << "\n" << clients[i]->name << " disconnected!";
+						clients[i]->disconnect();
+						if (clients[i]->team)
+						{
+							(*team1)--;
+						}
+						else
+						{
+							(*team2)--;
+						}
+						(*clientsNumber)--;
+						break;
+					}
+
+					IpAddress ip;
+					if (clients[i]->udpSocket.receive(rPacket, ip, clients[i]->serverPort) == Socket::Done)
+					{
+						clients[i]->player.receivePacket(&rPacket);
+						rPacket.clear();
+					}
+				}
+
 				if (clients[i]->stage == Stage::Playing)
 				{
 					clients[i]->player.update(time, *level);
@@ -478,39 +473,39 @@ void updateClients(Level* level, Client** clients, unsigned char* team1, unsigne
 					}
 				}
 			}
-		}
 
-		sPacket << score1;
-		sPacket << score2;
-		sPacket << *clientsNumber;
-		for (int i = 0; i < CLIENTS_SIZE; i++)
-		{
-			if (clients[i]->stage == Stage::Playing)
+			sPacket << score1;
+			sPacket << score2;
+			sPacket << *clientsNumber;
+			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				clients[i]->createPacket(&sPacket);
+				if (clients[i]->stage == Stage::Playing)
+				{
+					clients[i]->createPacket(&sPacket);
+				}
 			}
-		}
 
-		sPacket << bulletsNumber;
-		for (int i = 0; i < BULLETS_SIZE; i++)
-		{
-			if (bullets[i]->isAlive)
+			sPacket << bulletsNumber;
+			for (int i = 0; i < BULLETS_SIZE; i++)
 			{
-				bullets[i]->createPacket(&sPacket);
+				if (bullets[i]->isAlive)
+				{
+					bullets[i]->createPacket(&sPacket);
+				}
 			}
-		}
 
-		clientIndex = 0;
-		for (int i = 0; i < CLIENTS_SIZE; i++)
-		{
-			if (clients[i]->stage == Stage::Playing)
+			clientIndex = 0;
+			for (int i = 0; i < CLIENTS_SIZE; i++)
 			{
-				Packet pPacket = sPacket;
-				pPacket << clientIndex;
-				clients[i]->udpSocket.send(pPacket, clients[i]->ip, clients[i]->clientPort);
-				clientIndex++;
+				if (clients[i]->stage == Stage::Playing)
+				{
+					Packet pPacket = sPacket;
+					pPacket << clientIndex;
+					clients[i]->udpSocket.send(pPacket, clients[i]->ip, clients[i]->clientPort);					
+					clientIndex++;
+				}
 			}
+			sPacket.clear();
 		}
-		sPacket.clear();
 	}
 }

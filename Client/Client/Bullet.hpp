@@ -17,10 +17,7 @@ public:
 		animationManager.loop(AnimationType::Explode, false);
 		state = STATE_STAND;
 
-		x = 0;
-		y = 0;
-		left = false;
-		isAlive = true;					
+		isAlive = true; // No explode animation					
 	}
 
 	void update(signed __int32 _time)

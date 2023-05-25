@@ -39,7 +39,7 @@ int main()
 	Player** players = new Player*[CLIENTS_SIZE];
 	for (int i = 0; i < CLIENTS_SIZE; i++)
 	{
-		players[i] = new Player(playerAnimationManager, 100);
+		players[i] = new Player(playerAnimationManager);
 	}
 
 	Bullet** bullets = new  Bullet*[BULLETS_SIZE];
@@ -457,6 +457,38 @@ int main()
 
 					rPacket >> myIndex;
 					rPacket.clear();
+
+					playerState = 0;
+					if (Keyboard::isKeyPressed(Keyboard::Left))
+					{
+						playerState = playerState | KEY_LEFT;
+					}
+					if (Keyboard::isKeyPressed(Keyboard::Right))
+					{
+						playerState = playerState | KEY_RIGHT;
+					}
+
+					if (Keyboard::isKeyPressed(Keyboard::Up))
+					{
+						playerState = playerState | KEY_UP;
+					}
+					if (Keyboard::isKeyPressed(Keyboard::Down))
+					{
+						playerState = playerState | KEY_DOWN;
+					}
+
+					if (Keyboard::isKeyPressed(Keyboard::Space))
+					{
+						playerState = playerState | KEY_SPACE;
+					}
+					if (Keyboard::isKeyPressed(Keyboard::RShift))
+					{
+						playerState = playerState | KEY_RSHIFT;
+					}
+
+					sPacket << playerState;
+					udpSocket.send(sPacket, serverIp, serverPort);
+					sPacket.clear();
 				}
 			
 				if (clock.getElapsedTime().asMilliseconds() > MSPF)
@@ -479,22 +511,22 @@ int main()
 						bullets[i]->update(time);
 					}
 
-					if (players[myIndex]->x < windowWidthHalf) {
+					if (players[myIndex]->x <= windowWidthHalf) {
 						offsetX = windowWidthHalf - players[myIndex]->x;
 					}
 					else
 					{
-						if (players[myIndex]->x > mapWidth - windowWidthHalf) {
+						if (players[myIndex]->x >= mapWidth - windowWidthHalf) {
 							offsetX = mapWidth - windowWidthHalf - players[myIndex]->x;
 						}
 					}
 
-					if (players[myIndex]->y < windowHeightHalf) {
+					if (players[myIndex]->y <= windowHeightHalf) {
 						offsetY = windowHeightHalf - players[myIndex]->y;
 					}
 					else
 					{
-						if (players[myIndex]->y > mapHeight - windowHeightHalf) {
+						if (players[myIndex]->y >= mapHeight - windowHeightHalf) {
 							offsetY = mapHeight - windowHeightHalf - players[myIndex]->y;
 						}
 					}
@@ -526,38 +558,6 @@ int main()
 
 					window.display();					
 				}
-
-				playerState = 0;
-				if (Keyboard::isKeyPressed(Keyboard::Left))
-				{
-					playerState = playerState | KEY_LEFT;
-				}
-				if (Keyboard::isKeyPressed(Keyboard::Right))
-				{
-					playerState = playerState | KEY_RIGHT;
-				}
-
-				if (Keyboard::isKeyPressed(Keyboard::Up))
-				{
-					playerState = playerState | KEY_UP;
-				}
-				if (Keyboard::isKeyPressed(Keyboard::Down))
-				{
-					playerState = playerState | KEY_DOWN;
-				}
-
-				if (Keyboard::isKeyPressed(Keyboard::Space))
-				{
-					playerState = playerState | KEY_SPACE;
-				}
-				if (Keyboard::isKeyPressed(Keyboard::RShift))
-				{
-					playerState = playerState | KEY_RSHIFT;
-				}
-
-				sPacket << playerState;
-				udpSocket.send(sPacket, serverIp, serverPort);
-				sPacket.clear();
 				break;
 			}
 		}

@@ -30,6 +30,7 @@ public:
 		udpSocket.unbind();
 		stage = Stage::Connection;
 		name = "New player";
+		player.isAlive = false;
 	}
 
 	void createPacket(Packet* packet)

@@ -11,8 +11,10 @@ const Vector2i NULL_VECTOR2I = Vector2i(-1, -1);
 
 const float PLAYER_WIDTH = 30.f;
 const float PLAYER_HEIGHT = 40.0f;
+const int PLAYER_HEALTH = 100;
 const float BULLET_WIDTH = 6.f;
 const float BULLET_HEIGHT = 6.0f;
+const int BULLET_HEALTH = 10;
 
 const unsigned char STATE_STAND = 0;
 const unsigned char STATE_RUN = 1;

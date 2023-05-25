@@ -4,7 +4,7 @@
 class Bullet
 {
 public:
-	float vMove = 0.5;
+	float vMove = 0.5f;
 
 	FloatRect rect;
 	float dx;
